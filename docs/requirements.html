@@ -1,0 +1,1101 @@
+<title>学生イベント基盤 要件定義</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@600;700&family=Noto+Sans+JP:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  :root {
+    --ground: #F4F7F6;
+    --surface: #FFFFFF;
+    --surface-2: #E9EFEE;
+    --ink: #14201F;
+    --ink-2: #485A57;
+    --ink-3: #77857F;
+    --line: #D8E1DF;
+    --line-strong: #B9C7C4;
+    --accent: #0A6C68;
+    --accent-soft: #DEEDEB;
+    --warn: #9C5116;
+    --warn-soft: #F6E9DD;
+    --good: #2A6A4E;
+    --good-soft: #E0EEE6;
+
+    --f-display: "Shippori Mincho B1", "Hiragino Mincho ProN", "Yu Mincho", serif;
+    --f-body: "Noto Sans JP", "Hiragino Sans", "Yu Gothic", system-ui, sans-serif;
+    --f-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #0D1413;
+      --surface: #141D1C;
+      --surface-2: #1C2726;
+      --ink: #E5EDEB;
+      --ink-2: #A6B5B2;
+      --ink-3: #7B8986;
+      --line: #293534;
+      --line-strong: #3C4B49;
+      --accent: #55C4BB;
+      --accent-soft: #14302E;
+      --warn: #DDA46E;
+      --warn-soft: #2E2419;
+      --good: #6EBE93;
+      --good-soft: #172A21;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --ground: #0D1413;
+    --surface: #141D1C;
+    --surface-2: #1C2726;
+    --ink: #E5EDEB;
+    --ink-2: #A6B5B2;
+    --ink-3: #7B8986;
+    --line: #293534;
+    --line-strong: #3C4B49;
+    --accent: #55C4BB;
+    --accent-soft: #14302E;
+    --warn: #DDA46E;
+    --warn-soft: #2E2419;
+    --good: #6EBE93;
+    --good-soft: #172A21;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--f-body);
+    font-size: 15px;
+    line-height: 1.85;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 0 28px 120px;
+    display: grid;
+    grid-template-columns: 216px minmax(0, 1fr);
+    gap: 56px;
+    align-items: start;
+  }
+
+  /* ---------- masthead ---------- */
+  .masthead {
+    grid-column: 1 / -1;
+    padding: 64px 0 40px;
+    border-bottom: 2px solid var(--ink);
+  }
+  .eyebrow {
+    font-family: var(--f-mono);
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 0 0 18px;
+  }
+  .masthead h1 {
+    font-family: var(--f-display);
+    font-weight: 700;
+    font-size: clamp(30px, 5vw, 46px);
+    line-height: 1.3;
+    letter-spacing: 0.01em;
+    margin: 0 0 20px;
+    text-wrap: balance;
+  }
+  .lede {
+    font-size: 16px;
+    color: var(--ink-2);
+    max-width: 62ch;
+    margin: 0;
+  }
+  .meta-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 28px;
+    margin-top: 30px;
+    font-family: var(--f-mono);
+    font-size: 12px;
+    color: var(--ink-3);
+  }
+  .meta-row b {
+    color: var(--ink-2);
+    font-weight: 500;
+  }
+
+  /* ---------- table of contents ---------- */
+  nav.toc {
+    position: sticky;
+    top: 24px;
+    font-size: 13px;
+    line-height: 1.6;
+    padding-top: 44px;
+  }
+  nav.toc p {
+    font-family: var(--f-mono);
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    margin: 0 0 14px;
+  }
+  nav.toc ol {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    counter-reset: toc;
+  }
+  nav.toc a {
+    display: grid;
+    grid-template-columns: 22px 1fr;
+    gap: 6px;
+    text-decoration: none;
+    color: var(--ink-2);
+    padding: 3px 8px 3px 0;
+    border-left: 2px solid transparent;
+    padding-left: 10px;
+    transition: color .15s, border-color .15s;
+  }
+  nav.toc a::before {
+    counter-increment: toc;
+    content: counter(toc);
+    font-family: var(--f-mono);
+    font-size: 11px;
+    color: var(--ink-3);
+    font-variant-numeric: tabular-nums;
+  }
+  nav.toc a:hover { color: var(--accent); }
+  nav.toc a.current {
+    color: var(--accent);
+    border-left-color: var(--accent);
+    font-weight: 500;
+  }
+  nav.toc a.current::before { color: var(--accent); }
+  nav.toc a:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  /* ---------- article ---------- */
+  article { padding-top: 44px; min-width: 0; }
+
+  section { margin-bottom: 68px; scroll-margin-top: 24px; }
+
+  h2 {
+    font-family: var(--f-display);
+    font-weight: 700;
+    font-size: 25px;
+    line-height: 1.45;
+    margin: 0 0 6px;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 14px;
+    align-items: baseline;
+    text-wrap: balance;
+  }
+  h2 .num {
+    font-family: var(--f-mono);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--accent);
+    font-variant-numeric: tabular-nums;
+  }
+  .section-rule {
+    height: 1px;
+    background: var(--line-strong);
+    margin: 0 0 26px;
+  }
+
+  h3 {
+    font-family: var(--f-body);
+    font-weight: 700;
+    font-size: 15px;
+    letter-spacing: 0.02em;
+    margin: 36px 0 12px;
+    color: var(--ink);
+  }
+  h3:first-of-type { margin-top: 0; }
+
+  p { margin: 0 0 16px; max-width: 68ch; }
+  article > section > p { color: var(--ink-2); }
+
+  strong { font-weight: 700; color: var(--ink); }
+
+  ul, ol.body-list {
+    margin: 0 0 18px;
+    padding-left: 20px;
+    max-width: 68ch;
+    color: var(--ink-2);
+  }
+  li { margin-bottom: 7px; }
+  li::marker { color: var(--ink-3); }
+
+  code {
+    font-family: var(--f-mono);
+    font-size: 0.88em;
+    background: var(--surface-2);
+    padding: 1px 5px;
+    border-radius: 3px;
+    color: var(--ink);
+  }
+
+  pre {
+    font-family: var(--f-mono);
+    font-size: 12.5px;
+    line-height: 1.7;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    padding: 18px 20px;
+    overflow-x: auto;
+    margin: 0 0 20px;
+  }
+  pre code { background: none; padding: 0; font-size: inherit; }
+
+  .mermaid {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    padding: 20px;
+    overflow-x: auto;
+    margin: 0 0 20px;
+    font-family: var(--f-mono);
+    font-size: 12px;
+  }
+
+  /* ---------- tables ---------- */
+  .t-scroll { overflow-x: auto; margin: 0 0 22px; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13.5px;
+    line-height: 1.6;
+    min-width: 520px;
+  }
+  th, td {
+    text-align: left;
+    padding: 11px 14px 11px 0;
+    border-bottom: 1px solid var(--line);
+    vertical-align: top;
+  }
+  th {
+    font-family: var(--f-mono);
+    font-size: 10.5px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    font-weight: 500;
+    border-bottom: 1px solid var(--line-strong);
+    white-space: nowrap;
+  }
+  td { color: var(--ink-2); }
+  td:first-child { color: var(--ink); font-weight: 500; }
+  tbody tr:last-child td { border-bottom: none; }
+  .num-col { font-family: var(--f-mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+  /* ---------- pills ---------- */
+  .pill {
+    display: inline-block;
+    font-family: var(--f-mono);
+    font-size: 10.5px;
+    letter-spacing: 0.06em;
+    padding: 2px 7px;
+    border-radius: 2px;
+    white-space: nowrap;
+    font-weight: 500;
+  }
+  .p-must { background: var(--accent-soft); color: var(--accent); }
+  .p-later { background: var(--warn-soft); color: var(--warn); }
+  .p-out { background: var(--surface-2); color: var(--ink-3); }
+  .p-done { background: var(--good-soft); color: var(--good); }
+
+  /* ---------- decision block ---------- */
+  .decisions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 0;
+    border-top: 1px solid var(--line-strong);
+    border-left: 1px solid var(--line);
+    margin: 0 0 24px;
+  }
+  .decisions div {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--line);
+    border-right: 1px solid var(--line);
+  }
+  .decisions dt {
+    font-family: var(--f-mono);
+    font-size: 10.5px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    margin-bottom: 5px;
+  }
+  .decisions dd {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--ink);
+    line-height: 1.5;
+  }
+
+  /* ---------- callout ---------- */
+  .note {
+    border-left: 2px solid var(--accent);
+    padding: 2px 0 2px 18px;
+    margin: 0 0 22px;
+    max-width: 68ch;
+  }
+  .note p:last-child { margin-bottom: 0; }
+  .note .label {
+    font-family: var(--f-mono);
+    font-size: 10.5px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    display: block;
+    margin-bottom: 6px;
+  }
+  .note.risk { border-left-color: var(--warn); }
+  .note.risk .label { color: var(--warn); }
+
+  /* ---------- flow ---------- */
+  .flow {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: stretch;
+    margin: 0 0 24px;
+    padding: 0;
+    list-style: none;
+    max-width: none;
+  }
+  .flow li {
+    flex: 1 1 150px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-top: 2px solid var(--accent);
+    padding: 12px 14px;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .flow .step {
+    font-family: var(--f-mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    color: var(--ink-3);
+  }
+  .flow .who { font-size: 13.5px; font-weight: 700; color: var(--ink); }
+  .flow .what { font-size: 12.5px; color: var(--ink-2); line-height: 1.6; }
+
+  footer {
+    grid-column: 1 / -1;
+    border-top: 1px solid var(--line-strong);
+    padding-top: 20px;
+    font-family: var(--f-mono);
+    font-size: 11.5px;
+    color: var(--ink-3);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 24px;
+  }
+
+  a { color: var(--accent); }
+
+  @media (max-width: 900px) {
+    .wrap {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 0;
+      padding: 0 20px 80px;
+    }
+    nav.toc {
+      position: static;
+      padding: 32px 0 0;
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 24px;
+    }
+    nav.toc ol {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 2px 16px;
+    }
+    article { padding-top: 40px; }
+    .masthead { padding: 44px 0 32px; }
+  }
+</style>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <p class="eyebrow">要件定義 / v0.4 ドラフト</p>
+    <h1>学生と学生団体のための<br>イベント告知・参加登録プラットフォーム</h1>
+    <p class="lede">大学のサークル・学生団体、および個人の学生が、イベントの告知から参加登録・参加費の徴収・当日の受付までを一箇所で完結させるための Web サービス。connpass のイベント設計を土台に、主催者を主語とした継続的な集客と、学生イベント特有の少額決済に最適化する。</p>
+    <div class="meta-row">
+      <span><b>作成日</b> 2026-09-04</span>
+      <span><b>対象</b> MVP（第1リリース）</span>
+      <span><b>ステータス</b> 要件確定・実装未着手</span>
+      <span><b>リポジトリ</b> thepassion</span>
+    </div>
+  </header>
+
+  <nav class="toc" aria-label="目次">
+    <p>目次</p>
+    <ol>
+      <li><a href="#s1">プロダクトの定義</a></li>
+      <li><a href="#s2">市場調査</a></li>
+      <li><a href="#s3">ターゲットと利用文脈</a></li>
+      <li><a href="#s4">スコープ</a></li>
+      <li><a href="#s5">ドメインモデル</a></li>
+      <li><a href="#s6">主要ユースケース</a></li>
+      <li><a href="#s7">参加枠と補欠の仕様</a></li>
+      <li><a href="#s8">申込フォームと個人情報</a></li>
+      <li><a href="#s9">決済の設計</a></li>
+      <li><a href="#s10">画面一覧</a></li>
+      <li><a href="#s11">非機能要件</a></li>
+      <li><a href="#s12">技術スタック</a></li>
+      <li><a href="#s13">実装フェーズ</a></li>
+      <li><a href="#s14">未決事項</a></li>
+    </ol>
+  </nav>
+
+  <article>
+
+    <!-- ============ 1 ============ -->
+    <section id="s1">
+      <h2><span class="num">§1</span><span>プロダクトの定義</span></h2>
+      <div class="section-rule"></div>
+
+      <p><strong>主催者</strong>が主語になるイベントプラットフォーム。主催者は学生団体でも個人でもよく、どちらもフォローの対象になる。学生は主催者をフォローすることで、その主催者の新しいイベントを継続的に受け取る。</p>
+
+      <p>主軸は学生団体に置く。学生団体には他のコミュニティにない事情が三つあり、そこに構造で応えることが差別化になるためである。</p>
+
+      <ul>
+        <li><strong>幹事が毎年交代する。</strong> イベントが個人アカウントにぶら下がる設計では、代替わりのたびに過去の実績とフォロワーが失われる</li>
+        <li><strong>同じ団体が繰り返し開催する。</strong> 新歓、定例会、合宿、追いコン。過去イベントの複製と、フォロワーへの自動告知が効く</li>
+        <li><strong>新入生は個別イベントではなく団体を探している。</strong> 発見の単位はイベントより先に団体である</li>
+      </ul>
+
+      <p>一方で、入口は個人主催に開く。「サークルを立ち上げる前に、まず一本イベントを立てる」は学生では頻繁に起きる。個人で始めた人が後から団体を作り、<strong>過去のイベントごと団体へ移せる</strong>導線が、団体という主軸への流入路になる（§6 UC-5）。</p>
+
+      <h3>ひとことで</h3>
+      <p>「connpass の参加枠モデルを、学生の主催者フォロー構造と少額決済に載せ替えたもの」。</p>
+
+      <h3>確定した前提</h3>
+      <dl class="decisions">
+        <div><dt>位置づけ</dt><dd>実運用するサービス</dd></div>
+        <div><dt>差別化の軸</dt><dd>団体ページとフォロー</dd></div>
+        <div><dt>ビーチヘッド</dt><dd>自分の大学のサークル・学生団体</dd></div>
+        <div><dt>主催者になれる人</dt><dd>登録すれば誰でも</dd></div>
+        <div><dt>主催の単位</dt><dd>団体・個人の両方</dd></div>
+        <div><dt>フォロー対象</dt><dd>団体・個人の両方</dd></div>
+        <div><dt>個人の有料イベント</dt><dd>許可する</dd></div>
+        <div><dt>学生確認</dt><dd>行わない</dd></div>
+        <div><dt>マイページの項目</dt><dd>アイコン・ユーザーネーム・あだ名・SNS リンクのみ（本名は持たない）</dd></div>
+        <div><dt>大学の持ち場所</dt><dd>プロフィールではなくイベントが持つ</dd></div>
+        <div><dt>申込時の追加情報</dt><dd>主催者が質問を設計する</dd></div>
+        <div><dt>回答の保持期間</dt><dd>主催者が選択・既定30日で自動削除</dd></div>
+        <div><dt>参加枠</dt><dd>connpass 型（複数枠・補欠あり）</dd></div>
+        <div><dt>決済</dt><dd>MVP はモック、後日 実決済</dd></div>
+        <div><dt>入金先</dt><dd>イベントごとに指定</dd></div>
+        <div><dt>返金</dt><dd>原則なし</dd></div>
+        <div><dt>認証</dt><dd>Google ログイン</dd></div>
+        <div><dt>当日受付</dt><dd>参加者リストでチェック</dd></div>
+        <div><dt>スタック</dt><dd>Next.js + TypeScript</dd></div>
+      </dl>
+    </section>
+
+    <!-- ============ 2 ============ -->
+    <section id="s2">
+      <h2><span class="num">§2</span><span>市場調査</span></h2>
+      <div class="section-rule"></div>
+
+      <h3>競合マップ</h3>
+      <div class="t-scroll">
+        <table>
+          <thead>
+            <tr><th>サービス</th><th>ポジション</th><th>手数料</th><th>学生イベントとの相性</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>connpass</td><td>エンジニア勉強会特化</td><td class="num-col">0%＋PayPal 3.6%＋40円</td><td>参加枠・抽選・補欠の思想は理想的。IT 色が強く学生一般には広がらない</td></tr>
+            <tr><td>Peatix</td><td>汎用・国際対応</td><td class="num-col">4.9%＋99円/枚</td><td>機能は充実。固定 99 円が低額イベントに効きすぎる</td></tr>
+            <tr><td>Luma</td><td>デザイン重視・海外発</td><td class="num-col">基本無料</td><td>2024年に日本語化。学生・スタートアップ層で拡大中。<strong>最大の脅威</strong></td></tr>
+            <tr><td>こくちーずプロ</td><td>SEO 集客特化</td><td class="num-col">有料販売時のみ</td><td>「学生向け」特集ページを既に持つ</td></tr>
+            <tr><td>Doorkeeper</td><td>コミュニティ会員管理</td><td class="num-col">月額課金</td><td>継続コミュニティ向け。学生団体には月額が重い</td></tr>
+            <tr><td>Google フォーム＋LINE＋現金</td><td>—</td><td class="num-col">0円</td><td><strong>実際の競合はこれ。</strong> 学生の大多数はこの運用</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>発見1 — 低額イベントで既存サービスの手数料構造が壊れる</h3>
+      <p>学生イベントの参加費は 500〜2,000 円が中心。Peatix の「4.9%＋99円/枚」を当てはめると、固定費が効いて低額ほど不利になる。</p>
+      <div class="t-scroll">
+        <table>
+          <thead><tr><th>参加費</th><th>Peatix 手数料</th><th>実質負担率</th><th>connpass（PayPal のみ）</th><th>実質負担率</th></tr></thead>
+          <tbody>
+            <tr><td class="num-col">500円</td><td class="num-col">123円</td><td class="num-col">24.6%</td><td class="num-col">58円</td><td class="num-col">11.6%</td></tr>
+            <tr><td class="num-col">1,000円</td><td class="num-col">148円</td><td class="num-col">14.8%</td><td class="num-col">76円</td><td class="num-col">7.6%</td></tr>
+            <tr><td class="num-col">2,000円</td><td class="num-col">197円</td><td class="num-col">9.9%</td><td class="num-col">112円</td><td class="num-col">5.6%</td></tr>
+            <tr><td class="num-col">5,000円</td><td class="num-col">344円</td><td class="num-col">6.9%</td><td class="num-col">220円</td><td class="num-col">4.4%</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>connpass がプラットフォーム手数料を取らず決済手数料のみで運用しているのは、この価格帯を成立させる合理的な判断である。<strong>学生特化を名乗る以上、枚あたり固定費を持たない手数料設計を前提にする。</strong></p>
+
+      <h3>発見2 — ペインは「集客」ではなく「集金と会計」に寄っている</h3>
+      <p>集金まわりの調査で繰り返し現れた課題:</p>
+      <ul>
+        <li>会計担当が立て替え、後から回収する負担</li>
+        <li>誰が払ったか分からない、釣り銭の準備が要る</li>
+        <li>未払いの催促が気まずく、放置される</li>
+        <li>出欠と支払い状況が別管理で、会計が合わない</li>
+      </ul>
+      <p>connpass も Peatix も Luma も、ここは「決済して終わり」で団体の会計には踏み込んでいない。参加登録と入金状況が同一のデータとして紐づく状態は、既存サービスの空白地帯である。今回の差別化軸は団体ページとフォローに置くが、<strong>この空白は次の拡張候補として意識的に残す</strong>（§14）。</p>
+
+      <h3>発見3 — 縦割り特化は日本のこの市場で実証済み</h3>
+      <p>connpass は「エンジニア勉強会」という縦を切って汎用の Peatix と共存している。一方 Luma は無料・高デザインで横から侵食してくるため、<strong>「きれいなイベントページ」の土俵では勝負にならない</strong>。新歓・学園祭・幹事交代・大学単位のつながりといった学生固有の文脈に踏み込むほど差別化が効く。</p>
+
+      <div class="note risk">
+        <span class="label">前提リスク</span>
+        <p>Luma が日本の学生コミュニティに先に浸透した場合、「イベントページを作る」だけの価値は消える。団体・フォロー・大学という構造を早期に立てられるかが分岐点になる。</p>
+      </div>
+    </section>
+
+    <!-- ============ 3 ============ -->
+    <section id="s3">
+      <h2><span class="num">§3</span><span>ターゲットと利用文脈</span></h2>
+      <div class="section-rule"></div>
+
+      <h3>主催者 — 学生団体の運営メンバー</h3>
+      <p>サークル代表、幹事、広報担当。年に数回〜十数回のイベントを開催する。Google フォームで申込を集め、LINE で告知し、参加費は当日現金か個人の PayPay で回収している。表計算ソフトで名簿を管理し、当日は印刷した紙で受付する。</p>
+
+      <h3>主催者 — 個人で動く学生</h3>
+      <p>団体に属さずにイベントを企画する学生。勉強会、読書会、交流会、有志の合宿。「まず一本やってみる」段階にあり、団体を作るほどの体制はない。ここで手応えを得た人が団体を立ち上げ、イベントごと移管していく（§6 UC-5）のが、団体という主軸への流入路になる。</p>
+
+      <h3>参加者 — 学生</h3>
+      <p>大半がスマートフォンからアクセスする。新入生は「何かサークルを探している」漠然とした状態で流入し、既存の学生は「フォローしている団体の次のイベント」を目当てに戻ってくる。</p>
+
+      <h3>需要の季節性</h3>
+      <p>新歓期（3月下旬〜5月上旬）に開催数とアクセスが集中する。この期間の体験がプロダクトの評価を決めるため、<strong>初回リリースは新歓期に間に合わせることが実質的な納期</strong>になる。</p>
+    </section>
+
+    <!-- ============ 4 ============ -->
+    <section id="s4">
+      <h2><span class="num">§4</span><span>スコープ</span></h2>
+      <div class="section-rule"></div>
+
+      <p>MVP は「団体を作る → イベントを公開する → 学生が申し込む → 当日受付する」の一本線を通すことを目標とする。</p>
+
+      <div class="t-scroll">
+        <table>
+          <thead><tr><th>領域</th><th>MVP</th><th>内容</th></tr></thead>
+          <tbody>
+            <tr><td>Google ログイン</td><td><span class="pill p-must">MUST</span></td><td>アカウント作成、マイページ（アイコン・ユーザーネーム・あだ名・SNS リンク）。登録と同時に個人主催者が生成される</td></tr>
+            <tr><td>団体</td><td><span class="pill p-must">MUST</span></td><td>作成、プロフィール編集、複数管理者の招待</td></tr>
+            <tr><td>個人主催</td><td><span class="pill p-must">MUST</span></td><td>団体に属さずイベントを立てられる。有料イベントも可</td></tr>
+            <tr><td>主催者の移管</td><td><span class="pill p-must">MUST</span></td><td>個人で立てたイベントを、後から自分が管理する団体へ移す</td></tr>
+            <tr><td>イベント</td><td><span class="pill p-must">MUST</span></td><td>下書き・公開・中止、日時、会場（対面／オンライン）、説明文。作成時に<strong>主催者と対象の大学</strong>を選ぶ</td></tr>
+            <tr><td>参加枠</td><td><span class="pill p-must">MUST</span></td><td>複数枠、枠ごとの定員と価格、先着、補欠と自動繰り上げ</td></tr>
+            <tr><td>参加登録</td><td><span class="pill p-must">MUST</span></td><td>申込、キャンセル、マイページでの参加予定・履歴</td></tr>
+            <tr><td>申込フォーム</td><td><span class="pill p-must">MUST</span></td><td>主催者がイベントごとに質問を設計する。本名・連絡先などはプリセットから選べる</td></tr>
+            <tr><td>回答の自動削除</td><td><span class="pill p-must">MUST</span></td><td>主催者が選んだ保持期間（30日 / 90日 / 1年）の経過後に回答を自動削除</td></tr>
+            <tr><td>有料枠</td><td><span class="pill p-must">MUST</span></td><td><strong>モック決済</strong>。実決済に差し替え可能な抽象化を伴う</td></tr>
+            <tr><td>参加者管理</td><td><span class="pill p-must">MUST</span></td><td>参加者リスト、受付チェック、CSV 出力</td></tr>
+            <tr><td>フォロー</td><td><span class="pill p-must">MUST</span></td><td>主催者（団体・個人とも）のフォロー、新規イベント公開時のメール通知</td></tr>
+            <tr><td>イベント一覧</td><td><span class="pill p-must">MUST</span></td><td>大学・開催日での絞り込み、キーワード検索</td></tr>
+            <tr><td>実決済</td><td><span class="pill p-later">後日</span></td><td>Stripe。イベントごとの入金先設定を含む</td></tr>
+            <tr><td>返金</td><td><span class="pill p-later">後日</span></td><td>原則なし。イベント中止時は管理画面から手動対応</td></tr>
+            <tr><td>QR 受付</td><td><span class="pill p-later">後日</span></td><td>MVP は参加者リストのタップで受付済にする</td></tr>
+            <tr><td>抽選枠</td><td><span class="pill p-out">対象外</span></td><td>先着のみ。抽選と決済の組み合わせは複雑度が跳ね上がる</td></tr>
+            <tr><td>学生証明</td><td><span class="pill p-out">対象外</span></td><td>ac.jp 認証も学生証審査も行わない</td></tr>
+            <tr><td>レコメンド</td><td><span class="pill p-out">対象外</span></td><td>母数がないうちは成立しない</td></tr>
+            <tr><td>ネイティブアプリ</td><td><span class="pill p-out">対象外</span></td><td>スマートフォン向け Web で対応する</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ============ 5 ============ -->
+    <section id="s5">
+      <h2><span class="num">§5</span><span>ドメインモデル</span></h2>
+      <div class="section-rule"></div>
+
+      <p>中心にあるのは <code>Organizer → Event → Slot → Registration</code> の階層である。</p>
+
+      <h3>Organizer を第一級のエンティティにする</h3>
+      <p>主催者が団体と個人の二種類あるとき、<code>Event</code> に <code>groupId</code> と <code>userId</code> を並べて片方だけ埋める設計は採らない。イベント・フォロー・入金先・権限判定のすべてに「団体か個人か」の分岐が入り込み、機能を足すたびに分岐が増殖するためである。</p>
+
+      <p>代わりに <strong><code>Organizer</code>（主催者アカウント）を独立したエンティティ</strong>とし、その下に団体と個人の違いを閉じ込める。ユーザー登録時に <code>type=USER</code> の Organizer を自動生成し、団体作成時に <code>type=GROUP</code> の Organizer を生成する。イベント・フォロー・入金先・告知はすべて <code>Organizer</code> だけを参照する。</p>
+
+      <p>プロフィールが<strong>アイコン・ユーザーネーム・あだ名・SNS リンク</strong>の4項目に絞られた結果、団体固有の属性は残らなくなった。したがって <code>Group</code> という別テーブルは設けず、<code>Organizer</code> に一本化する。団体と個人の差は <code>type</code> と、運営メンバーを持てるかどうかだけになる。</p>
+
+      <pre class="mermaid">erDiagram
+    User ||--|| Organizer : "個人主催者"
+    User ||--o{ OrganizerMember : ""
+    Organizer ||--o{ OrganizerMember : "運営する（団体のみ）"
+    Organizer ||--o{ SocialLink : "SNS リンク"
+    University ||--o{ Event : "対象の大学"
+    User ||--o{ Follow : ""
+    Organizer ||--o{ Follow : "フォローされる"
+    Organizer ||--o{ Event : "主催する"
+    Organizer ||--o{ PayoutAccount : "入金先を持つ"
+    Event ||--o{ Slot : "参加枠"
+    Event }o--o| PayoutAccount : "この回の入金先"
+    Slot ||--o{ Registration : "申込"
+    User ||--o{ Registration : ""
+    Registration ||--o| Payment : "支払い"
+    Event ||--o{ RegistrationQuestion : "申込時の質問"
+    Registration ||--o{ RegistrationAnswer : "回答"
+    RegistrationQuestion ||--o{ RegistrationAnswer : ""
+    Event ||--o{ Announcement : "告知"</pre>
+
+      <p>この形の効果は四つある。<strong>権限判定が1関数に集約される</strong>（<code>canManage(organizerId, userId)</code> の内部だけが分岐を知る）。<strong>URL が <code>/@slug</code> で統一される</strong>。<strong>プロフィール編集画面が個人と団体で共通になる</strong>。そして<strong>イベントの移管が <code>Event.organizerId</code> の付け替えだけで済む</strong>。</p>
+
+      <h3>主要エンティティ</h3>
+      <div class="t-scroll">
+        <table>
+          <thead><tr><th>エンティティ</th><th>主な属性</th><th>備考</th></tr></thead>
+          <tbody>
+            <tr><td>University</td><td><code>name</code>, <code>slug</code>, <code>emailDomain?</code></td><td>マスタとして事前投入。イベントの対象大学として参照される。<code>emailDomain</code> は将来の自動判定用に持つだけ</td></tr>
+            <tr><td>User</td><td><code>googleSub</code>, <code>email</code></td><td><strong>認証と通知のための最小限のみ。</strong> 表示に関わる情報はすべて Organizer が持つ。登録時に個人 Organizer を自動生成する</td></tr>
+            <tr><td><strong>Organizer</strong></td><td><code>type</code>(USER / GROUP), <code>userId?</code>, <code>slug</code>, <code>displayName</code>, <code>iconUrl</code>, <code>bio?</code>, <code>coverUrl?</code></td><td><strong>主催者アカウント。プロフィールの実体でもある。</strong> <code>slug</code> がユーザーネーム（サービス全体でユニーク、<code>/@slug</code> の URL になる）、<code>displayName</code> があだ名（重複可・日本語可）。<code>type=USER</code> のときのみ <code>userId</code> が非 NULL（CHECK 制約）。<code>slug</code> は予約語（<code>events</code>, <code>search</code>, <code>me</code>, <code>manage</code>, <code>api</code> 等）を禁止する。<code>bio</code> と <code>coverUrl</code> は<strong>団体のプロフィールでのみ使い、個人のマイページには出さない</strong>（フィールドは共通、UI が異なる）</td></tr>
+            <tr><td>SocialLink</td><td><code>organizerId</code>, <code>platform</code>, <code>url</code>, <code>sortOrder</code></td><td>X / Instagram / GitHub など。<strong>URL を登録するだけで本人確認は行わない</strong>ため、認証済マークは出さない。個人・団体とも持てる</td></tr>
+            <tr><td>OrganizerMember</td><td><code>organizerId</code>, <code>userId</code>, <code>role</code>(OWNER / ADMIN), <code>invitedAt</code>, <code>joinedAt</code></td><td><strong><code>type=GROUP</code> の Organizer にのみ作成できる</strong>（CHECK 制約）。OWNER は最低1名を保証し、最後の OWNER は離脱できない</td></tr>
+            <tr><td>Follow</td><td><code>userId</code>, <code>organizerId</code>, <code>createdAt</code></td><td>複合ユニーク制約。団体・個人の区別なくフォローできる。自分自身の個人 Organizer はフォロー対象から除外する</td></tr>
+            <tr><td>Event</td><td><code>organizerId</code>, <code>targetUniversityId?</code>, <code>title</code>, <code>body</code>, <code>startAt</code>, <code>endAt</code>, <code>venueType</code>, <code>venueName</code>, <code>address</code>, <code>onlineUrl</code>, <code>status</code>, <code>publishedAt</code>, <code>coverUrl</code>, <code>payoutAccountId?</code>, <code>attendeeListVisibility</code>, <code>answerRetentionDays</code>, <code>dataUsePurpose?</code></td><td><code>status</code>: DRAFT / PUBLISHED / CANCELLED。<code>onlineUrl</code> は参加確定者にのみ開示。<code>answerRetentionDays</code> は 30 / 90 / 365（§8）。<code>targetUniversityId</code> が NULL のイベントは「大学を問わない」として扱う</td></tr>
+            <tr><td>Slot</td><td><code>eventId</code>, <code>name</code>, <code>description</code>, <code>capacity</code>, <code>priceYen</code>, <code>opensAt?</code>, <code>closesAt?</code>, <code>sortOrder</code></td><td><code>priceYen = 0</code> が無料枠。「本編は無料、懇親会だけ有料」を1イベント内で表現する</td></tr>
+            <tr><td>Registration</td><td><code>slotId</code>, <code>userId</code>, <code>status</code>, <code>appliedAt</code>, <code>waitlistPos?</code>, <code>paymentDueAt?</code>, <code>checkedInAt?</code>, <code>note</code></td><td><code>status</code>: PENDING_PAYMENT / CONFIRMED / WAITLISTED / CANCELLED / EXPIRED</td></tr>
+            <tr><td>RegistrationQuestion</td><td><code>eventId</code>, <code>label</code>, <code>helpText?</code>, <code>type</code>, <code>options?</code>, <code>required</code>, <code>isPersonalData</code>, <code>sortOrder</code></td><td>主催者がイベントごとに設計する申込時の質問。公開後は削除と型変更を禁止する（§8）</td></tr>
+            <tr><td>RegistrationAnswer</td><td><code>registrationId</code>, <code>questionId</code>, <code>value</code></td><td><strong>本名や連絡先はここにのみ存在する。</strong> 保持期間の経過後に自動削除される。閲覧できるのは主催者と本人のみ</td></tr>
+            <tr><td>Payment</td><td><code>registrationId</code>, <code>provider</code>, <code>providerRef</code>, <code>amountYen</code>, <code>status</code>, <code>paidAt?</code>, <code>refundedAt?</code></td><td><code>provider</code>: MOCK / STRIPE。<code>providerRef</code> にユニーク制約を張り Webhook の冪等性を担保</td></tr>
+            <tr><td>PayoutAccount</td><td><code>organizerId</code>, <code>provider</code>, <code>externalAccountId</code>, <code>label</code>, <code>verifiedAt?</code></td><td>MVP では未使用。実決済フェーズで有効化する。個人主催者も持てる</td></tr>
+            <tr><td>Announcement</td><td><code>eventId</code>, <code>body</code>, <code>sentAt</code>, <code>audience</code></td><td>参加者への一斉連絡。<code>audience</code>: 確定者 / 補欠含む全員</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="note">
+        <span class="label">設計判断</span>
+        <p>参加登録は <code>Event</code> ではなく <code>Slot</code> にぶら下げる。定員も価格も枠の属性であり、イベント直下に定員を置くと「懇親会だけ有料」「LT 登壇者枠は 5 名」といった学生イベントで頻出する形が表現できなくなる。</p>
+      </div>
+
+      <h3>権限判定</h3>
+      <p>イベントの編集・参加者の閲覧・入金先の設定は、すべて次の1関数を通す。分岐を知っているのはこの関数の内部だけとする。</p>
+      <pre><code>async function canManage(organizerId: string, userId: string): Promise&lt;boolean&gt; {
+  const organizer = await db.organizer.findUnique({ where: { id: organizerId } })
+  if (!organizer) return false
+
+  // 個人主催者 — 本人のみ
+  if (organizer.type === 'USER') return organizer.userId === userId
+
+  // 団体主催者 — OWNER または ADMIN
+  const member = await db.organizerMember.findUnique({
+    where: { organizerId_userId: { organizerId, userId } },
+  })
+  return member?.role === 'OWNER' || member?.role === 'ADMIN'
+}</code></pre>
+
+      <div class="note">
+        <span class="label">大学はイベントが持つ</span>
+        <p>大学はプロフィールではなく <code>Event.targetUniversityId</code> が持つ。学生は他大学のイベントにも参加し、学外に開かれた合同イベントもあるため、主催者の所属で絞るより<strong>イベント自身が対象を宣言するほうが実態に合う</strong>。マイページの項目も4つのまま増えない。<code>NULL</code> は「大学を問わない」を意味する。</p>
+      </div>
+    </section>
+
+    <!-- ============ 6 ============ -->
+    <section id="s6">
+      <h2><span class="num">§6</span><span>主要ユースケース</span></h2>
+      <div class="section-rule"></div>
+
+      <h3>UC-1 一本線（MVP の受け入れ基準）</h3>
+      <ol class="flow">
+        <li><span class="step">01</span><span class="who">主催者</span><span class="what">Google でログインし、団体を作成。副代表を管理者として招待する</span></li>
+        <li><span class="step">02</span><span class="who">主催者</span><span class="what">新歓イベントを作成。一般枠 40 名（無料）と懇親会枠 20 名（1,500 円）を設定し、アレルギーの質問を追加して公開</span></li>
+        <li><span class="step">03</span><span class="who">システム</span><span class="what">団体のフォロワーへ公開を通知</span></li>
+        <li><span class="step">04</span><span class="who">参加者</span><span class="what">イベントを見つけて両方の枠に申込。質問に答え、懇親会枠は決済へ進む</span></li>
+        <li><span class="step">05</span><span class="who">参加者</span><span class="what">支払い完了。参加確定となり、マイページに表示される</span></li>
+        <li><span class="step">06</span><span class="who">主催者</span><span class="what">当日、スマホで参加者リストを開き、来た人をタップして受付済にする</span></li>
+      </ol>
+
+      <h3>UC-2 満員と繰り上げ</h3>
+      <p>定員に達した枠への申込は補欠として受け付ける。確定者がキャンセルすると、同じ枠の補欠の先頭が自動的に繰り上がり、本人へ通知される。有料枠の繰り上げでは支払い期限が設定される（§7）。</p>
+
+      <h3>UC-3 幹事の代替わり</h3>
+      <p>卒業する代表が、新代表を OWNER に昇格させてから団体を離脱する。団体・過去イベント・フォロワーはすべて残る。最後の OWNER は離脱できない制約により、管理者不在の団体は発生しない。</p>
+
+      <h3>UC-4 イベント中止</h3>
+      <p>主催者がイベントを中止すると、全参加者へ中止通知が送られ、以後の申込が停止する。有料枠の返金は原則行わない。中止に伴う返金が必要な場合、運営が決済事業者の管理画面から個別に対応する（MVP では機能として持たない）。</p>
+
+      <h3>UC-5 個人イベントの団体への移管</h3>
+      <p>個人としてイベントを立てた学生が、後日サークルを正式に立ち上げ、そのイベントを団体主催に移す。参加者・申込・支払い状況はそのまま引き継がれ、イベントの URL も変わらない。</p>
+      <ul>
+        <li><strong>実行できるのは、移管元と移管先の両方で <code>canManage</code> が真の人のみ</strong>。自分が管理していない団体へイベントを押し付けることはできない</li>
+        <li><strong>支払い済みの <code>Payment</code> が1件でも存在するイベントは移管できない。</strong> 入金先が変わることで、決済事業者側の記録と齟齬が生じるため。この制約は Phase 4 以降で効く</li>
+        <li>移管によってフォロワーへの再通知は行わない。新しい主催者のフォロワーに知らせたい場合は、主催者が明示的に告知する</li>
+      </ul>
+      <p>逆方向（団体 → 個人）も同じ関数で扱えるが、UI としては提供しない。誤操作で団体の資産が個人に移ることを避けるためである。</p>
+    </section>
+
+    <!-- ============ 7 ============ -->
+    <section id="s7">
+      <h2><span class="num">§7</span><span>参加枠と補欠の仕様</span></h2>
+      <div class="section-rule"></div>
+
+      <p>プロダクトの中核ロジックであり、バグが最も高くつく箇所。仕様を明示する。</p>
+
+      <h3>状態遷移</h3>
+      <pre class="mermaid">stateDiagram-v2
+    [*] --> 判定: 申込
+    判定 --> CONFIRMED: 空きあり・無料枠
+    判定 --> PENDING_PAYMENT: 空きあり・有料枠
+    判定 --> WAITLISTED: 満員
+    PENDING_PAYMENT --> CONFIRMED: 支払い完了
+    PENDING_PAYMENT --> EXPIRED: 期限切れ
+    WAITLISTED --> CONFIRMED: 繰り上げ・無料枠
+    WAITLISTED --> PENDING_PAYMENT: 繰り上げ・有料枠
+    CONFIRMED --> CANCELLED: 本人がキャンセル
+    WAITLISTED --> CANCELLED: 本人がキャンセル
+    EXPIRED --> [*]
+    CANCELLED --> [*]</pre>
+
+      <h3>規則</h3>
+      <ul>
+        <li><strong>先着順。</strong> 抽選は MVP の対象外</li>
+        <li><strong>定員判定は必ずトランザクション内で行う。</strong> 枠行をロックしてから確定数を数え、登録を作成する。アプリケーション側で件数を数えてから書き込む実装は、新歓期の同時アクセスで確実に定員超過を起こす</li>
+        <li><strong>補欠の順序は申込時刻。</strong> <code>waitlistPos</code> は保持するが、正の順序は <code>appliedAt</code> とし、繰り上げ時に再計算する</li>
+        <li><strong>1ユーザーは同一枠に1件のみ。</strong> 異なる枠への同時申込は許可する（本編＋懇親会）</li>
+        <li><strong>有料枠の支払い期限</strong>は <code>min(申込時刻 + 24時間, イベント開始時刻)</code>。期限切れは EXPIRED とし、枠を解放して補欠を繰り上げる</li>
+        <li><strong>キャンセル期限。</strong> イベント開始後のキャンセルは不可。開始前であれば無料枠はいつでもキャンセルできる</li>
+        <li><strong>有料枠の支払い済みキャンセルは返金しない。</strong> 申込画面でこの旨を明示し、同意を得る</li>
+      </ul>
+
+      <div class="note risk">
+        <span class="label">要検討</span>
+        <p>「支払い期限 24 時間」は、開催直前の申込では実質機能しない。開始 24 時間前を過ぎたイベントでは期限を 1 時間に短縮する、あるいは有料枠の申込を締め切る。運用データが出るまで暫定値とする。</p>
+      </div>
+    </section>
+
+    <!-- ============ 8 ============ -->
+    <section id="s8">
+      <h2><span class="num">§8</span><span>申込フォームと個人情報</span></h2>
+      <div class="section-rule"></div>
+
+      <p><strong>アカウントに本名を持たせない。</strong> プロフィールは表示名（ハンドルネーム）・メールアドレス・大学のみとする。一方で、合宿の緊急連絡先、大学への届出、飲食を伴う会のアレルギー確認など、イベントによっては主催者が本名や連絡先を知る必要がある。</p>
+
+      <p>この二つを両立させるため、<strong>個人情報はアカウントではなく申込ごとの回答として持つ</strong>。誰の情報が、どのイベントのために、いつまで存在するのかが、データ構造の上で確定する。</p>
+
+      <div class="note">
+        <span class="label">なぜイベント単位か</span>
+        <p>学生団体の現状は、Google フォームで本名と電話番号を集め、スプレッドシートに無期限で置きっぱなしにする運用である。幹事が代替わりしても消えず、共有リンクだけが生き続ける。個人情報をアカウントに持たせず、イベントに紐づけて期限付きで持つ設計は、<strong>この状態を運用ルールではなく構造で防ぐ</strong>。既存のイベントサービスにはない性質になる。</p>
+      </div>
+
+      <h3>主催者が質問を設計する</h3>
+      <p>イベントごとに、主催者が申込時の質問を追加できる。ゼロから作らせないよう、よく使う項目はプリセットとして用意する。</p>
+
+      <div class="t-scroll">
+        <table>
+          <thead><tr><th>プリセット</th><th>形式</th><th>個人情報</th><th>典型的な用途</th></tr></thead>
+          <tbody>
+            <tr><td>本名</td><td>1行テキスト</td><td><span class="pill p-later">該当</span></td><td>大学への届出、名札の準備</td></tr>
+            <tr><td>フリガナ</td><td>1行テキスト</td><td><span class="pill p-later">該当</span></td><td>受付の五十音順並べ替え</td></tr>
+            <tr><td>電話番号</td><td>電話番号</td><td><span class="pill p-later">該当</span></td><td>当日の連絡</td></tr>
+            <tr><td>緊急連絡先</td><td>1行テキスト</td><td><span class="pill p-later">該当</span></td><td>合宿・野外イベント</td></tr>
+            <tr><td>大学・学部・学年</td><td>1行テキスト</td><td><span class="pill p-out">—</span></td><td>参加者層の把握、学内限定イベントの確認</td></tr>
+            <tr><td>アレルギー・食事制限</td><td>複数行テキスト</td><td><span class="pill p-later">該当</span></td><td>飲食を伴う会</td></tr>
+            <tr><td>自由記述の質問</td><td>テキスト / 選択 / 複数選択</td><td>主催者が指定</td><td>「参加する競技」「懇親会の参加可否」など</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <pre><code>model RegistrationQuestion {
+  eventId        String
+  label          String
+  helpText       String?
+  type           QuestionType   // TEXT | TEXTAREA | TEL | SELECT | MULTI_SELECT
+  options        Json?          // SELECT 系のみ
+  required       Boolean
+  isPersonalData Boolean        // 個人情報として扱うか
+  sortOrder      Int
+}
+
+model RegistrationAnswer {
+  registrationId String
+  questionId     String
+  value          String
+}</code></pre>
+
+      <p><strong>イベント公開後は、質問の削除と型の変更を禁止する。</strong> 既存の回答と整合しなくなるためである。追加・並べ替え・文言の修正のみ許可する。</p>
+
+      <h3>回答が見える範囲</h3>
+      <ul>
+        <li><strong>主催者（<code>canManage</code> が真の人）と回答した本人のみ。</strong> それ以外からは一切見えない</li>
+        <li><strong>公開参加者リストには出さない。</strong> 公開されるのは表示名のみで、回答は主催者用の画面にしか現れない</li>
+        <li>CSV 出力は主催者のみ。<strong>出力の操作は記録に残す</strong>（誰がいつ出力したか）</li>
+        <li>イベントが中止されても、回答の閲覧権限は変わらない。保持期間の起算は当初の開催日とする</li>
+      </ul>
+
+      <h3>保持期間は主催者が選ぶ</h3>
+      <p>イベント作成時に <strong>30日 / 90日 / 1年</strong> から選ぶ。既定は 30日。選択欄には、選択の重みが伝わる注釈を添える。</p>
+
+      <pre><code>個人情報の保持期間
+
+  ○ 30日（推奨）    ○ 90日    ○ 1年
+
+  イベント終了からこの期間が過ぎると、申込時の回答は自動的に
+  削除されます。参加記録と支払い履歴は残ります。
+
+  長く保持するほど、団体として個人情報を管理する責任が重く
+  なります。合宿や野外イベントのように、事後の事故対応で
+  連絡先が必要になる場合を除き、短い期間を選んでください。</code></pre>
+
+      <ul>
+        <li>削除の <strong>7日前に主催者へ予告メール</strong>を送る。必要なら手元に控えを取れるようにする</li>
+        <li>削除されるのは <code>RegistrationAnswer</code> のみ。<code>Registration</code>（誰が参加したか）と <code>Payment</code>（支払い記録）は残る</li>
+        <li>参加者は自分の回答をいつでも確認・訂正でき、<strong>イベント終了後は自分の判断で削除できる</strong></li>
+      </ul>
+
+      <h3>毎回入力する</h3>
+      <p>回答をユーザーのプロフィールに保存して次回以降に自動入力する仕組みは<strong>持たない</strong>。保存すれば結局アカウントが本名を抱えることになり、この章の前提が崩れるためである。入力の手間はブラウザの自動入力に任せる。</p>
+
+      <h3>主催者側に課す義務</h3>
+      <ul>
+        <li><code>isPersonalData</code> の質問を1つでも含むイベントは、<strong>公開時に利用目的の記載を必須にする</strong>（「合宿保険の加入手続きに使用します」など）</li>
+        <li>申込画面には、<strong>誰が回答を見るのか</strong>と<strong>いつまで保持されるのか</strong>を、申込ボタンの手前に必ず表示する</li>
+      </ul>
+    </section>
+
+    <!-- ============ 9 ============ -->
+    <section id="s9">
+      <h2><span class="num">§9</span><span>決済の設計</span></h2>
+      <div class="section-rule"></div>
+
+      <p>MVP では実決済を行わないが、<strong>後から差し替えたときに参加登録側のコードが一行も変わらない</strong>ことを設計目標とする。そのために、モック実装も実決済と同じ非同期フロー（外部で支払い → Webhook で状態確定）を通す。同期的に「支払い済にする」だけのモックを書くと、実決済導入時に状態遷移を作り直すことになる。</p>
+
+      <h3>抽象化</h3>
+      <pre><code>interface PaymentProvider {
+  // 支払いセッションを開始し、遷移先 URL を返す
+  createCheckout(input: {
+    registrationId: string
+    amountYen: number
+    payoutAccountRef: string | null   // イベントごとの入金先
+    returnUrl: string
+  }): Promise&lt;{ providerRef: string; redirectUrl: string }&gt;
+
+  // Webhook を検証し、正規化したイベントを返す
+  parseWebhook(rawBody: string, signature: string): PaymentEvent
+
+  // 実装は後日。MVP では未対応エラーを返す
+  refund(paymentId: string, amountYen: number): Promise&lt;void&gt;
+}
+
+type PaymentEvent =
+  | { type: 'paid';   providerRef: string; paidAt: Date }
+  | { type: 'failed'; providerRef: string; reason: string }</code></pre>
+
+      <div class="t-scroll">
+        <table>
+          <thead><tr><th>実装</th><th>createCheckout</th><th>状態確定</th><th>時期</th></tr></thead>
+          <tbody>
+            <tr><td>MockPaymentProvider</td><td>アプリ内の疑似決済画面 <code>/mock/checkout/[ref]</code> へ遷移。「支払う」「失敗させる」の2ボタン</td><td>疑似決済画面から自前の Webhook エンドポイントを叩く</td><td><span class="pill p-must">MVP</span></td></tr>
+            <tr><td>StripePaymentProvider</td><td>Stripe Checkout Session を作成し、Stripe のホスト画面へ遷移</td><td>Stripe からの Webhook を署名検証して処理</td><td><span class="pill p-later">後日</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Webhook ハンドラの要件</h3>
+      <ul>
+        <li><strong>冪等であること。</strong> <code>Payment.providerRef</code> にユニーク制約を張り、同じイベントが二重に届いても状態を二重に進めない</li>
+        <li><strong>署名を検証すること。</strong> モック実装でも検証経路を通し、本番導入時に検証漏れが起きない形にしておく</li>
+        <li><strong>支払い完了で確定させること。</strong> <code>PENDING_PAYMENT → CONFIRMED</code> の遷移は Webhook のみが行う。リダイレクト先の画面で確定させてはならない</li>
+      </ul>
+
+      <h3>入金先</h3>
+      <p>入金先はイベントごとに指定できる。合宿費は会計担当の口座、学祭の物販は団体の口座、といった実態に合わせるための決定である。データモデル上は <code>Organizer</code> が複数の <code>PayoutAccount</code> を持ち、<code>Event.payoutAccountId</code> がそのうち一つを指す。個人主催者も同じ仕組みで入金先を持つ。MVP ではフィールドを持つだけで、UI も送金処理も実装しない。</p>
+
+      <div class="note risk">
+        <span class="label">法務上の分岐点（実決済フェーズで確定が必要）</span>
+        <p>参加費をプラットフォームが一旦預かって主催者へ送金する形は収納代行にあたり、規約・入金サイクル・未入金トラブルの責任を運営が負う。主催者の Stripe アカウントへ直接入金する形（Stripe Connect Standard）なら運営は資金に触れず、責任範囲が大きく縮む。<strong>「イベントごとに入金先を指定できる」という要件は後者と自然に両立する</strong>ため、実決済は Connect Standard を第一候補とする。</p>
+      </div>
+
+      <div class="note risk">
+        <span class="label">個人主催者の有料イベント（実決済フェーズで確定が必要）</span>
+        <p>個人主催でも有料イベントを許可する方針を採った。ここで注意が要るのは、<strong>有料イベントの販売主体が個人になると、特定商取引法に基づく表記として氏名・住所・電話番号の開示が求められうる</strong>点である。学生が自宅住所と電話番号を公開する状況は、そのまま放置できない。</p>
+        <p>実務では、開示請求があった場合に遅滞なく提供する旨を表示することで常時掲載を省略する運用や、プラットフォームが問い合わせ窓口を代行する形が採られている。<strong>いずれを採るかは法務確認を経て決める必要があり、この要件定義では結論を出さない。</strong> 確認が済むまでは Phase 8 の有料機能を個人主催者へ開放しない、という段階的な開放も選択肢になる。</p>
+      </div>
+    </section>
+
+    <!-- ============ 10 ============ -->
+    <section id="s10">
+      <h2><span class="num">§10</span><span>画面一覧</span></h2>
+      <div class="section-rule"></div>
+
+      <div class="t-scroll">
+        <table>
+          <thead><tr><th>区分</th><th>画面</th><th>パス</th><th>要点</th></tr></thead>
+          <tbody>
+            <tr><td>公開</td><td>トップ / イベント一覧</td><td><code>/</code></td><td>大学と開催日で絞り込み。直近の公開イベントを新着順に</td></tr>
+            <tr><td>公開</td><td>イベント詳細</td><td><code>/events/[id]</code></td><td>枠ごとの残席、申込ボタン、主催団体へのリンク、参加者リスト（設定により）</td></tr>
+            <tr><td>公開</td><td>主催者ページ</td><td><code>/@[slug]</code></td><td><strong>団体・個人で共通。</strong> アイコン、あだ名、SNS リンク、今後のイベント、過去のイベント、フォローボタン、フォロワー数。団体ではこれに紹介文と運営メンバー、個人では所属している団体を加える</td></tr>
+            <tr><td>公開</td><td>検索</td><td><code>/search</code></td><td>キーワード、大学、日付範囲</td></tr>
+            <tr><td>参加者</td><td>申込フロー</td><td><code>/events/[id]/apply</code></td><td>枠選択 → <strong>主催者が設定した質問への回答</strong> → 確認（返金なし・回答を見る人・保持期間の明示）→ 無料は完了 / 有料は決済へ</td></tr>
+            <tr><td>参加者</td><td>マイページ</td><td><code>/me</code></td><td><strong>プロフィール編集（アイコン・ユーザーネーム・あだ名・SNS リンクの4項目のみ）</strong>と、参加予定・参加履歴・補欠中・支払い待ち</td></tr>
+            <tr><td>参加者</td><td>フォロー中</td><td><code>/me/following</code></td><td>フォローしている主催者の一覧と最新イベント</td></tr>
+            <tr><td>主催</td><td>団体作成</td><td><code>/groups/new</code></td><td>作成と同時に団体主催者が生成され、作成者が OWNER になる</td></tr>
+            <tr><td>主催</td><td>団体の設定</td><td><code>/@[slug]/settings</code></td><td>プロフィール（アイコン・ユーザーネーム・あだ名・SNS リンク・紹介文）、管理者の招待と権限、入金先（後日）。<strong>個人のプロフィール編集はマイページで行い、フォームは共通のものを使う</strong></td></tr>
+            <tr><td>主催</td><td>イベント作成 / 編集</td><td><code>/events/new</code></td><td><strong>冒頭で主催者と対象の大学を選ぶ</strong>（主催者は 自分 / 管理している団体、大学は 特定の大学 / 大学を問わない）。基本情報、参加枠の追加・並べ替え、<strong>申込時の質問の設計と保持期間の選択</strong>、下書き保存、過去イベントからの複製</td></tr>
+            <tr><td>主催</td><td>イベント移管</td><td><code>/manage/events/[id]/transfer</code></td><td>移管先の主催者を選ぶ。候補は自分が管理する主催者のみ。支払い済みがある場合は理由を示して不可にする</td></tr>
+            <tr><td>主催</td><td>参加者リスト</td><td><code>/manage/events/[id]/attendees</code></td><td>枠別の一覧、支払い状況、<strong>申込時の回答</strong>、受付チェック、CSV 出力。<strong>スマホでの操作を前提に設計する</strong></td></tr>
+            <tr><td>主催</td><td>告知配信</td><td><code>/manage/events/[id]/announce</code></td><td>参加者への一斉メール。宛先は確定者 / 補欠含む全員から選択</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ============ 11 ============ -->
+    <section id="s11">
+      <h2><span class="num">§11</span><span>非機能要件</span></h2>
+      <div class="section-rule"></div>
+
+      <div class="t-scroll">
+        <table>
+          <thead><tr><th>項目</th><th>要件</th></tr></thead>
+          <tbody>
+            <tr><td>想定規模（初年度）</td><td>ユーザー 3,000 / 団体 150 / イベント 1,200 件。大学は 1〜3 校</td></tr>
+            <tr><td>負荷特性</td><td>新歓期（3月下旬〜5月上旬）に集中。人気イベントの申込開始直後に同一枠へ書き込みが殺到する。<strong>定員判定の排他制御がボトルネックかつ最大のリスク</strong></td></tr>
+            <tr><td>クライアント</td><td>スマートフォンの Web ブラウザが主。モバイルファーストで設計する</td></tr>
+            <tr><td>認証</td><td>Google OAuth 2.0 のみ。パスワードを保持しない</td></tr>
+            <tr><td>認可</td><td>イベントの編集・参加者閲覧・入金先設定は <code>canManage(organizerId, userId)</code> の判定のみを根拠とする（§5）。<strong>サーバー側で毎回検証する</strong>（URL の推測でリストが見えてはならない）</td></tr>
+            <tr><td>個人情報</td><td><strong>アカウントが持つのはアイコン・ユーザーネーム・あだ名・SNS リンク・メールアドレスのみで、本名も大学も持たない。</strong> 本名・連絡先はイベント単位の回答としてのみ存在し、保持期間の経過後に自動削除される（§8）。参加者リストの公開はイベント単位で選択でき、既定は主催者のみ閲覧</td></tr>
+            <tr><td>メール</td><td>申込完了、繰り上げ、支払い期限、イベント中止、フォロー先の新規公開。配信停止の導線を必ず設ける</td></tr>
+            <tr><td>可用性</td><td>新歓期に単一障害点を持たない構成。定期メンテナンスは新歓期を避ける</td></tr>
+            <tr><td>バックアップ</td><td>日次の自動バックアップ。参加者データの喪失は致命的</td></tr>
+            <tr><td>法務</td><td>利用規約、プライバシーポリシー、特定商取引法に基づく表記（有料機能の実装時）。<strong>個人主催者が有料イベントを立てる場合の表記の扱い</strong>（§9）と、未成年者の決済に関する同意の扱いを、実決済の実装前に法務確認のうえ確定する</td></tr>
+            <tr><td>不正・迷惑対策</td><td>個人でも誰でも有料イベントを立てられるため、架空イベントによる集金のリスクがある。<strong>通報導線と運営による非公開化の手段を、有料機能の公開と同時に用意する</strong></td></tr>
+            <tr><td>アクセシビリティ</td><td>キーボード操作とフォーカス表示、フォームのラベル付け、コントラスト比 4.5:1 以上</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ============ 12 ============ -->
+    <section id="s12">
+      <h2><span class="num">§12</span><span>技術スタック</span></h2>
+      <div class="section-rule"></div>
+
+      <div class="t-scroll">
+        <table>
+          <thead><tr><th>層</th><th>採用</th><th>理由</th></tr></thead>
+          <tbody>
+            <tr><td>フレームワーク</td><td>Next.js（App Router）＋ TypeScript</td><td>フロントとバックを一体で書ける。Server Actions で申込処理をサーバー側に閉じられる</td></tr>
+            <tr><td>DB</td><td>PostgreSQL</td><td>定員判定に行ロックを使う。トランザクション分離が要件</td></tr>
+            <tr><td>ORM</td><td>Prisma</td><td>スキーマ駆動でマイグレーションが追える。interactive transaction で排他制御を書く</td></tr>
+            <tr><td>認証</td><td>Auth.js（NextAuth）＋ Google Provider</td><td>セッション管理を自前で持たない</td></tr>
+            <tr><td>バリデーション</td><td>Zod</td><td>フォームと Server Action で同じスキーマを共有する</td></tr>
+            <tr><td>スタイル</td><td>Tailwind CSS</td><td>モバイルファーストの記述が短い</td></tr>
+            <tr><td>メール</td><td>Resend</td><td>トランザクションメールの実装が軽い</td></tr>
+            <tr><td>ホスティング</td><td>Vercel ＋ マネージド PostgreSQL</td><td>個人運営で維持コストが低い</td></tr>
+            <tr><td>画像</td><td>オブジェクトストレージ＋ Next.js Image</td><td>団体アイコンとイベントカバー</td></tr>
+            <tr><td>定期実行</td><td>Cron</td><td>支払い期限切れ（EXPIRED 判定と繰り上げ）、リマインド送信、<strong>回答の自動削除と7日前の予告メール</strong>を確実に走らせる</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="note">
+        <span class="label">実装上の注意</span>
+        <p>申込処理は Server Action から直接 DB を叩かず、<code>registerToSlot(slotId, userId)</code> のようなドメイン関数に集約する。定員判定・補欠採番・支払い期限の設定が複数箇所に散ると、必ず不整合が生まれる。</p>
+      </div>
+    </section>
+
+    <!-- ============ 13 ============ -->
+    <section id="s13">
+      <h2><span class="num">§13</span><span>実装フェーズ</span></h2>
+      <div class="section-rule"></div>
+
+      <p>各フェーズの終わりに動くものが残る順序で並べる。Phase 5 までで §6 の UC-1 が通る。</p>
+
+      <div class="t-scroll">
+        <table>
+          <thead><tr><th>Phase</th><th>内容</th><th>完了条件</th></tr></thead>
+          <tbody>
+            <tr><td class="num-col">0</td><td>基盤</td><td>Next.js・Prisma・PostgreSQL・Google ログインが動く。<strong>登録と同時に個人 Organizer が生成され</strong>、マイページでアイコン・ユーザーネーム・あだ名・SNS リンクを編集でき、<code>/@slug</code> でページが表示される</td></tr>
+            <tr><td class="num-col">1</td><td>団体と主催者</td><td>団体を作成・編集でき、管理者を招待できる。団体・個人の主催者ページが同じ <code>/@slug</code> で見られ、<code>canManage()</code> が両方の型で正しく判定する</td></tr>
+            <tr><td class="num-col">2</td><td>イベントと参加枠</td><td><strong>主催者を選んで</strong>作成でき、下書きから公開まで通る。枠ごとの定員と価格が設定できる。個人イベントを自分の団体へ移管できる</td></tr>
+            <tr><td class="num-col">3</td><td>参加登録と申込フォーム</td><td>申込・キャンセル・補欠・自動繰り上げが動く。主催者が設計した質問に答えて申し込め、保持期間を過ぎた回答が Cron で自動削除される。<strong>同時申込で定員超過が起きないことをテストで確認する</strong></td></tr>
+            <tr><td class="num-col">4</td><td>有料枠（モック決済）</td><td>疑似決済画面を経由し、Webhook 経由で PENDING_PAYMENT → CONFIRMED が確定する。支払い期限切れが Cron で EXPIRED になる</td></tr>
+            <tr><td class="num-col">5</td><td>参加者管理と受付</td><td>参加者リストがスマホで開け、申込時の回答が確認でき、タップで受付済にでき、CSV が出力できる</td></tr>
+            <tr><td class="num-col">6</td><td>フォローと通知</td><td>主催者（団体・個人とも）をフォローでき、新規イベント公開時にフォロワーへメールが届く</td></tr>
+            <tr><td class="num-col">7</td><td>発見</td><td>大学・日付・キーワードで絞り込める一覧と検索</td></tr>
+            <tr><td class="num-col">8</td><td>実決済</td><td>StripePaymentProvider へ差し替え。イベントごとの入金先設定を有効化。特商法表記・利用規約を掲載し、<strong>個人主催者の表記の扱いと通報導線を伴って公開する</strong></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ============ 14 ============ -->
+    <section id="s14">
+      <h2><span class="num">§14</span><span>未決事項</span></h2>
+      <div class="section-rule"></div>
+
+      <p>実装開始をブロックしないが、該当フェーズまでに決める必要がある項目。</p>
+
+      <div class="t-scroll">
+        <table>
+          <thead><tr><th>項目</th><th>論点</th><th>期限</th></tr></thead>
+          <tbody>
+            <tr><td>サービス名とドメイン</td><td>未定。主催者の <code>slug</code> を <code>/@slug</code> として URL に出す設計のため、ドメインは早めに押さえたい</td><td>Phase 1</td></tr>
+            <tr><td>ユーザーネームの初期値</td><td>Google の表示名からの自動生成では衝突と可読性の問題が出る。登録時にユーザー自身に決めさせるか、暫定 ID を振って後から変更させるか</td><td>Phase 0</td></tr>
+            <tr><td>ユーザーネームの変更制限</td><td>何度でも変更できると、なりすましと旧 URL の失効が起きる。変更回数の上限と、旧 slug をリダイレクトで保持する期間を決める</td><td>Phase 1</td></tr>
+            <tr><td>合同イベントの対象大学</td><td>複数大学の合同新歓では対象が1つに定まらない。MVP は「単一の大学」か「大学を問わない」で始め、需要が見えたら多対多に広げる</td><td>Phase 7</td></tr>
+            <tr><td>手数料モデル</td><td>§2 の通り枚あたり固定費は取らない方針。無料で始めるか、数%を取るか、参加者への転嫁を許すか</td><td>Phase 8</td></tr>
+            <tr><td>大学マスタの初期データ</td><td>全国分を入れるか、ビーチヘッドの1校から始めて申請制で増やすか</td><td>Phase 1</td></tr>
+            <tr><td>参加者リストの既定公開範囲</td><td>connpass は公開が既定。学生イベントでは非公開が既定のほうが安全と考えるが、公開は集客に効く</td><td>Phase 3</td></tr>
+            <tr><td>保持期間の選択肢</td><td>30日 / 90日 / 1年 の三択と既定 30日が実態に合うか。合宿の事故対応で実際に何日必要かは、学生団体に確認して決めたい</td><td>Phase 3</td></tr>
+            <tr><td>未成年からの個人情報取得</td><td>18歳未満の参加者から本名・連絡先を取得する際の保護者同意の要否。実決済時の未成年同意とあわせて法務確認する</td><td>Phase 3</td></tr>
+            <tr><td>支払い期限の値</td><td>暫定 24 時間。開催直前の申込での扱いを含めて再検討（§7）</td><td>Phase 4</td></tr>
+            <tr><td>通知チャネル</td><td>MVP はメールのみ。学生の反応次第で LINE 連携を検討する</td><td>Phase 6</td></tr>
+            <tr><td>個人主催の特商法表記</td><td>個人が有料イベントを立てる際の氏名・住所・電話番号の扱い（§9）。法務確認が必要。結論が出るまで有料機能を個人へ開放しない段階的公開も選択肢</td><td>Phase 8</td></tr>
+            <tr><td>不適切イベントへの対応</td><td>個人でも誰でも有料イベントを立てられるため、架空イベントによる集金のリスクがある。通報導線と運営による非公開化の手段が必要。<strong>個人の有料主催を許可した時点で優先度が上がった</strong></td><td>公開前</td></tr>
+            <tr><td>会計機能への拡張</td><td>§2 の発見2。未払い一覧・団体ごとの収支集計は空白地帯だが、今回の差別化軸から外している。Phase 8 以降の候補</td><td>—</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </article>
+
+  <footer>
+    <span>学生イベント基盤 要件定義 v0.4</span>
+    <span>2026-09-04</span>
+    <span>次のアクション: Phase 0 の着手可否を判断する</span>
+  </footer>
+
+</div>
+
+<script>
+  (function () {
+    var links = Array.prototype.slice.call(document.querySelectorAll('nav.toc a'));
+    var map = {};
+    links.forEach(function (a) {
+      var id = a.getAttribute('href').slice(1);
+      var el = document.getElementById(id);
+      if (el) map[id] = a;
+    });
+    var sections = Object.keys(map).map(function (id) { return document.getElementById(id); });
+    if (!('IntersectionObserver' in window) || !sections.length) return;
+
+    var visible = {};
+    var obs = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) { visible[e.target.id] = e.isIntersecting; });
+      var current = null;
+      for (var i = 0; i < sections.length; i++) {
+        if (visible[sections[i].id]) { current = sections[i].id; break; }
+      }
+      links.forEach(function (a) { a.classList.remove('current'); });
+      if (current && map[current]) map[current].classList.add('current');
+    }, { rootMargin: '-10% 0px -70% 0px' });
+
+    sections.forEach(function (s) { obs.observe(s); });
+  })();
+</script>
