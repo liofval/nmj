@@ -504,7 +504,7 @@
         <div><dt>返金</dt><dd>原則なし</dd></div>
         <div><dt>認証</dt><dd>Google ログイン</dd></div>
         <div><dt>当日受付</dt><dd>参加者リストでチェック</dd></div>
-        <div><dt>スタック</dt><dd>Next.js + TypeScript</dd></div>
+        <div><dt>スタック</dt><dd>Astro + TypeScript</dd></div>
       </dl>
     </section>
 
@@ -1043,15 +1043,15 @@ type PaymentEvent =
         <table>
           <thead><tr><th>層</th><th>採用</th><th>理由</th></tr></thead>
           <tbody>
-            <tr><td>フレームワーク</td><td>Next.js（App Router）＋ TypeScript</td><td>フロントとバックを一体で書ける。Server Actions で申込処理をサーバー側に閉じられる</td></tr>
+            <tr><td>フレームワーク</td><td>Astro ＋ TypeScript</td><td><strong>デザイナー納品の HTML を書き換えずに取り込む前提</strong>で選定。<code>.astro</code> は HTML スーパーセットで、マークアップに触らずに動的な差し込み・アイランド・Server Endpoint を追加できる。JSX 変換を強制する Next.js は制約と衝突する</td></tr>
             <tr><td>DB</td><td>PostgreSQL</td><td>定員判定に行ロックを使う。トランザクション分離が要件</td></tr>
             <tr><td>ORM</td><td>Prisma</td><td>スキーマ駆動でマイグレーションが追える。interactive transaction で排他制御を書く</td></tr>
             <tr><td>認証</td><td>Auth.js（NextAuth）＋ Google Provider</td><td>セッション管理を自前で持たない</td></tr>
             <tr><td>バリデーション</td><td>Zod</td><td>フォームと Server Action で同じスキーマを共有する</td></tr>
             <tr><td>スタイル</td><td>Tailwind CSS</td><td>モバイルファーストの記述が短い</td></tr>
             <tr><td>メール</td><td>Resend</td><td>トランザクションメールの実装が軽い</td></tr>
-            <tr><td>ホスティング</td><td>Vercel ＋ マネージド PostgreSQL</td><td>個人運営で維持コストが低い</td></tr>
-            <tr><td>画像</td><td>オブジェクトストレージ＋ Next.js Image</td><td>団体アイコンとイベントカバー</td></tr>
+            <tr><td>ホスティング</td><td>Vercel ＋ マネージド PostgreSQL</td><td>個人運営で維持コストが低い。Astro の SSR アダプタを利用する</td></tr>
+            <tr><td>画像</td><td>オブジェクトストレージ＋ Astro Image</td><td>団体アイコンとイベントカバー</td></tr>
             <tr><td>定期実行</td><td>Cron</td><td>支払い期限切れ（EXPIRED 判定と繰り上げ）、リマインド送信、<strong>回答の自動削除と7日前の予告メール</strong>を確実に走らせる</td></tr>
           </tbody>
         </table>
@@ -1059,7 +1059,12 @@ type PaymentEvent =
 
       <div class="note">
         <span class="label">実装上の注意</span>
-        <p>申込処理は Server Action から直接 DB を叩かず、<code>registerToSlot(slotId, userId)</code> のようなドメイン関数に集約する。定員判定・補欠採番・支払い期限の設定が複数箇所に散ると、必ず不整合が生まれる。</p>
+        <p>申込処理は Astro Server Endpoint / Actions から直接 DB を叩かず、<code>registerToSlot(slotId, userId)</code> のようなドメイン関数に集約する。定員判定・補欠採番・支払い期限の設定が複数箇所に散ると、必ず不整合が生まれる。</p>
+      </div>
+
+      <div class="note">
+        <span class="label">デザイナー納品 HTML の扱い</span>
+        <p>フロント実装は<strong>デザイナー納品の HTML（全ページ）を書き換えないこと</strong>を前提にする。受領した HTML をそのまま <code>.astro</code> ファイルとして取り込み、動的な部分は Astro の式（<code>{}</code>）・コンポーネント境界・Server Endpoint 経由で差し込む。<strong>マークアップの修正が必要になった場合は、実装側で直さずデザイナーに戻す</strong>。この責務分離を守るために Astro を選定している。属性の追加（<code>id</code>、<code>data-*</code>、<code>hx-*</code> 相当）は実装側の作業範囲として許容し、事前に運用ルールを共有しておく。</p>
       </div>
     </section>
 
@@ -1068,13 +1073,13 @@ type PaymentEvent =
       <h2><span class="num">§13</span><span>実装フェーズ</span></h2>
       <div class="section-rule"></div>
 
-      <p>各フェーズの終わりに動くものが残る順序で並べる。Phase 5 までで §6 の UC-1 が通る。</p>
+      <p>各フェーズの終わりに動くものが残る順序で並べる。Phase 5 までで §6 の UC-1 が通る。<strong>Phase 0 の前提として、デザイナーから全ページの HTML が納品されている</strong>ものとする（§12 の "デザイナー納品 HTML の扱い" を参照）。</p>
 
       <div class="t-scroll">
         <table>
           <thead><tr><th>Phase</th><th>内容</th><th>完了条件</th></tr></thead>
           <tbody>
-            <tr><td class="num-col">0</td><td>基盤</td><td>Next.js・Prisma・PostgreSQL・Google ログインが動く。<strong>登録と同時に個人 Organizer が生成され</strong>、マイページでアイコン・ユーザーネーム・あだ名・SNS リンクを編集でき、<code>/@slug</code> でページが表示される</td></tr>
+            <tr><td class="num-col">0</td><td>基盤</td><td>Astro・Prisma・PostgreSQL・Google ログインが動く。<strong>デザイナー納品の HTML を <code>.astro</code> として取り込む導線が整う</strong>。登録と同時に個人 Organizer が生成され、マイページでアイコン・ユーザーネーム・あだ名・SNS リンクを編集でき、<code>/@slug</code> でページが表示される</td></tr>
             <tr><td class="num-col">1</td><td>団体と主催者</td><td>団体を作成・編集でき、管理者を招待できる。団体・個人の主催者ページが同じ <code>/@slug</code> で見られ、<code>canManage()</code> が両方の型で正しく判定する</td></tr>
             <tr><td class="num-col">2</td><td>イベントと参加枠</td><td><strong>主催者を選んで</strong>作成でき、下書きから公開まで通る。枠ごとの定員と価格が設定できる。個人イベントを自分の団体へ移管できる</td></tr>
             <tr><td class="num-col">3</td><td>参加登録と申込フォーム</td><td>申込・キャンセル・補欠・自動繰り上げが動く。主催者が設計した質問に答えて申し込め、保持期間を過ぎた回答が Cron で自動削除される。<strong>同時申込で定員超過が起きないことをテストで確認する</strong></td></tr>
