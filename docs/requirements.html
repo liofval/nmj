@@ -454,7 +454,7 @@
       <li><a href="#s7">参加枠と補欠の仕様</a></li>
       <li><a href="#s8">申込フォームと個人情報</a></li>
       <li><a href="#s9">決済の設計</a></li>
-      <li><a href="#s10">画面一覧</a></li>
+      <li><a href="#s10">情報設計と画面一覧</a></li>
       <li><a href="#s11">非機能要件</a></li>
       <li><a href="#s12">技術スタック</a></li>
       <li><a href="#s13">実装フェーズ</a></li>
@@ -928,19 +928,68 @@ type PaymentEvent =
 
     <!-- ============ 10 ============ -->
     <section id="s10">
-      <h2><span class="num">§10</span><span>画面一覧</span></h2>
+      <h2><span class="num">§10</span><span>情報設計と画面一覧</span></h2>
       <div class="section-rule"></div>
 
+      <h3>グローバルナビ（タブ）</h3>
+      <p>サイト全体のタブは <strong>Home / Media / Events</strong> の3つに絞る。マイページはタブに含めず、ヘッダ右上のログインボタン経由で入る。<strong>タブに置くのは「未ログインでも意味のある入口」だけ</strong>にし、ログインしないと成立しない画面は右上に集約する。</p>
+
+      <div class="t-scroll">
+        <table>
+          <thead><tr><th>タブ</th><th>パス</th><th>役割</th></tr></thead>
+          <tbody>
+            <tr><td>Home</td><td><code>/</code></td><td>季節性 hero（新歓・学園祭）、注目イベント、Media からの注目記事。ログイン中はフォロー中主催者の新着に一部差し替える</td></tr>
+            <tr><td>Media</td><td><code>/media</code></td><td>学生イベント文脈の読み物・特集・主催者インタビュー。SEO とオーガニック集客の入口。記事から関連イベント／主催者ページへ導線を張る（§2 の "縦割り特化" を "コンテンツで層を厚くする" へ拡張）</td></tr>
+            <tr><td>Events</td><td><code>/events</code></td><td>イベントの発見。<strong>カレンダー</strong>と<strong>一覧</strong>の2ビューを内側で切り替える。大学・開催日・キーワードでの絞り込みは両ビュー共通（§4）</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Events タブ内の切り替え（カレンダー / 一覧）</h3>
+      <p>Events タブは同じデータ集合を <strong>カレンダー</strong> と <strong>一覧</strong> の2ビューで見せる。パスは <code>/events</code>（既定＝一覧）と <code>/events/calendar</code> に分け、絞り込み条件は URL パラメータで両ビューを行き来しても引き継がれるようにする。<strong>ビュー切替は URL を書き換える</strong>（タブ内タブでも、状態は URL に載せる原則を守る）。</p>
+
+      <h3>ヘッダのログインボタンとマイページ</h3>
+      <p>マイページはタブに置かない。ヘッダ右上に、未ログイン時は「ログイン」ボタン、ログイン後は自分のアイコン（クリックで <code>/me</code>）を出す。<strong>マイページはログインしないと存在すら見えない</strong>のを既定にする。</p>
+
+      <div class="t-scroll">
+        <table>
+          <thead><tr><th>マイページの機能</th><th>備考</th></tr></thead>
+          <tbody>
+            <tr><td>参加予定・履歴・補欠中・支払い待ち</td><td>§4 の参加登録に対応。既存の <code>/me</code> の内容</td></tr>
+            <tr><td>イベントへの申込（アプライ）</td><td>ここは入口。申込フォーム本体は <code>/events/[id]/apply</code>（§8）</td></tr>
+            <tr><td>お気に入りイベント</td><td><strong>新規要件</strong>。主催者フォロー（§1）とは別レイヤーで、"個別イベント" を保存する。詳細仕様は §14 の未決事項として起票</td></tr>
+            <tr><td>フォロー中の主催者</td><td>一覧と、それぞれの最新イベント（<code>/me/following</code>）</td></tr>
+            <tr><td>主催者ページへの切り替え</td><td>自分が管理している主催者へ、<strong>完全別リンクとして遷移</strong>する（下の "主催者側は完全別リンク" 参照）</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>主催者側は完全別リンク</h3>
+      <p>主催者としての管理画面（<code>/manage/...</code>）と公開の主催者ページ（<code>/@[slug]</code>）は、参加者向けの Home / Media / Events のタブ帯とは<strong>独立した URL 空間</strong>として扱う。参加者としての体験と主催者としての体験は目線が違うため、同じ画面に混ぜない。マイページからは「主催者側へ切り替える」ボタンひとつで飛ぶ。<strong>主催者側からロゴをクリックしても参加者向けのトップには戻さず、主催者ダッシュボードのトップに戻す</strong>。参加者用トップに戻るには明示的なリンクを用意する。</p>
+
+      <h3>タブ設計の原則</h3>
+      <ul>
+        <li><strong>タブは未ログインで意味を持つ画面だけ。</strong> ログインが必要な画面はヘッダから出す</li>
+        <li><strong>タブは独立した URL を持つ。</strong> SPA 内の状態切り替えではなく、SNS 共有と検索エンジンに素直に露出させるため</li>
+        <li><strong>参加者体験と主催者体験は分離する。</strong> グローバルナビは参加者向けのみ。主催者側は完全別リンクとしてマイページから遷移する</li>
+        <li><strong>グローバルタブは3つを既定、上限4つ。</strong> スマホ幅で並ぶ現実的な上限。5つ目が必要になったら統合を先に検討する</li>
+      </ul>
+
+      <h3>全画面一覧</h3>
       <div class="t-scroll">
         <table>
           <thead><tr><th>区分</th><th>画面</th><th>パス</th><th>要点</th></tr></thead>
           <tbody>
-            <tr><td>公開</td><td>トップ / イベント一覧</td><td><code>/</code></td><td>大学と開催日で絞り込み。直近の公開イベントを新着順に</td></tr>
+            <tr><td>公開</td><td>Home（トップ）</td><td><code>/</code></td><td>季節性 hero、注目イベント、Media からの注目記事。ログイン中はフォロー中主催者の新着に一部差し替える</td></tr>
+            <tr><td>公開</td><td>Media（読み物）</td><td><code>/media</code></td><td>特集・インタビュー・ノウハウ記事の一覧。記事から関連イベント／主催者ページへ導線を張る</td></tr>
+            <tr><td>公開</td><td>Media 記事詳細</td><td><code>/media/[slug]</code></td><td>記事本文と、末尾に関連イベント／主催者カード</td></tr>
+            <tr><td>公開</td><td>Events（一覧）</td><td><code>/events</code></td><td>大学と開催日で絞り込み。直近の公開イベントを新着順に。フィルタ状態は URL パラメータに保持</td></tr>
+            <tr><td>公開</td><td>Events（カレンダー）</td><td><code>/events/calendar</code></td><td>月次のカレンダービュー。絞り込みは一覧と共通の URL パラメータ</td></tr>
             <tr><td>公開</td><td>イベント詳細</td><td><code>/events/[id]</code></td><td>枠ごとの残席、申込ボタン、主催団体へのリンク、参加者リスト（設定により）</td></tr>
             <tr><td>公開</td><td>主催者ページ</td><td><code>/@[slug]</code></td><td><strong>団体・個人で共通。</strong> アイコン、あだ名、SNS リンク、今後のイベント、過去のイベント、フォローボタン、フォロワー数。団体ではこれに紹介文と運営メンバー、個人では所属している団体を加える</td></tr>
             <tr><td>公開</td><td>検索</td><td><code>/search</code></td><td>キーワード、大学、日付範囲</td></tr>
             <tr><td>参加者</td><td>申込フロー</td><td><code>/events/[id]/apply</code></td><td>枠選択 → <strong>主催者が設定した質問への回答</strong> → 確認（返金なし・回答を見る人・保持期間の明示）→ 無料は完了 / 有料は決済へ</td></tr>
-            <tr><td>参加者</td><td>マイページ</td><td><code>/me</code></td><td><strong>プロフィール編集（アイコン・ユーザーネーム・あだ名・SNS リンクの4項目のみ）</strong>と、参加予定・参加履歴・補欠中・支払い待ち</td></tr>
+            <tr><td>参加者</td><td>マイページ</td><td><code>/me</code></td><td><strong>プロフィール編集（アイコン・ユーザーネーム・あだ名・SNS リンクの4項目のみ）</strong>、参加予定・参加履歴・補欠中・支払い待ち、<strong>お気に入りイベント</strong>、フォロー中の主催者、<strong>自分が管理している主催者ページへの切り替え（完全別リンク）</strong>。ヘッダのログインボタン経由で入る</td></tr>
             <tr><td>参加者</td><td>フォロー中</td><td><code>/me/following</code></td><td>フォローしている主催者の一覧と最新イベント</td></tr>
             <tr><td>主催</td><td>団体作成</td><td><code>/groups/new</code></td><td>作成と同時に団体主催者が生成され、作成者が OWNER になる</td></tr>
             <tr><td>主催</td><td>団体の設定</td><td><code>/@[slug]/settings</code></td><td>プロフィール（アイコン・ユーザーネーム・あだ名・SNS リンク・紹介文）、管理者の招待と権限、入金先（後日）。<strong>個人のプロフィール編集はマイページで行い、フォームは共通のものを使う</strong></td></tr>
@@ -1058,6 +1107,8 @@ type PaymentEvent =
             <tr><td>個人主催の特商法表記</td><td>個人が有料イベントを立てる際の氏名・住所・電話番号の扱い（§9）。法務確認が必要。結論が出るまで有料機能を個人へ開放しない段階的公開も選択肢</td><td>Phase 8</td></tr>
             <tr><td>不適切イベントへの対応</td><td>個人でも誰でも有料イベントを立てられるため、架空イベントによる集金のリスクがある。通報導線と運営による非公開化の手段が必要。<strong>個人の有料主催を許可した時点で優先度が上がった</strong></td><td>公開前</td></tr>
             <tr><td>会計機能への拡張</td><td>§2 の発見2。未払い一覧・団体ごとの収支集計は空白地帯だが、今回の差別化軸から外している。Phase 8 以降の候補</td><td>—</td></tr>
+            <tr><td>お気に入りイベント</td><td>マイページの新規要件（§10）。主催者フォローとは別レイヤーで、個別イベント単位で保存する。<strong>並び順・通知連携（開催前リマインドの要否）・上限数・非公開／共有可否</strong>を確定させる</td><td>Phase 2</td></tr>
+            <tr><td>Media（読み物）の設計</td><td>グローバルタブ Media（§10）の中身。<strong>入稿導線（社内編集 or 主催者投稿）、CMS 構成、カテゴリ分類、関連イベント／主催者への紐付けアルゴリズム、SEO タイトル設計</strong>を Phase 前に固める。r25 の"著名人インタビュー・連載"の型が参考になる（§2 参照）</td><td>Phase 2</td></tr>
           </tbody>
         </table>
       </div>
