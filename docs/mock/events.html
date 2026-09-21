@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Events — nmj (モック)</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="hdr">
+  <a href="index.html" class="brand">nmj</a>
+  <nav class="tabs">
+    <a href="index.html">Home</a>
+    <a href="#" onclick="alert('Media は現時点のモック対象外です'); return false;">Media</a>
+    <a href="events.html" class="on">Events</a>
+  </nav>
+  <div class="user-slot">
+    <a href="#" class="btn-login" onclick="alert('ログインは現時点のモック対象外です'); return false;">ログイン</a>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <a href="index.html" class="back">← Home に戻る</a>
+
+  <h1 style="font-size: 22px; margin-bottom: 4px;">Events</h1>
+  <p style="color: var(--ink-3); font-size: 13px; margin-bottom: 16px;">
+    <a href="events.html" style="color:var(--ink); font-weight:500; border-bottom: 2px solid var(--accent); padding-bottom: 4px;">一覧</a>
+    <a href="#" onclick="alert('カレンダービューはモック対象外です'); return false;" style="color:var(--ink-3); margin-left: 16px;">カレンダー</a>
+  </p>
+
+  <div class="filters">
+    <div class="field search">
+      <label>キーワード</label>
+      <input type="search" placeholder="🔍 イベント名で検索">
+    </div>
+    <div class="field">
+      <label>大学</label>
+      <select>
+        <option>すべて</option>
+        <option>慶應義塾大学</option>
+        <option>早稲田大学</option>
+        <option>東京大学</option>
+        <option>一橋大学</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>日付</label>
+      <select>
+        <option>すべて</option>
+        <option>今週</option>
+        <option>今月</option>
+        <option>来月</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>種別</label>
+      <select>
+        <option>すべて</option>
+        <option>対面</option>
+        <option>オンライン</option>
+      </select>
+    </div>
+    <div class="count">結果 4 件</div>
+  </div>
+
+  <a href="event.html" class="evrow">
+    <div class="cvr">COVER</div>
+    <div>
+      <h3>春の新歓ミーティング</h3>
+      <div class="meta"><b>@keio-lightmusic</b> · 慶應 · 対面 · 残 12 席</div>
+      <div class="meta">2026-04-08 (火) 18:00 − 20:00</div>
+      <div class="meta">1,500円 / 500円 / 無料枠あり</div>
+    </div>
+  </a>
+
+  <a href="event.html" class="evrow">
+    <div class="cvr">COVER</div>
+    <div>
+      <h3>読書会 #12 現代思想</h3>
+      <div class="meta"><b>@waseda-bookclub</b> · 早稲田 · 対面 · 残 5 席</div>
+      <div class="meta">2026-04-10 (木) 19:00 − 21:00</div>
+      <div class="meta">500円</div>
+    </div>
+  </a>
+
+  <a href="event.html" class="evrow">
+    <div class="cvr">COVER</div>
+    <div>
+      <h3>プログラミング勉強会 #4</h3>
+      <div class="meta"><b>@utokyo-code</b> · 東大 · オンライン · 残 34 席</div>
+      <div class="meta">2026-04-12 (土) 14:00 − 16:00</div>
+      <div class="meta">無料</div>
+    </div>
+  </a>
+
+  <a href="event.html" class="evrow">
+    <div class="cvr">COVER</div>
+    <div>
+      <h3>ダンスサークル体験会</h3>
+      <div class="meta"><b>@keio-dance</b> · 慶應 · 対面 · 残 8 席</div>
+      <div class="meta">2026-04-15 (火) 18:30 − 20:30</div>
+      <div class="meta">無料</div>
+    </div>
+  </a>
+
+</main>
+
+<footer class="ft">
+  © 2026 nmj (モック) · <a href="../requirements.html">要件定義</a> · <a href="../wireframes.html">ワイヤーフレーム</a>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>お支払い — nmj (モック)</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="hdr">
+  <a href="index.html" class="brand">nmj</a>
+  <nav class="tabs">
+    <a href="index.html">Home</a>
+    <a href="#" onclick="alert('Media は現時点のモック対象外です'); return false;">Media</a>
+    <a href="events.html">Events</a>
+  </nav>
+  <div class="user-slot">
+    <span class="avatar">Y</span>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <a href="apply.html" class="back">← 申込に戻る</a>
+
+  <h1 style="font-size: 20px; margin-bottom: 20px;">お支払い（モック）</h1>
+
+  <div class="receipt">
+    <div class="row">
+      <span>春の新歓ミーティング</span>
+      <span></span>
+    </div>
+    <div class="row">
+      <span>懇親会枠 × 1</span>
+      <span>1,500円</span>
+    </div>
+    <div class="row total">
+      <span>合計</span>
+      <span>1,500円</span>
+    </div>
+  </div>
+
+  <div class="notice info">
+    <b>これはモック決済です</b><br>
+    MVP 期間中はダミーの決済です。実際の請求は発生しません。Phase 8 で Stripe に差し替え予定。
+  </div>
+
+  <div class="form-block">
+    <h2>シナリオを選ぶ</h2>
+    <p class="sub">MVP 期間中の開発用スイッチです。</p>
+
+    <div class="slot-choice">
+      <label>
+        <input type="radio" name="scenario" value="success" checked>
+        <div class="info">
+          <div class="n">決済成功をシミュレート</div>
+          <div class="p">PENDING_PAYMENT → CONFIRMED</div>
+        </div>
+      </label>
+      <label>
+        <input type="radio" name="scenario" value="failure">
+        <div class="info">
+          <div class="n">決済失敗をシミュレート</div>
+          <div class="p">カード拒否のケース</div>
+        </div>
+      </label>
+      <label>
+        <input type="radio" name="scenario" value="timeout">
+        <div class="info">
+          <div class="n">タイムアウトをシミュレート</div>
+          <div class="p">Webhook 遅延</div>
+        </div>
+      </label>
+    </div>
+  </div>
+
+  <div class="actionbar">
+    <a href="apply.html" class="btn-back">← 戻る</a>
+    <button class="btn-next" onclick="executePayment()">決済を実行 →</button>
+  </div>
+
+</main>
+
+<footer class="ft">
+  © 2026 nmj (モック) · <a href="../requirements.html">要件定義</a> · <a href="../wireframes.html">ワイヤーフレーム</a>
+</footer>
+
+<script>
+  function executePayment() {
+    const scenario = document.querySelector('input[name="scenario"]:checked').value;
+    if (scenario === 'success') {
+      window.location.href = 'complete.html';
+    } else if (scenario === 'failure') {
+      alert('⚠ 支払いに失敗しました\n\nカードが拒否されました。\n別のカードを試すか、支払い期限内にもう一度お試しください。\n\n(モックのため、この場ではダイアログのみ)');
+    } else if (scenario === 'timeout') {
+      alert('⌛ タイムアウト\n\nWebhook の応答が遅延しています。\n数分後にマイページで状態を確認してください。\n\n(モックのため、この場ではダイアログのみ)');
+    }
+  }
+</script>
+
+</body>
+</html>

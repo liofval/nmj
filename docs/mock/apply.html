@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>申込 — nmj (モック)</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="hdr">
+  <a href="index.html" class="brand">nmj</a>
+  <nav class="tabs">
+    <a href="index.html">Home</a>
+    <a href="#" onclick="alert('Media は現時点のモック対象外です'); return false;">Media</a>
+    <a href="events.html">Events</a>
+  </nav>
+  <div class="user-slot">
+    <span class="avatar">Y</span>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <a href="event.html" class="back">← Event 詳細に戻る</a>
+
+  <h1 style="font-size: 20px; margin-bottom: 4px;">申込 — 春の新歓ミーティング</h1>
+  <p style="color: var(--ink-3); font-size: 13px; margin-bottom: 8px;">@keio-lightmusic</p>
+
+  <div class="steps">
+    <div class="step done" data-step="1"><span class="n">1</span> 枠選択</div>
+    <div class="step done" data-step="2"><span class="n">2</span> 質問</div>
+    <div class="step on" data-step="3"><span class="n">3</span> 確認</div>
+  </div>
+
+  <!-- Step 1 -->
+  <div class="form-block" data-panel="1" style="display:none;">
+    <h2>参加枠を選ぶ</h2>
+    <p class="sub">複数枠を同時に選ぶこともできます。</p>
+    <div class="slot-choice">
+      <label>
+        <input type="radio" name="slot" value="general">
+        <div class="info">
+          <div class="n">一般枠</div>
+          <div class="p">無料 · 残 25 席</div>
+        </div>
+      </label>
+      <label>
+        <input type="radio" name="slot" value="party" checked>
+        <div class="info">
+          <div class="n">懇親会枠（食事付き）</div>
+          <div class="p">1,500円 · 残 8 席</div>
+        </div>
+      </label>
+      <label>
+        <input type="radio" name="slot" value="lt">
+        <div class="info">
+          <div class="n">LT 登壇枠</div>
+          <div class="p">無料 · 満員 (補欠登録)</div>
+        </div>
+      </label>
+    </div>
+    <div class="actionbar">
+      <a href="event.html" class="btn-back">← 戻る</a>
+      <button class="btn-next" onclick="goStep(2)">質問に答える →</button>
+    </div>
+  </div>
+
+  <!-- Step 2 -->
+  <div class="form-block" data-panel="2" style="display:none;">
+    <h2>申込時の質問</h2>
+    <p class="sub">主催者が設定した質問に答えてください。</p>
+
+    <div class="field-row">
+      <label>お名前 <b>*</b></label>
+      <input type="text" placeholder="山田太郎">
+    </div>
+
+    <div class="field-row">
+      <label>大学 <b>*</b></label>
+      <select>
+        <option>選択してください</option>
+        <option>慶應義塾大学</option>
+        <option>早稲田大学</option>
+        <option>東京大学</option>
+        <option>一橋大学</option>
+      </select>
+    </div>
+
+    <div class="field-row">
+      <label>アレルギー <span style="color:var(--ink-3); font-weight:400; font-size:11px;">(懇親会枠のみ)</span></label>
+      <textarea placeholder="例: エビ、そば、乳製品"></textarea>
+    </div>
+
+    <div class="actionbar">
+      <button class="btn-back" onclick="goStep(1)">← 戻る</button>
+      <button class="btn-next" onclick="goStep(3)">内容を確認 →</button>
+    </div>
+  </div>
+
+  <!-- Step 3 (default open) -->
+  <div class="form-block" data-panel="3">
+    <h2>内容の確認</h2>
+    <p class="sub">以下の内容で申し込みます。</p>
+
+    <dl class="summary">
+      <dt>参加枠</dt>
+      <dd>懇親会枠（食事付き） · 1,500円</dd>
+      <dt>お名前</dt>
+      <dd>山田太郎</dd>
+      <dt>大学</dt>
+      <dd>慶應義塾大学</dd>
+      <dt>アレルギー</dt>
+      <dd>なし</dd>
+    </dl>
+
+    <div class="notice info">
+      <b>個人情報の取り扱い（重要）</b><br>
+      · 回答を見る人: この主催者と、主催者が招待した運営メンバーのみ<br>
+      · 保持期間: 90日（開催日から）· 経過後は自動削除<br>
+      · 原則、返金は行いません
+    </div>
+
+    <div class="field-row">
+      <label style="display: flex; gap: 8px; align-items: center; font-size: 13px;">
+        <input type="checkbox" id="agree" onchange="document.getElementById('proceed').disabled = !this.checked;">
+        個人情報の取扱いに同意する
+      </label>
+    </div>
+
+    <div class="actionbar">
+      <button class="btn-back" onclick="goStep(2)">← 戻る</button>
+      <a href="checkout.html?slot=party&amount=1500" id="proceed" class="btn-next" style="pointer-events:none; opacity:0.5;">決済に進む (1,500円) →</a>
+    </div>
+  </div>
+
+</main>
+
+<footer class="ft">
+  © 2026 nmj (モック) · <a href="../requirements.html">要件定義</a> · <a href="../wireframes.html">ワイヤーフレーム</a>
+</footer>
+
+<script>
+  function goStep(n) {
+    document.querySelectorAll('[data-panel]').forEach(p => p.style.display = 'none');
+    document.querySelector(`[data-panel="${n}"]`).style.display = 'block';
+    document.querySelectorAll('.step').forEach(s => {
+      const sn = parseInt(s.dataset.step);
+      s.classList.remove('on', 'done');
+      if (sn < n) s.classList.add('done');
+      else if (sn === n) s.classList.add('on');
+    });
+    window.scrollTo({top: 0, behavior: 'smooth'});
+  }
+
+  // Wire agree checkbox to enable proceed link
+  document.addEventListener('DOMContentLoaded', () => {
+    const cb = document.getElementById('agree');
+    const link = document.getElementById('proceed');
+    if (cb && link) {
+      cb.addEventListener('change', () => {
+        if (cb.checked) {
+          link.style.pointerEvents = 'auto';
+          link.style.opacity = '1';
+        } else {
+          link.style.pointerEvents = 'none';
+          link.style.opacity = '0.5';
+        }
+      });
+    }
+  });
+
+  // Start on step 1 if the URL suggests so (fresh visit)
+  if (!window.location.hash) {
+    goStep(1);
+  }
+</script>
+
+</body>
+</html>

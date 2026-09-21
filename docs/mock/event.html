@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>春の新歓ミーティング — nmj (モック)</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="hdr">
+  <a href="index.html" class="brand">nmj</a>
+  <nav class="tabs">
+    <a href="index.html">Home</a>
+    <a href="#" onclick="alert('Media は現時点のモック対象外です'); return false;">Media</a>
+    <a href="events.html" class="on">Events</a>
+  </nav>
+  <div class="user-slot">
+    <a href="#" class="btn-login" onclick="alert('ログインは現時点のモック対象外です'); return false;">ログイン</a>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <a href="events.html" class="back">← Events に戻る</a>
+
+  <div class="ev-hero">
+    <div class="cover">EVENT COVER</div>
+    <div class="body">
+      <div class="badges">
+        <span class="badge b-open">受付中</span>
+        <span class="badge b-venue">対面</span>
+        <span class="badge b-univ">慶應</span>
+      </div>
+      <h1>春の新歓ミーティング</h1>
+      <div class="host">
+        <a href="#" onclick="alert('主催者ページはモック対象外です'); return false;">@keio-lightmusic</a>
+        · 慶應軽音サークル
+      </div>
+
+      <ul class="ev-meta">
+        <li>
+          <b>📅 日時</b>
+          2026-04-08 (火) 18:00 − 20:00
+          <a href="#" class="cal-link" onclick="alert('Google カレンダー追加'); return false;">+ Google Cal</a>
+          <a href="#" class="cal-link" onclick="alert('ics ダウンロード'); return false;">ics</a>
+        </li>
+        <li>
+          <b>📍 会場</b>
+          対面 · 慶應義塾大学 三田キャンパス 西校舎 512教室
+          <a href="#" class="cal-link" onclick="alert('地図を開く'); return false;">地図</a>
+        </li>
+        <li>
+          <b>📝 募集</b>
+          2026-03-15 (土) 09:00 〜 2026-04-07 (月) 23:59
+        </li>
+      </ul>
+
+      <div class="actions">
+        <a href="#" class="btn-icon" onclick="this.textContent = this.textContent.includes('♥') ? '♡ お気に入り' : '♥ お気に入り済み'; return false;">♡ お気に入り</a>
+        <a href="#" class="btn-icon" onclick="alert('フォローしました'); return false;">+ 主催者をフォロー</a>
+        <a href="#" class="btn-icon" onclick="navigator.clipboard.writeText(location.href); alert('URL をコピーしました'); return false;">シェア</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec-hdr" style="margin-top: 24px;">
+    <h2>参加枠</h2>
+  </div>
+
+  <div class="slot">
+    <div class="meta">
+      <div class="name">一般枠</div>
+      <div class="avail"><span class="price">無料</span> · 残 25 席 / 40 席</div>
+    </div>
+    <a href="apply.html?slot=general" class="btn">この枠に申し込む →</a>
+  </div>
+
+  <div class="slot">
+    <div class="meta">
+      <div class="name">懇親会枠（食事付き）</div>
+      <div class="avail"><span class="price">1,500円</span> · 残 8 席 / 20 席</div>
+    </div>
+    <a href="apply.html?slot=party" class="btn">この枠に申し込む →</a>
+  </div>
+
+  <div class="slot">
+    <div class="meta">
+      <div class="name">LT 登壇枠</div>
+      <div class="avail"><span class="price">無料</span> · 満員 (定員 2)</div>
+    </div>
+    <a href="apply.html?slot=lt&waitlist=1" class="btn warn">補欠登録</a>
+  </div>
+
+  <div class="desc">
+    <h3>説明</h3>
+    <p>慶應軽音サークルの新歓ミーティングです。サークル紹介・体験セッション・軽い懇親会を行います。楽器経験の有無は問いません。</p>
+    <p>当日の流れ:</p>
+    <ul>
+      <li>18:00 − 18:30 サークル紹介</li>
+      <li>18:30 − 19:30 体験セッション（希望者）</li>
+      <li>19:30 − 20:00 懇親会（別枠）</li>
+    </ul>
+  </div>
+
+  <div class="desc">
+    <h3>申込時に聞かれること</h3>
+    <ul>
+      <li>お名前（必須）</li>
+      <li>大学（必須）</li>
+      <li>アレルギー（懇親会枠のみ）</li>
+    </ul>
+  </div>
+
+  <div class="sec-hdr">
+    <h2>参加者 <span style="color:var(--ink-3); font-weight:400;">25 / 40</span></h2>
+    <a class="more" href="#" onclick="alert('参加者一覧はモック対象外です'); return false;">すべて見る →</a>
+  </div>
+  <div class="attendees">
+    <span class="avatar-sm">Y</span>
+    <span class="avatar-sm">S</span>
+    <span class="avatar-sm">T</span>
+    <span class="avatar-sm">M</span>
+    <span class="avatar-sm">H</span>
+    <span class="avatar-sm">K</span>
+    <span class="more-count">+ 19 人</span>
+  </div>
+
+  <div class="sec-hdr" style="margin-top: 24px;">
+    <h2>主催者</h2>
+  </div>
+  <div class="orgcard">
+    <div class="icon">軽</div>
+    <div class="info">
+      <div class="name"><a href="#" onclick="alert('主催者ページはモック対象外です'); return false;">慶應軽音サークル (@keio-lightmusic)</a></div>
+      <div class="stats">フォロワー 234 · 過去 18 イベント</div>
+    </div>
+    <a href="#" class="follow" onclick="alert('フォローしました'); return false;">フォロー +</a>
+  </div>
+
+</main>
+
+<div class="sticky-cta">
+  <div class="price">無料 〜 1,500円</div>
+  <a href="apply.html?slot=general" class="btn-next">申し込む →</a>
+</div>
+
+<footer class="ft">
+  © 2026 nmj (モック) · <a href="../requirements.html">要件定義</a> · <a href="../wireframes.html">ワイヤーフレーム</a>
+</footer>
+
+</body>
+</html>
