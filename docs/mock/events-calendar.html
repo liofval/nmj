@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Events カレンダー — nmj (モック)</title>
+<link rel="stylesheet" href="style.css">
+<style>
+  .view-toggle { display: inline-flex; gap: 4px; background: var(--surface); border: 1px solid var(--line); border-radius: 3px; padding: 2px; }
+  .view-toggle a { padding: 6px 14px; font-size: 13px; text-decoration: none; color: var(--ink-2); border-radius: 2px; }
+  .view-toggle a.on { background: var(--ink); color: white; }
+
+  .cal { background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 20px; margin-bottom: 24px; }
+  .cal-nav { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+  .cal-nav .month { font-weight: 700; font-size: 16px; flex: 1; }
+  .cal-nav button {
+    padding: 6px 12px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 13px;
+    color: var(--ink-2);
+  }
+  .cal-nav button:hover { border-color: var(--accent); color: var(--accent); }
+  .cal-nav .today { background: var(--accent-soft); color: var(--accent); border-color: transparent; font-weight: 500; }
+
+  .cal-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 1px;
+    background: var(--line);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .cal-hdr {
+    background: var(--bg);
+    padding: 8px 0;
+    text-align: center;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    color: var(--ink-3);
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+  .cal-hdr.sun { color: var(--danger); }
+  .cal-hdr.sat { color: var(--accent); }
+  .cal-day {
+    background: var(--surface);
+    min-height: 68px;
+    padding: 6px 8px;
+    display: flex; flex-direction: column; gap: 4px;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: border-color .1s, background .1s;
+    font-family: ui-monospace, monospace;
+  }
+  .cal-day.empty { background: var(--bg); cursor: default; }
+  .cal-day.has:hover { border-color: var(--accent-soft); background: var(--accent-soft); }
+  .cal-day.sel { border-color: var(--accent); background: var(--accent-soft); }
+  .cal-day .d { font-size: 13px; font-weight: 500; color: var(--ink); }
+  .cal-day.sun .d { color: var(--danger); }
+  .cal-day.sat .d { color: var(--accent); }
+  .cal-day .dots { font-size: 10px; color: var(--accent); letter-spacing: 3px; line-height: 1; }
+  .cal-day .count {
+    display: none;
+    font-size: 10px;
+    color: var(--ink-3);
+    padding: 2px 5px;
+    background: var(--bg);
+    border-radius: 2px;
+    align-self: flex-start;
+    letter-spacing: 0;
+  }
+  .day-list-hdr {
+    display: flex; align-items: baseline; justify-content: space-between;
+    padding: 8px 0 12px;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 12px;
+  }
+  .day-list-hdr h2 { font-size: 15px; }
+  .day-list-hdr .count { color: var(--ink-3); font-size: 13px; }
+  .empty-state {
+    text-align: center;
+    color: var(--ink-3);
+    font-size: 13px;
+    padding: 40px 0;
+  }
+
+  @media (max-width: 720px) {
+    .cal { padding: 12px; }
+    .cal-day { min-height: 50px; padding: 4px; }
+    .cal-day .d { font-size: 12px; }
+    .cal-day .dots { font-size: 8px; }
+    .cal-hdr { font-size: 10px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="hdr">
+  <a href="index.html" class="brand">nmj</a>
+  <nav class="tabs">
+    <a href="index.html">Home</a>
+    <a href="media.html">Media</a>
+    <a href="events.html" class="on">Events</a>
+  </nav>
+  <div class="user-slot">
+    <a href="#" class="btn-login" onclick="alert('ログインは現時点のモック対象外です'); return false;">ログイン</a>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <a href="index.html" class="back">← Home に戻る</a>
+
+  <h1 style="font-size: 22px; margin-bottom: 12px;">Events</h1>
+
+  <div class="view-toggle" style="margin-bottom: 16px;">
+    <a href="events.html">一覧</a>
+    <a href="events-calendar.html" class="on">カレンダー</a>
+  </div>
+
+  <div class="filters">
+    <div class="field">
+      <label>大学</label>
+      <select>
+        <option>すべて</option>
+        <option>慶應義塾大学</option>
+        <option>早稲田大学</option>
+        <option>東京大学</option>
+        <option>一橋大学</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>種別</label>
+      <select>
+        <option>すべて</option>
+        <option>対面</option>
+        <option>オンライン</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="cal">
+    <div class="cal-nav">
+      <button onclick="alert('モックのため月移動は無効です')">←</button>
+      <span class="month">2026年 4月</span>
+      <button onclick="alert('モックのため月移動は無効です')">→</button>
+      <button class="today" onclick="selectDay(8)">今月へ</button>
+    </div>
+
+    <div class="cal-grid" id="grid">
+      <div class="cal-hdr">月</div>
+      <div class="cal-hdr">火</div>
+      <div class="cal-hdr">水</div>
+      <div class="cal-hdr">木</div>
+      <div class="cal-hdr">金</div>
+      <div class="cal-hdr sat">土</div>
+      <div class="cal-hdr sun">日</div>
+      <!-- Days are populated by JS -->
+    </div>
+  </div>
+
+  <div class="day-list-hdr">
+    <h2 id="day-title">4/8 (火) のイベント</h2>
+    <span class="count" id="day-count">2 件</span>
+  </div>
+  <div id="day-list">
+    <!-- Rendered by JS -->
+  </div>
+
+</main>
+
+<footer class="ft">
+  © 2026 nmj (モック) · <a href="../requirements.html">要件定義</a> · <a href="../wireframes.html">ワイヤーフレーム</a>
+</footer>
+
+<script>
+  // April 2026: 1st is Wednesday
+  const YEAR = 2026;
+  const MONTH = 4;
+  const FIRST_DAY_COL = 2; // Wed (Mon=0, Tue=1, Wed=2)
+  const DAYS_IN_MONTH = 30;
+
+  const WEEKDAYS = ['月','火','水','木','金','土','日'];
+
+  const events = {
+    2: [
+      {title: '春の講演会「経済学入門」', host: '@keio-econ', univ: '慶應', type: 'オンライン', avail: '残 45 席', time: '19:00 − 20:30', price: '無料'}
+    ],
+    5: [
+      {title: 'ボードゲーム交流会 #7', host: '@waseda-boardgames', univ: '早稲田', type: '対面', avail: '残 3 席', time: '13:00 − 17:00', price: '500円'}
+    ],
+    8: [
+      {title: '春の新歓ミーティング', host: '@keio-lightmusic', univ: '慶應', type: '対面', avail: '残 25 席', time: '18:00 − 20:00', price: '1,500円 / 500円 / 無料'},
+      {title: 'テニスサークル 春の勧誘会', host: '@utokyo-tennis', univ: '東大', type: '対面', avail: '残 8 席', time: '17:00 − 19:00', price: '無料'}
+    ],
+    10: [
+      {title: '読書会 #12 現代思想', host: '@waseda-bookclub', univ: '早稲田', type: '対面', avail: '残 5 席', time: '19:00 − 21:00', price: '500円'}
+    ],
+    12: [
+      {title: 'プログラミング勉強会 #4', host: '@utokyo-code', univ: '東大', type: 'オンライン', avail: '残 34 席', time: '14:00 − 16:00', price: '無料'}
+    ],
+    15: [
+      {title: 'ダンスサークル体験会', host: '@keio-dance', univ: '慶應', type: '対面', avail: '残 8 席', time: '18:30 − 20:30', price: '無料'}
+    ],
+    18: [
+      {title: '合同新歓 (経済系サークル)', host: '@keio-econ', univ: '合同', type: '対面', avail: '残 12 席', time: '16:00 − 18:00', price: '無料'},
+      {title: '国際交流会 Spring 2026', host: '@waseda-intl', univ: '早稲田', type: '対面', avail: '残 30 席', time: '19:00 − 21:00', price: '無料'},
+      {title: '映画研究会 上映会', host: '@utokyo-cinema', univ: '東大', type: '対面', avail: '残 15 席', time: '20:00 − 22:00', price: '500円'}
+    ],
+    22: [
+      {title: 'キャリア相談会', host: '@utokyo-career', univ: '東大', type: 'オンライン', avail: '残 20 席', time: '18:00 − 19:30', price: '無料'}
+    ],
+    25: [
+      {title: '春の合宿説明会', host: '@keio-lightmusic', univ: '慶應', type: '対面', avail: '残 40 席', time: '15:00 − 16:30', price: '無料'}
+    ]
+  };
+
+  function renderCalendar() {
+    const grid = document.getElementById('grid');
+    // Add empty cells before day 1
+    for (let i = 0; i < FIRST_DAY_COL; i++) {
+      const cell = document.createElement('div');
+      cell.className = 'cal-day empty';
+      grid.appendChild(cell);
+    }
+    // Add day cells
+    for (let d = 1; d <= DAYS_IN_MONTH; d++) {
+      const col = (FIRST_DAY_COL + d - 1) % 7;
+      const cell = document.createElement('div');
+      cell.className = 'cal-day';
+      if (col === 5) cell.classList.add('sat');
+      if (col === 6) cell.classList.add('sun');
+      cell.dataset.day = d;
+
+      const dEl = document.createElement('span');
+      dEl.className = 'd';
+      dEl.textContent = d;
+      cell.appendChild(dEl);
+
+      const dayEvents = events[d];
+      if (dayEvents && dayEvents.length > 0) {
+        cell.classList.add('has');
+        const dots = document.createElement('span');
+        dots.className = 'dots';
+        const n = Math.min(dayEvents.length, 3);
+        dots.textContent = '●'.repeat(n);
+        cell.appendChild(dots);
+        cell.addEventListener('click', () => selectDay(d));
+      }
+
+      grid.appendChild(cell);
+    }
+  }
+
+  function selectDay(d) {
+    document.querySelectorAll('.cal-day.sel').forEach(el => el.classList.remove('sel'));
+    const cell = document.querySelector(`.cal-day[data-day="${d}"]`);
+    if (cell) cell.classList.add('sel');
+
+    const col = (FIRST_DAY_COL + d - 1) % 7;
+    const weekday = WEEKDAYS[col];
+
+    document.getElementById('day-title').textContent = `${MONTH}/${d} (${weekday}) のイベント`;
+    const dayEvents = events[d] || [];
+    document.getElementById('day-count').textContent = `${dayEvents.length} 件`;
+
+    const list = document.getElementById('day-list');
+    if (dayEvents.length === 0) {
+      list.innerHTML = '<div class="empty-state">この日のイベントはありません</div>';
+      return;
+    }
+    list.innerHTML = dayEvents.map(ev => `
+      <a href="event.html" class="evrow">
+        <div class="cvr">COVER</div>
+        <div>
+          <h3>${ev.title}</h3>
+          <div class="meta"><b>${ev.host}</b> · ${ev.univ} · ${ev.type} · ${ev.avail}</div>
+          <div class="meta">${MONTH}/${d} ${ev.time}</div>
+          <div class="meta">${ev.price}</div>
+        </div>
+      </a>
+    `).join('');
+  }
+
+  renderCalendar();
+  selectDay(8);
+</script>
+
+</body>
+</html>
