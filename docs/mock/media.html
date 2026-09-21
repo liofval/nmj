@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Media — nmj (モック)</title>
+<link rel="stylesheet" href="style.css">
+<style>
+  .cat-chips { display: flex; gap: 8px; margin: 16px 0 28px; flex-wrap: wrap; }
+  .chip { padding: 6px 14px; border: 1px solid var(--line); border-radius: 20px; font-size: 13px; color: var(--ink-2); text-decoration: none; background: var(--surface); cursor: pointer; }
+  .chip.on { background: var(--ink); color: white; border-color: var(--ink); }
+  .chip:hover:not(.on) { border-color: var(--accent); color: var(--accent); }
+
+  .featured {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr;
+    gap: 20px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    overflow: hidden;
+    text-decoration: none;
+    color: inherit;
+    margin-bottom: 8px;
+    transition: border-color .15s;
+  }
+  .featured:hover { border-color: var(--accent); }
+  .featured .cover-big {
+    aspect-ratio: 16/10;
+    background: var(--accent-soft);
+    color: var(--accent);
+    display: flex; align-items: center; justify-content: center;
+    font-family: ui-monospace, monospace;
+    font-size: 13px; letter-spacing: 0.14em;
+  }
+  .featured .body { padding: 28px 32px; display: flex; flex-direction: column; justify-content: center; }
+  .featured .tag { font-family: ui-monospace, monospace; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 12px; }
+  .featured h2 { font-size: 22px; line-height: 1.4; margin-bottom: 12px; }
+  .featured p { font-size: 13px; color: var(--ink-2); margin-bottom: 12px; }
+  .featured .meta { font-size: 12px; color: var(--ink-3); }
+
+  .media-card .cover { font-size: 11px; }
+  .media-card .cat { font-family: ui-monospace, monospace; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 6px; }
+
+  @media (max-width: 720px) {
+    .featured { grid-template-columns: 1fr; }
+    .featured .body { padding: 20px; }
+    .featured h2 { font-size: 18px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="hdr">
+  <a href="index.html" class="brand">nmj</a>
+  <nav class="tabs">
+    <a href="index.html">Home</a>
+    <a href="media.html" class="on">Media</a>
+    <a href="events.html">Events</a>
+  </nav>
+  <div class="user-slot">
+    <a href="#" class="btn-login" onclick="alert('ログインは現時点のモック対象外です'); return false;">ログイン</a>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <a href="index.html" class="back">← Home に戻る</a>
+
+  <h1 style="font-size: 24px; margin-bottom: 4px;">Media</h1>
+  <p style="color: var(--ink-3); font-size: 13px;">学生イベントの読み物・特集・主催者インタビュー</p>
+
+  <div class="cat-chips">
+    <a class="chip on">すべて</a>
+    <a class="chip">新歓ガイド</a>
+    <a class="chip">インタビュー</a>
+    <a class="chip">ノウハウ</a>
+    <a class="chip">学園祭レポート</a>
+  </div>
+
+  <div class="sec-hdr">
+    <h2>特集</h2>
+  </div>
+
+  <a href="article.html" class="featured">
+    <div class="cover-big">FEATURED COVER</div>
+    <div class="body">
+      <div class="tag">特集 · 新歓ガイド</div>
+      <h2>新歓を成功させる7つの型</h2>
+      <p>幹事交代でフォロワーを失わず、毎年安定して人を集める団体は何をしているのか。3年連続で新歓成功している5団体に聞いた共通パターン。</p>
+      <div class="meta">7分読了 · 2026-04-01</div>
+    </div>
+  </a>
+
+  <div class="sec-hdr" style="margin-top: 40px;">
+    <h2>新着</h2>
+  </div>
+
+  <div class="cards">
+    <a href="article.html" class="card media-card">
+      <div class="cover">ARTICLE</div>
+      <div class="body">
+        <div class="cat">インタビュー</div>
+        <div class="title">幹事交代でフォロワーを失わない — 慶應軽音の続け方</div>
+        <div class="meta">5分読了 · 2026-03-28</div>
+      </div>
+    </a>
+    <a href="article.html" class="card media-card">
+      <div class="cover">ARTICLE</div>
+      <div class="body">
+        <div class="cat">ノウハウ</div>
+        <div class="title">Google フォームからの卒業 — 集金と会計を1つにする</div>
+        <div class="meta">6分読了 · 2026-03-25</div>
+      </div>
+    </a>
+    <a href="article.html" class="card media-card">
+      <div class="cover">ARTICLE</div>
+      <div class="body">
+        <div class="cat">学園祭レポート</div>
+        <div class="title">早稲田祭2025 舞台裏 — 20万人を回した運営の記録</div>
+        <div class="meta">10分読了 · 2026-03-20</div>
+      </div>
+    </a>
+    <a href="article.html" class="card media-card">
+      <div class="cover">ARTICLE</div>
+      <div class="body">
+        <div class="cat">新歓ガイド</div>
+        <div class="title">新入生に届く告知の書き方</div>
+        <div class="meta">4分読了 · 2026-03-18</div>
+      </div>
+    </a>
+    <a href="article.html" class="card media-card">
+      <div class="cover">ARTICLE</div>
+      <div class="body">
+        <div class="cat">ノウハウ</div>
+        <div class="title">当日受付を紙から解放する</div>
+        <div class="meta">5分読了 · 2026-03-15</div>
+      </div>
+    </a>
+    <a href="article.html" class="card media-card">
+      <div class="cover">ARTICLE</div>
+      <div class="body">
+        <div class="cat">インタビュー</div>
+        <div class="title">個人で始めた勉強会が団体になるまで</div>
+        <div class="meta">6分読了 · 2026-03-10</div>
+      </div>
+    </a>
+  </div>
+
+  <p style="text-align: center; margin: 32px 0;">
+    <a href="#" class="btn-icon" onclick="alert('モックのためこれ以上の記事はありません'); return false;">もっと読み込む</a>
+  </p>
+
+</main>
+
+<footer class="ft">
+  © 2026 nmj (モック) · <a href="../requirements.html">要件定義</a> · <a href="../wireframes.html">ワイヤーフレーム</a>
+</footer>
+
+</body>
+</html>
