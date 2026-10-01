@@ -139,7 +139,7 @@ const rows=[
  {n:'修正・本番準備',s:'2027-01-18',e:'2027-01-26',k:'t'},
  {n:'本番決済確認 → 公開',m:'2027-01-28'},
 ];
-const P=({lp:'lp',ticket:'ticket'})[new URLSearchParams(location.search).get('p')]||'all';
+const Q=new URLSearchParams(location.search).get('p'), P=(Q==='lp'||Q==='ticket')?Q:'all';
 document.body.classList.add('p-'+P);
 if(P!=='all')document.querySelectorAll('[data-p="all"]').forEach(e=>e.remove());
 document.querySelectorAll('[data-p="lp-only"]').forEach(e=>e.dataset.p=P==='lp'?'lp':'none');

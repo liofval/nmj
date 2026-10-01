@@ -40,10 +40,12 @@ const TABS=[
   {id:'figma',label:'デザインプレビュー',src:'./figma-preview/'},
   {id:'er',label:'ER 図',src:'./er-diagram.html'},
   {id:'schema',label:'スキーマ',src:'./schema.prisma',text:true},
+  {id:'schedule',label:'スケジュール（全体）',src:'./schedule.html',hidden:true},
 ];
 const nav=document.getElementById('tabs'), main=document.getElementById('main'), sp=nav.querySelector('.sp'), open=document.getElementById('open');
 const btn={}, pane={};
 TABS.forEach(t=>{
+  if(t.hidden)return;
   const b=document.createElement('button'); b.textContent=t.label; b.onclick=()=>{location.hash=t.id};
   nav.insertBefore(b,sp); btn[t.id]=b;
 });
@@ -62,7 +64,7 @@ function show(id){
     }
     main.appendChild(pane[t.id]);
   }
-  TABS.forEach(x=>{btn[x.id].classList.toggle('on',x.id===t.id); pane[x.id]&&pane[x.id].classList.toggle('on',x.id===t.id)});
+  TABS.forEach(x=>{btn[x.id]&&btn[x.id].classList.toggle('on',x.id===t.id); pane[x.id]&&pane[x.id].classList.toggle('on',x.id===t.id)});
   open.href=t.src; document.title=`${t.label} — NEXT MOVE JAPAN`;
 }
 window.addEventListener('hashchange',()=>show(location.hash.slice(1)));
