@@ -1,0 +1,611 @@
+// ============================================================
+// NEXT MOVE JAPAN 学生イベント基盤 — Prisma schema（ドラフト）
+// 要件定義 v0.4 §5 ＋ プロトタイプ画面から追加で必要になったもの
+// DB: PostgreSQL
+// ※ Prisma で書けない制約（CHECK・部分一意インデックス）は末尾の SQL をマイグレーションに追記する
+// ============================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ---------- enums ----------
+enum OrganizerType {
+  USER
+  GROUP
+}
+
+enum MemberRole {
+  OWNER
+  ADMIN
+}
+
+enum EventStatus {
+  DRAFT
+  PUBLISHED
+  CANCELLED
+}
+
+enum VenueType {
+  OFFLINE
+  ONLINE
+}
+
+enum AttendeeListVisibility {
+  ORGANIZER_ONLY // 既定
+  PUBLIC_NICKNAME // 参加者のあだ名を公開
+}
+
+enum RegistrationStatus {
+  PENDING_PAYMENT
+  CONFIRMED
+  WAITLISTED
+  CANCELLED
+  EXPIRED
+}
+
+enum QuestionType {
+  TEXT
+  TEXTAREA
+  TEL
+  SELECT
+  MULTI_SELECT
+}
+
+enum PaymentProvider {
+  MOCK
+  STRIPE
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+}
+
+enum AnnouncementAudience {
+  CONFIRMED // 確定者のみ
+  ALL // 補欠を含む全員
+}
+
+enum ReportTargetType {
+  EVENT
+  ORGANIZER
+}
+
+enum ReportReason {
+  FRAUD // 詐欺・架空のイベント
+  INAPPROPRIATE // 不適切な内容
+  PERSONAL_DATA_ABUSE // 個人情報の不正な収集
+  OTHER
+}
+
+enum ArticleStatus {
+  DRAFT
+  IN_REVIEW // 主催者投稿は運営の審査待ち
+  PUBLISHED
+  REJECTED
+}
+
+enum NotificationType {
+  REGISTRATION_CONFIRMED // 申込完了
+  WAITLIST_PROMOTED // 補欠からの繰り上げ
+  PAYMENT_DUE_REMINDER // 支払い期限
+  PAYMENT_EXPIRED // 期限切れ
+  EVENT_CANCELLED // 中止
+  NEW_EVENT_FROM_FOLLOWING // フォロー先の新規公開
+  ANNOUNCEMENT // 主催者からの告知
+  ANSWER_DELETION_NOTICE // 回答削除の7日前予告（主催者宛て）
+  INVITATION // メンバー招待
+}
+
+enum EmailCategory {
+  EVENT_UPDATES // 申込・繰り上げ・期限・中止（取引メール）
+  FOLLOW_NEWS // フォロー先の新規公開
+  ANNOUNCEMENTS // 主催者からの告知
+}
+
+enum NotificationStatus {
+  QUEUED
+  SENT
+  FAILED
+  SUPPRESSED // 配信停止により送らなかった
+}
+
+enum ReportStatus {
+  OPEN
+  RESOLVED
+  DISMISSED
+}
+
+// ---------- マスタ ----------
+model University {
+  id          String  @id @default(cuid())
+  name        String
+  slug        String  @unique
+  emailDomain String? // 将来の自動判定用に持つだけ
+  events      Event[]
+}
+
+// ---------- アカウント ----------
+// 認証と通知のための最小限。表示に関わる情報は Organizer（type=USER）が持つ。本名・大学は持たない
+model User {
+  id        String   @id @default(cuid())
+  googleSub String   @unique
+  email     String   @unique
+  isStaff   Boolean  @default(false) // 運営（記事の審査・通報の対応）
+  createdAt DateTime @default(now())
+
+  organizer     Organizer?        @relation("PersonalOrganizer")
+  memberships   OrganizerMember[]
+  follows       Follow[]
+  favorites     Favorite[]
+  registrations Registration[]
+  invitationsCreated Invitation[] @relation("InvitationCreatedBy")
+  invitationsAccepted Invitation[] @relation("InvitationAcceptedBy")
+  exportLogs    AnswerExportLog[]
+  reports       Report[]
+  reportsResolved Report[] @relation("ReportResolvedBy")
+  articlesWritten  MediaArticle[] @relation("ArticleAuthor")
+  articlesReviewed MediaArticle[] @relation("ArticleReviewer")
+  notifications    NotificationLog[]
+  emailPreferences EmailPreference[]
+
+  // Auth.js（Prisma アダプタ）
+  accounts Account[]
+  sessions Session[]
+}
+
+// 主催者アカウント（団体・個人を1つに閉じ込める）。/@slug の実体
+model Organizer {
+  id          String        @id @default(cuid())
+  type        OrganizerType
+  userId      String?       @unique // type=USER のときのみ非 NULL（CHECK は末尾 SQL）
+  slug        String        @unique // ユーザーネーム。予約語はアプリ側で拒否
+  displayName String // あだ名（重複可・日本語可）
+  iconUrl     String?
+  bio         String? // 団体のみ UI で使う
+  coverUrl    String? // 団体のみ UI で使う
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  user           User?             @relation("PersonalOrganizer", fields: [userId], references: [id])
+  members        OrganizerMember[]
+  socialLinks    SocialLink[]
+  followers      Follow[]
+  events         Event[]
+  payoutAccounts PayoutAccount[]
+  invitations    Invitation[]
+  articleLinks   MediaArticleOrganizer[]
+  articlesAuthored MediaArticle[] @relation("ArticleAuthorOrganizer")
+}
+
+// 運営メンバー（type=GROUP の Organizer にのみ作成。最後の OWNER は離脱不可 → アプリのトランザクションで検証）
+model OrganizerMember {
+  organizerId String
+  userId      String
+  role        MemberRole
+  invitedAt   DateTime   @default(now())
+  joinedAt    DateTime?
+
+  organizer Organizer @relation(fields: [organizerId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([organizerId, userId])
+  @@index([userId])
+}
+
+// 招待リンク（メンバー招待モーダル）
+model Invitation {
+  id          String     @id @default(cuid())
+  organizerId String
+  role        MemberRole @default(ADMIN)
+  token       String     @unique
+  expiresAt   DateTime
+  createdById String
+  acceptedById String?
+  acceptedAt  DateTime?
+  revokedAt   DateTime?
+  createdAt   DateTime   @default(now())
+
+  organizer  Organizer @relation(fields: [organizerId], references: [id], onDelete: Cascade)
+  createdBy  User      @relation("InvitationCreatedBy", fields: [createdById], references: [id])
+  acceptedBy User?     @relation("InvitationAcceptedBy", fields: [acceptedById], references: [id])
+
+  @@index([organizerId])
+}
+
+model SocialLink {
+  id          String @id @default(cuid())
+  organizerId String
+  platform    String // X / Instagram / GitHub など（本人確認はしない）
+  url         String
+  sortOrder   Int    @default(0)
+
+  organizer Organizer @relation(fields: [organizerId], references: [id], onDelete: Cascade)
+
+  @@index([organizerId, sortOrder])
+}
+
+model Follow {
+  userId      String
+  organizerId String
+  notifyEmail Boolean  @default(true) // 新規公開のメール通知 ON/OFF
+  createdAt   DateTime @default(now())
+
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organizer Organizer @relation(fields: [organizerId], references: [id], onDelete: Cascade)
+
+  @@id([userId, organizerId])
+  @@index([organizerId])
+}
+
+// ---------- イベント ----------
+model Event {
+  id                     String                 @id @default(cuid())
+  organizerId            String // 移管はこの付け替えだけ
+  targetUniversityId     String? // NULL = 大学を問わない
+  title                  String
+  body                   String // Markdown
+  startAt                DateTime
+  endAt                  DateTime
+  venueType              VenueType
+  venueName              String?
+  address                String?
+  onlineUrl              String? // 参加確定者にのみ開示
+  status                 EventStatus            @default(DRAFT)
+  publishedAt            DateTime?
+  cancelledAt            DateTime?
+  cancelReason           String? // 中止時の参加者への説明
+  coverUrl               String?
+  payoutAccountId        String? // この回の入金先（MVP は未使用）
+  attendeeListVisibility AttendeeListVisibility @default(ORGANIZER_ONLY)
+  answerRetentionDays    Int                    @default(30) // 30 / 90 / 365（CHECK は末尾 SQL）
+  dataUsePurpose         String? // 個人情報の質問があれば公開時に必須（アプリで検証）
+  createdAt              DateTime               @default(now())
+  updatedAt              DateTime               @updatedAt
+
+  organizer         Organizer              @relation(fields: [organizerId], references: [id])
+  targetUniversity  University?            @relation(fields: [targetUniversityId], references: [id])
+  payoutAccount     PayoutAccount?         @relation(fields: [payoutAccountId], references: [id])
+  slots             Slot[]
+  questions         RegistrationQuestion[]
+  announcements     Announcement[]
+  favorites         Favorite[]
+  exportLogs        AnswerExportLog[]
+  articleLinks      MediaArticleEvent[]
+  notifications     NotificationLog[]
+
+  @@index([status, startAt])
+  @@index([targetUniversityId, startAt])
+  @@index([organizerId, startAt])
+  @@index([endAt]) // 回答の自動削除 Cron
+}
+
+// 参加枠。定員と価格は枠の属性
+model Slot {
+  id          String    @id @default(cuid())
+  eventId     String
+  name        String
+  description String?
+  capacity    Int
+  priceYen    Int       @default(0) // 0 = 無料枠
+  opensAt     DateTime?
+  closesAt    DateTime?
+  sortOrder   Int       @default(0)
+
+  event         Event          @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  registrations Registration[]
+
+  @@index([eventId, sortOrder])
+}
+
+// 申込。定員判定は Slot 行を SELECT ... FOR UPDATE してから数える（registerToSlot に集約）
+model Registration {
+  id           String             @id @default(cuid())
+  slotId       String
+  userId       String
+  status       RegistrationStatus
+  appliedAt    DateTime           @default(now()) // 補欠の正の順序
+  waitlistPos  Int?
+  paymentDueAt DateTime? // min(申込+24h, 開始時刻)
+  checkedInAt  DateTime? // 当日の受付
+  cancelledAt  DateTime?
+  note         String?
+
+  slot     Slot                 @relation(fields: [slotId], references: [id])
+  user     User                 @relation(fields: [userId], references: [id])
+  answers  RegistrationAnswer[]
+  payments Payment[] // 失敗→再試行があるため複数
+  notifications NotificationLog[]
+
+  // 同一枠に有効な申込は1件 → 部分一意インデックスを末尾 SQL で作成
+  @@index([slotId, status, appliedAt])
+  @@index([userId, status])
+  @@index([status, paymentDueAt]) // 期限切れ Cron
+}
+
+// 申込時の質問。公開後は削除・type 変更禁止（アプリで検証）
+model RegistrationQuestion {
+  id             String       @id @default(cuid())
+  eventId        String
+  label          String
+  helpText       String?
+  type           QuestionType
+  options        Json? // SELECT 系のみ
+  required       Boolean      @default(false)
+  isPersonalData Boolean      @default(false)
+  slotIds        String[] // 空 = 全枠。「懇親会枠のみ」などの対象枠
+  sortOrder      Int          @default(0)
+
+  event   Event                @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  answers RegistrationAnswer[]
+
+  @@index([eventId, sortOrder])
+}
+
+// 本名・連絡先はここにだけ存在し、保持期間後に削除される。閲覧は主催者と本人のみ
+model RegistrationAnswer {
+  registrationId String
+  questionId     String
+  value          String
+  updatedAt      DateTime @updatedAt
+
+  registration Registration         @relation(fields: [registrationId], references: [id], onDelete: Cascade)
+  question     RegistrationQuestion @relation(fields: [questionId], references: [id])
+
+  @@id([registrationId, questionId])
+}
+
+// CSV 出力の記録（誰がいつ出力したか。§8）
+model AnswerExportLog {
+  id             String   @id @default(cuid())
+  eventId        String
+  userId         String
+  includeAnswers Boolean
+  includeWaitlist Boolean @default(false)
+  exportedAt     DateTime @default(now())
+
+  event Event @relation(fields: [eventId], references: [id])
+  user  User  @relation(fields: [userId], references: [id])
+
+  @@index([eventId, exportedAt])
+}
+
+// ---------- 決済 ----------
+model Payment {
+  id             String          @id @default(cuid())
+  registrationId String
+  provider       PaymentProvider
+  providerRef    String          @unique // Webhook の冪等性
+  amountYen      Int
+  status         PaymentStatus   @default(PENDING)
+  failureReason  String?
+  paidAt         DateTime?
+  refundedAt     DateTime?
+  createdAt      DateTime        @default(now())
+
+  registration Registration @relation(fields: [registrationId], references: [id])
+
+  @@index([registrationId])
+}
+
+// 実決済フェーズで有効化（Stripe Connect Standard 想定）
+model PayoutAccount {
+  id                String          @id @default(cuid())
+  organizerId       String
+  provider          PaymentProvider
+  externalAccountId String
+  label             String
+  verifiedAt        DateTime?
+
+  organizer Organizer @relation(fields: [organizerId], references: [id])
+  events    Event[]
+
+  @@index([organizerId])
+}
+
+// ---------- 告知・お気に入り・通報 ----------
+model Announcement {
+  id             String               @id @default(cuid())
+  eventId        String
+  subject        String
+  body           String
+  audience       AnnouncementAudience
+  recipientCount Int
+  sentAt         DateTime             @default(now())
+
+  event         Event             @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  notifications NotificationLog[]
+
+  @@index([eventId, sentAt])
+}
+
+// 個別イベントの保存（仕様の細部は §14 で未決）
+model Favorite {
+  userId    String
+  eventId   String
+  createdAt DateTime @default(now())
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@id([userId, eventId])
+  @@index([eventId])
+}
+
+// 通報（targetId は Event.id か Organizer.id。ポリモーフィックなので FK は張らない）
+model Report {
+  id             String           @id @default(cuid())
+  reporterUserId String
+  targetType     ReportTargetType
+  targetId       String
+  reason         ReportReason
+  detail         String?
+  status         ReportStatus     @default(OPEN)
+  createdAt      DateTime         @default(now())
+  resolvedAt     DateTime?
+  resolvedById   String? // 対応した運営
+  resolution     String?
+
+  reporter   User  @relation(fields: [reporterUserId], references: [id])
+  resolvedBy User? @relation("ReportResolvedBy", fields: [resolvedById], references: [id])
+
+  @@index([targetType, targetId])
+  @@index([status, createdAt])
+}
+
+// ---------- Media（自前 DB。運営と主催者が投稿、主催者投稿は運営が審査） ----------
+model MediaArticle {
+  id                String        @id @default(cuid())
+  slug              String        @unique
+  title             String
+  lead              String?
+  body              String
+  category          String // 新歓ガイド / インタビュー / ノウハウ / 学園祭（体系は未決）
+  coverUrl          String?
+  readMinutes       Int?
+  isFeatured        Boolean       @default(false)
+  status            ArticleStatus @default(DRAFT)
+  authorUserId      String // 書いた人
+  authorOrganizerId String? // 主催者として投稿した場合。NULL = 運営記事
+  reviewedById      String? // 審査した運営
+  reviewedAt        DateTime?
+  rejectReason      String?
+  publishedAt       DateTime?
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+
+  author          User       @relation("ArticleAuthor", fields: [authorUserId], references: [id])
+  authorOrganizer Organizer? @relation("ArticleAuthorOrganizer", fields: [authorOrganizerId], references: [id])
+  reviewedBy      User?      @relation("ArticleReviewer", fields: [reviewedById], references: [id])
+  events          MediaArticleEvent[] // 関連イベント
+  organizers      MediaArticleOrganizer[] // 記事に登場する主催者
+
+  @@index([status, publishedAt])
+  @@index([category, publishedAt])
+  @@index([authorOrganizerId])
+}
+
+model MediaArticleEvent {
+  articleId String
+  eventId   String
+
+  article MediaArticle @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  event   Event        @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@id([articleId, eventId])
+}
+
+model MediaArticleOrganizer {
+  articleId   String
+  organizerId String
+
+  article   MediaArticle @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  organizer Organizer    @relation(fields: [organizerId], references: [id], onDelete: Cascade)
+
+  @@id([articleId, organizerId])
+}
+
+// ---------- メール通知（送信ログと配信停止） ----------
+model NotificationLog {
+  id                String             @id @default(cuid())
+  userId            String? // 宛先ユーザー（招待など未登録宛ては NULL）
+  toEmail           String
+  type              NotificationType
+  status            NotificationStatus @default(QUEUED)
+  eventId           String?
+  registrationId    String?
+  announcementId    String?
+  providerMessageId String? // Resend のメッセージ ID
+  error             String?
+  createdAt         DateTime           @default(now())
+  sentAt            DateTime?
+
+  user         User?         @relation(fields: [userId], references: [id])
+  event        Event?        @relation(fields: [eventId], references: [id])
+  registration Registration? @relation(fields: [registrationId], references: [id])
+  announcement Announcement? @relation(fields: [announcementId], references: [id])
+
+  @@index([userId, createdAt])
+  @@index([type, status])
+  @@index([eventId])
+}
+
+// 配信停止（カテゴリ単位）。行が無ければ受信する。フォロー先ごとの ON/OFF は Follow.notifyEmail
+model EmailPreference {
+  userId    String
+  category  EmailCategory
+  enabled   Boolean       @default(true)
+  updatedAt DateTime      @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, category])
+}
+
+// ---------- Auth.js（@auth/prisma-adapter） ----------
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ============================================================
+// マイグレーションに手書きで追加する SQL（Prisma では表現できない制約）
+// ------------------------------------------------------------
+// -- 個人主催者のときだけ userId を持つ
+// ALTER TABLE "Organizer" ADD CONSTRAINT organizer_user_check
+//   CHECK ((type = 'USER') = ("userId" IS NOT NULL));
+//
+// -- 保持期間は 30 / 90 / 365 のいずれか
+// ALTER TABLE "Event" ADD CONSTRAINT event_retention_check
+//   CHECK ("answerRetentionDays" IN (30, 90, 365));
+//
+// -- 定員・価格は 0 以上
+// ALTER TABLE "Slot" ADD CONSTRAINT slot_capacity_check CHECK (capacity >= 0 AND "priceYen" >= 0);
+//
+// -- 同一枠に有効な申込は1人1件（キャンセル・期限切れ後の再申込は許可）
+// CREATE UNIQUE INDEX registration_active_unique ON "Registration" ("slotId", "userId")
+//   WHERE status IN ('PENDING_PAYMENT', 'CONFIRMED', 'WAITLISTED');
+//
+// -- キーワード検索（タイトル・説明）
+// CREATE EXTENSION IF NOT EXISTS pg_trgm;
+// CREATE INDEX event_title_trgm ON "Event" USING gin (title gin_trgm_ops);
+// ============================================================
