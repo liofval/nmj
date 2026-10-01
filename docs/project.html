@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NEXT MOVE JAPAN — プロジェクト資料</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700;900&family=Barlow+Condensed:wght@700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{display:flex;flex-direction:column;font:14px/1.6 "Noto Sans JP",sans-serif;color:#111;background:#fff}
+nav{display:flex;align-items:stretch;gap:2px;background:#111;padding:0 16px;border-bottom:3px solid #FF6002;flex:none;overflow-x:auto}
+nav .brand{font:800 18px/1 "Barlow Condensed",sans-serif;letter-spacing:.06em;color:#fff;display:flex;align-items:center;padding-right:20px;white-space:nowrap}
+nav button{font:700 13px/1 "Noto Sans JP",sans-serif;color:#bbb;background:none;border:0;padding:16px 16px 13px;cursor:pointer;white-space:nowrap;border-bottom:3px solid transparent;margin-bottom:-3px}
+nav button:hover{color:#fff}
+nav button.on{color:#fff;border-bottom-color:#fff;background:#2a2a2a}
+nav .sp{flex:1}
+nav a.open{color:#FF6002;font-size:12px;display:flex;align-items:center;white-space:nowrap;text-decoration:none;padding-left:16px}
+main{flex:1;position:relative}
+main iframe,main .pane{position:absolute;inset:0;width:100%;height:100%;border:0;display:none}
+main .on{display:block}
+.pane{overflow:auto;padding:24px 32px}
+.pane pre{font:12.5px/1.6 ui-monospace,Menlo,monospace;background:#f5f5f5;padding:16px 20px;margin:0}
+</style>
+</head>
+<body>
+<nav id="tabs">
+  <span class="brand">NEXT MOVE JAPAN</span>
+  <span class="sp"></span>
+  <a class="open" id="open" href="#" target="_blank" rel="noopener">別タブで開く ↗</a>
+</nav>
+<main id="main"></main>
+<script>
+const TABS=[
+  {id:'schedule',label:'スケジュール',src:'./schedule.html'},
+  {id:'todo',label:'TODO',src:'./todo.html'},
+  {id:'wireframe',label:'ワイヤーフレーム',src:'./wireframes.html'},
+  {id:'prototype',label:'デザイン（プロトタイプ）',src:'./prototype.html'},
+  {id:'figma',label:'デザインプレビュー',src:'./figma-preview/'},
+  {id:'er',label:'ER 図',src:'./er-diagram.html'},
+  {id:'schema',label:'スキーマ',src:'./schema.prisma',text:true},
+];
+const nav=document.getElementById('tabs'), main=document.getElementById('main'), sp=nav.querySelector('.sp'), open=document.getElementById('open');
+const btn={}, pane={};
+TABS.forEach(t=>{
+  const b=document.createElement('button'); b.textContent=t.label; b.onclick=()=>{location.hash=t.id};
+  nav.insertBefore(b,sp); btn[t.id]=b;
+});
+function show(id){
+  const t=TABS.find(x=>x.id===id)||TABS[0];
+  if(!pane[t.id]){
+    if(t.text){
+      const d=document.createElement('div'); d.className='pane';
+      d.innerHTML=`<pre>読み込み中…</pre>`;
+      fetch(t.src).then(r=>{if(!r.ok)throw 0;return r.text()})
+        .then(x=>{d.firstChild.textContent=x})
+        .catch(()=>{d.innerHTML=`<p>この環境では表示できません。<a href="${t.src}">${t.src}</a> を直接開いてください。</p>`});
+      pane[t.id]=d;
+    }else{
+      const f=document.createElement('iframe'); f.src=t.src; f.title=t.label; pane[t.id]=f;
+    }
+    main.appendChild(pane[t.id]);
+  }
+  TABS.forEach(x=>{btn[x.id].classList.toggle('on',x.id===t.id); pane[x.id]&&pane[x.id].classList.toggle('on',x.id===t.id)});
+  open.href=t.src; document.title=`${t.label} — NEXT MOVE JAPAN`;
+}
+window.addEventListener('hashchange',()=>show(location.hash.slice(1)));
+show(location.hash.slice(1));
+</script>
+</body>
+</html>
