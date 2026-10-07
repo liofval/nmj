@@ -259,6 +259,8 @@ ul.ops{margin:0;padding-left:1.1em}
     var l=document.createElement('label'); l.textContent=it.label; l.htmlFor='memo-'+it.id;
     var ta=document.createElement('textarea'); ta.id='memo-'+it.id; ta.value=data[it.id]||'';
     ta.addEventListener('input',function(){dirty[it.id]=true; clearTimeout(timer); timer=setTimeout(flush,400);});
+    // 編集中に別タブで保存された内容は、未編集のままフォーカスを外したときに反映する
+    ta.addEventListener('blur',function(){ if(dirty[it.id]) return; var cur=readStored(); if(it.id in cur) ta.value=cur[it.id]; });
     fields.appendChild(l); fields.appendChild(ta); tas[it.id]=ta;
   });
   function readStored(){try{return JSON.parse(localStorage.getItem(key)||'{}')||{}}catch(e){return {}}}
@@ -296,8 +298,9 @@ ul.ops{margin:0;padding-left:1.1em}
   embed(shown||emb.memo||{});
   document.getElementById('memoEmbed').addEventListener('click',function(){
     flush(); var memo=collect(); embed(memo);
-    try{localStorage.setItem(EKEY,JSON.stringify(memo))}catch(e){}
-    status.textContent='埋め込みました '+new Date().toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'});
+    var ok=!Object.keys(dirty).length;
+    try{localStorage.setItem(EKEY,JSON.stringify(memo))}catch(e){ok=false}
+    status.textContent=ok?'埋め込みました '+new Date().toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'}):'埋め込みを保存できません（HTMLで保存してください）';
   });
   document.getElementById('memoExport').addEventListener('click',function(){
     var memo=collect();
