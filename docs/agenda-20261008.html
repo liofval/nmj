@@ -13,8 +13,21 @@ header{background:var(--black);color:#fff;padding:32px 48px 26px}
 header .eyebrow{font:700 13px/1 "Barlow Condensed";letter-spacing:.12em;color:var(--orange)}
 header h1{font:900 26px/1.35 "Noto Sans JP";margin:8px 0 6px}
 header p{margin:0;color:#ccc;font-size:13.5px}
-main{max-width:1440px;padding:8px 48px 48px}
-@media (max-width:720px){main{padding:8px 16px 40px}header{padding:24px 16px 20px}}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:32px;max-width:1800px;padding:0 48px 48px}
+main{min-width:0;padding-top:8px}
+aside.memo-panel{position:sticky;top:16px;align-self:start;margin-top:24px;max-height:calc(100vh - 32px);overflow:auto;border:2px solid var(--black);background:#fff;padding:14px 16px}
+.memo-panel h2{font:900 16px/1.4 "Noto Sans JP";margin:0 0 4px;display:flex;justify-content:space-between;align-items:baseline}
+.memo-panel h2 small{font:400 11px/1 "Noto Sans JP";color:var(--g600)}
+.memo-panel label{display:block;font-size:12px;font-weight:700;margin:10px 0 3px}
+.memo-panel textarea{width:100%;min-height:64px;resize:vertical;font:13px/1.6 "Noto Sans JP",sans-serif;border:1px solid var(--g200);padding:6px 8px;background:var(--g100)}
+.memo-panel textarea:focus{outline:2px solid var(--orange);background:#fff}
+.memo-panel .btns{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.memo-panel button{font:700 12px/1 "Noto Sans JP";padding:9px 12px;border:1.5px solid var(--black);background:#fff;cursor:pointer}
+.memo-panel button.primary{background:var(--black);color:#fff}
+.memo-panel .note{font-size:11px;color:var(--g600);margin-top:8px;line-height:1.6}
+@media (max-width:1100px){.layout{grid-template-columns:1fr;padding:0 32px 40px}aside.memo-panel{position:static;max-height:none}}
+@media (max-width:720px){.layout{padding:0 16px 40px}header{padding:24px 16px 20px}}
+@media print{aside.memo-panel .btns,aside.memo-panel .note{display:none}aside.memo-panel{position:static;max-height:none}}
 table{border-collapse:collapse;width:100%;font-size:14px;margin-top:16px}
 th,td{border:1px solid var(--g200);padding:6px 12px;text-align:left;vertical-align:top}
 th{background:var(--black);color:#fff;font-size:12px}
@@ -42,6 +55,7 @@ ul.ops{margin:0;padding-left:1.1em}
   <h1>メディア・HP 定例（60分）アジェンダ・議事録</h1>
   <p>今日のゴール：<b style="color:#fff">HP の構成とメディアのワイヤーフレームを fix する</b></p>
 </header>
+<div class="layout">
 <main>
 
 <table>
@@ -201,5 +215,68 @@ ul.ops{margin:0;padding-left:1.1em}
 </section>
 
 </main>
+<aside class="memo-panel" id="memoPanel">
+  <h2>メモ <small id="memoStatus">自動保存</small></h2>
+  <div id="memoFields"></div>
+  <div class="btns">
+    <button type="button" class="primary" id="memoExport">メモ入りHTMLを保存</button>
+    <button type="button" id="memoClear">メモを消去</button>
+  </div>
+  <p class="note">入力はこのブラウザに自動保存されます。他の人に渡すときは「メモ入りHTMLを保存」で出したファイルを共有してください（開くとメモが入った状態で表示されます）。</p>
+</aside>
+</div>
+<script type="application/json" id="memoEmbedded">{}</script>
+<script>
+(function(){
+  var KEY='nmj-agenda-20261008-memo';
+  var fields=document.getElementById('memoFields'), status=document.getElementById('memoStatus');
+  var embEl=document.getElementById('memoEmbedded'), emb={};
+  try{emb=JSON.parse(embEl.textContent||'{}')||{}}catch(e){emb={}}
+  var key=KEY+(emb.savedAt?'@'+emb.savedAt:'');
+  var local={}; try{local=JSON.parse(localStorage.getItem(key)||'{}')||{}}catch(e){local={}}
+  var data=Object.assign({},emb.memo||{},local);
+  var items=[{id:'all',label:'全体'}];
+  document.querySelectorAll('section.item h2').forEach(function(h,i){
+    var t=h.cloneNode(true); var tm=t.querySelector('.time'); if(tm) tm.remove();
+    items.push({id:'s'+(i+1),label:t.textContent.trim()});
+  });
+  var tas={};
+  items.forEach(function(it){
+    var l=document.createElement('label'); l.textContent=it.label; l.htmlFor='memo-'+it.id;
+    var ta=document.createElement('textarea'); ta.id='memo-'+it.id; ta.value=data[it.id]||'';
+    ta.addEventListener('input',save);
+    fields.appendChild(l); fields.appendChild(ta); tas[it.id]=ta;
+  });
+  var timer;
+  function collect(){var o={}; Object.keys(tas).forEach(function(k){if(tas[k].value)o[k]=tas[k].value}); return o;}
+  function save(){
+    clearTimeout(timer);
+    timer=setTimeout(function(){
+      try{localStorage.setItem(key,JSON.stringify(collect())); status.textContent='保存しました '+new Date().toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'});}
+      catch(e){status.textContent='自動保存できません（HTMLで保存してください）';}
+    },400);
+  }
+  document.getElementById('memoExport').addEventListener('click',function(){
+    var doc=document.documentElement.cloneNode(true);
+    var memo=collect();
+    doc.querySelectorAll('#memoFields').forEach(function(f){f.innerHTML='';});
+    var e=doc.querySelector('#memoEmbedded');
+    e.textContent=JSON.stringify({savedAt:new Date().toISOString(),memo:memo}).replace(/</g,'\\u003c');
+    var html='<!doctype html>\n'+doc.outerHTML;
+    var a=document.createElement('a');
+    var d=new Date(), pad=function(n){return ('0'+n).slice(-2)};
+    a.download='NMJ定例_20261008_メモ入り_'+pad(d.getHours())+pad(d.getMinutes())+'.html';
+    a.href=URL.createObjectURL(new Blob([html],{type:'text/html'}));
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function(){URL.revokeObjectURL(a.href)},1000);
+  });
+  document.getElementById('memoClear').addEventListener('click',function(){
+    if(!confirm('このブラウザに保存したメモを消去します。よろしいですか？'))return;
+    Object.keys(tas).forEach(function(k){tas[k].value=''});
+    try{localStorage.removeItem(key)}catch(e){}
+    status.textContent='消去しました';
+  });
+})();
+</script>
 </body>
 </html>
