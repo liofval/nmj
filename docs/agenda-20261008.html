@@ -13,6 +13,10 @@ header{background:var(--black);color:#fff;padding:32px 48px 26px}
 header .eyebrow{font:700 13px/1 "Barlow Condensed";letter-spacing:.12em;color:var(--orange)}
 header h1{font:900 26px/1.35 "Noto Sans JP";margin:8px 0 6px}
 header p{margin:0;color:#ccc;font-size:13.5px}
+.hd-top{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
+.mtg{display:flex;align-items:center;gap:8px;font-size:12px;color:#aaa}
+.mtg select{font:700 14px/1.4 "Noto Sans JP",sans-serif;color:#fff;background:#222;border:1.5px solid var(--orange);padding:8px 34px 8px 12px;border-radius:4px;max-width:100%;cursor:pointer;appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--orange) 50%),linear-gradient(135deg,var(--orange) 50%,transparent 50%);background-position:calc(100% - 16px) 55%,calc(100% - 11px) 55%;background-size:5px 5px;background-repeat:no-repeat}
+.mtg select option{color:#111;background:#fff}
 .layout{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:32px;max-width:1800px;padding:0 48px 48px}
 main{min-width:0;padding-top:8px}
 aside.memo-panel{position:sticky;top:16px;align-self:start;margin-top:24px;max-height:calc(100vh - 32px);overflow:auto;border:2px solid var(--black);background:#fff;padding:14px 16px}
@@ -52,7 +56,8 @@ ul.ops{margin:0;padding-left:1.1em}
 </head>
 <body>
 <header>
-  <div class="eyebrow">MEETING 10/8 THU</div>
+  <div class="hd-top"><div class="eyebrow">MEETING 10/8 THU</div>
+    <label class="mtg"><span>定例を選ぶ</span><select id="meetingSelect" aria-label="定例の日付を選ぶ"></select></label></div>
   <h1>メディア・HP 定例（60分）アジェンダ・議事録</h1>
   <p>今日のゴール：<b style="color:#fff">HP の構成とメディアのワイヤーフレームを fix する</b></p>
 </header>
@@ -234,5 +239,6 @@ ul.ops{margin:0;padding-left:1.1em}
   box.appendChild(f); open.href=edit;
 })();
 </script>
+<script src="./meetings.js"></script>
 </body>
 </html>
