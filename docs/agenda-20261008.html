@@ -3,121 +3,148 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>NEXT MOVE JAPAN 定例アジェンダ 10/8（木）</title>
+<title>NEXT MOVE JAPAN 定例 10/8（木）アジェンダ・議事録</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700;900&family=Barlow+Condensed:wght@700;800&display=swap" rel="stylesheet">
 <style>
 :root{--black:#111;--g600:#7C7C7C;--g200:#E5E5E5;--g100:#F5F5F5;--orange:#FF6002;--orange-w:#FFF1E8}
 *{box-sizing:border-box}
-body{margin:0;font:14.5px/1.8 "Noto Sans JP",sans-serif;color:var(--black);background:#fff}
-header{background:var(--black);color:#fff;padding:40px 56px 32px}
-header .eyebrow{font:700 14px/1 "Barlow Condensed";letter-spacing:.12em;color:var(--orange)}
-header h1{font:900 30px/1.35 "Noto Sans JP";margin:8px 0}
-header p{margin:0;color:#ccc}
-section{padding:32px 56px;border-bottom:1px solid var(--g200);max-width:1100px}
-h2{font:900 20px/1.4 "Noto Sans JP";margin:0 0 12px}
-h3{font-size:16px;margin:24px 0 6px}
-h3 .t{font-weight:400;color:var(--g600);font-size:13px;margin-left:8px}
-.tag{display:inline-block;font:700 11px/1.7 "Noto Sans JP";padding:0 8px;background:var(--orange);color:#fff;margin-left:6px;vertical-align:2px}
-.tag.s{background:var(--g600)}
-table{border-collapse:collapse;width:100%;font-size:14px}
-th,td{border:1px solid var(--g200);padding:7px 12px;text-align:left;vertical-align:top}
+body{margin:0;font:14.5px/1.75 "Noto Sans JP",sans-serif;color:var(--black);background:#fff}
+header{background:var(--black);color:#fff;padding:32px 48px 26px}
+header .eyebrow{font:700 13px/1 "Barlow Condensed";letter-spacing:.12em;color:var(--orange)}
+header h1{font:900 26px/1.35 "Noto Sans JP";margin:8px 0 6px}
+header p{margin:0;color:#ccc;font-size:13.5px}
+main{max-width:960px;padding:8px 48px 48px}
+table{border-collapse:collapse;width:100%;font-size:14px;margin-top:16px}
+th,td{border:1px solid var(--g200);padding:6px 12px;text-align:left;vertical-align:top}
 th{background:var(--black);color:#fff;font-size:12px}
-ul,ol{margin:4px 0;padding-left:1.4em}
+.item{border-top:3px solid var(--black);margin-top:28px;padding-top:10px}
+.item h2{font:900 18px/1.4 "Noto Sans JP";margin:0;display:flex;gap:12px;align-items:baseline}
+.item h2 .time{font:700 15px/1 "Barlow Condensed";color:var(--orange);letter-spacing:.04em}
+.goal{margin:4px 0 8px;font-weight:700}
+.goal::before{content:"ゴール：";color:var(--orange)}
+ol,ul{margin:4px 0;padding-left:1.4em}
+li{margin:1px 0}
+.say{color:var(--g600);font-size:13px}
+.memo{margin-top:10px;background:var(--g100);padding:8px 14px;font-size:13.5px}
+.memo div{border-bottom:1px dashed #bbb;min-height:28px;padding-top:4px}
+.memo b{color:var(--orange)}
 a{color:var(--orange);font-weight:700}
-.box{background:var(--orange-w);padding:14px 18px;margin-top:12px}
 .check li{list-style:"☐ "}
 </style>
 </head>
 <body>
 <header>
-  <div class="eyebrow">WEEKLY MEETING AGENDA</div>
-  <h1>NEXT MOVE JAPAN 定例 10/8（木）</h1>
-  <p>目的：HP の構成とメディアのワイヤーフレームを fix して、デザインと開発に着手できる状態にする（60分）</p>
+  <div class="eyebrow">MEETING 10/8 THU</div>
+  <h1>メディア・HP 定例（60分）アジェンダ・議事録</h1>
+  <p>今日のゴール：<b style="color:#fff">HP の構成とメディアのワイヤーフレームを fix する</b></p>
 </header>
+<main>
 
-<section>
-  <h2>進行</h2>
-  <table>
-    <tr><th style="width:40px">#</th><th>議題</th><th style="width:80px">時間</th><th style="width:80px">区分</th></tr>
-    <tr><td>1</td><td>スケジュールの共有</td><td>5分</td><td>共有</td></tr>
-    <tr><td>2</td><td>HP 構成案の確認</td><td>10分</td><td><b>決定</b></td></tr>
-    <tr><td>3</td><td><b>メディアのワイヤーフレーム確認</b></td><td>20分</td><td><b>決定</b></td></tr>
-    <tr><td>4</td><td>メディアの要件確定（残りの論点）</td><td>10分</td><td><b>決定</b></td></tr>
-    <tr><td>5</td><td>Stripe 申請と HP 素材の依頼</td><td>10分</td><td>依頼</td></tr>
-    <tr><td>6</td><td>次回までの宿題確認</td><td>5分</td><td>確認</td></tr>
-  </table>
+<table>
+  <tr><th style="width:96px">時間</th><th>議題</th><th style="width:70px">種類</th></tr>
+  <tr><td>0:00–0:05</td><td>1. スケジュール共有</td><td>共有</td></tr>
+  <tr><td>0:05–0:15</td><td>2. HP 構成の確認</td><td><b>決める</b></td></tr>
+  <tr><td>0:15–0:35</td><td>3. メディアのワイヤー確認（画面共有）</td><td><b>決める</b></td></tr>
+  <tr><td>0:35–0:45</td><td>4. メディアのルール確認</td><td><b>決める</b></td></tr>
+  <tr><td>0:45–0:55</td><td>5. 担当決め（Stripe・HP 素材）</td><td><b>決める</b></td></tr>
+  <tr><td>0:55–1:00</td><td>6. 宿題の確認</td><td>確認</td></tr>
+</table>
+
+<section class="item">
+  <h2><span class="time">0:00–0:05</span>1. スケジュール共有</h2>
+  <p class="goal">全員が公開日と進め方を知っている</p>
+  <ol>
+    <li><a href="https://liofval.github.io/nmj/project.html#schedule-lp">HP のスケジュール</a>を画面共有 → <b>公開 11/26（木）</b></li>
+    <li><a href="https://liofval.github.io/nmj/project.html#schedule-ticket">メディアのスケジュール</a>に切り替え → <b>公開 1/28（木）・カード決済込み</b></li>
+    <li>「確認・承認・締切は毎週木曜のこの定例で行う」と伝える</li>
+  </ol>
 </section>
 
-<section>
-  <h2>議題の中身</h2>
-
-  <h3>1. スケジュールの共有<span class="t">5分</span><span class="tag s">共有</span></h3>
-  <ul>
-    <li>HP は 11/26（木）公開、メディアは Stripe の実決済込みで 1/28（木）公開</li>
-    <li>確認・承認・締切はすべて木曜の定例で行う</li>
-    <li>資料：<a href="https://liofval.github.io/nmj/project.html">https://liofval.github.io/nmj/project.html</a></li>
-  </ul>
-
-  <h3>2. HP 構成案の確認<span class="t">10分</span><span class="tag">決定</span></h3>
-  <ul>
-    <li>掲載項目：団体紹介・ミッション／活動実績／イベント／メンバー／お問い合わせ／SNS</li>
-    <li>項目の過不足と並び順</li>
-    <li>お問い合わせの送信先メールアドレス</li>
-  </ul>
-
-  <h3>3. メディアのワイヤーフレーム確認<span class="t">20分</span><span class="tag">決定</span></h3>
-  <ul>
-    <li>開くページ：<a href="https://liofval.github.io/nmj/project.html#wireframe">https://liofval.github.io/nmj/project.html#wireframe</a></li>
-    <li>利用者の流れに沿って、実際にクリックしながら進める
-      <ol>
-        <li><b>参加者</b>：ホーム → イベント一覧・検索 → イベント詳細 → 申込（入力 → 確認 → 決済 → 完了）→ マイページ</li>
-        <li><b>主催者</b>：団体作成 → イベント作成 → ダッシュボード → 参加者リスト・CSV → お知らせ配信（事前メモで指摘があった画面だけ開く）</li>
-        <li><b>うまくいかない場合</b>：決済の失敗・期限切れ、定員オーバー、移管できない場合</li>
-      </ol>
-    </li>
-    <li>各画面で確かめること：足りない画面や項目はないか／文言・項目名は合っているか／操作の順番に違和感はないか</li>
-    <li><b>最後に「この内容で fix にするか」を決める</b>。修正が出たら、その内容と反映する期限を決める</li>
-  </ul>
-  <div class="box">
-    <b>事前のお願い（定例の前日まで）</b>
-    <ul>
-      <li>各自でワイヤーフレームを一通り触っておく</li>
-      <li>気になった点は、ワイヤーフレーム右側の「メモ」欄に画面ごとに書く</li>
-      <li>書き終えたら上部の「メモ入りHTMLを書き出す」で出したファイルを共有する（メモは各自のブラウザに保存されるだけなので、書き出さないと他の人には見えない）</li>
-    </ul>
+<section class="item">
+  <h2><span class="time">0:05–0:15</span>2. HP 構成の確認</h2>
+  <p class="goal">HP に載せる項目と並び順が決まる</p>
+  <ol>
+    <li>案を読み上げる：<b>団体紹介・ミッション → 活動実績 → イベント → メンバー → お問い合わせ → SNS</b></li>
+    <li>聞く：「足りない項目・いらない項目は？」「並び順はこれでいい？」</li>
+    <li>聞く：「お問い合わせはどのメールアドレスに届けばいい？」</li>
+  </ol>
+  <div class="memo">
+    <div><b>決定：</b>掲載項目・並び順 </div>
+    <div><b>決定：</b>お問い合わせ先 </div>
   </div>
-
-  <h3>4. メディアの要件確定（残りの論点）<span class="t">10分</span><span class="tag">決定</span></h3>
-  <ul>
-    <li>ワイヤーで決まらなかった点</li>
-    <li>団体の権限は OWNER / ADMIN の2種類でよいか</li>
-    <li>有料枠のルール（支払い後の返金なし・支払期限は申込から24時間）</li>
-    <li>ユーザーネーム変更の制限</li>
-  </ul>
-
-  <h3>5. Stripe 申請と HP 素材の依頼<span class="t">10分</span><span class="tag s">依頼</span></h3>
-  <ul>
-    <li>Stripe 申請の担当者を決める（締切 10/22）。必要なもの：法人の情報、代表者の本人確認書類、入金口座</li>
-    <li>学生団体の代表者が Stripe に登録できるかは制作側で調べて、10/22 までに報告する</li>
-    <li>HP 素材（原稿・写真・実績・メンバー紹介・SNS アカウント）の担当者を決める（締切 10/22）</li>
-  </ul>
-
-  <h3>6. 次回 10/15（木）までの宿題<span class="t">5分</span><span class="tag s">確認</span></h3>
-  <ul>
-    <li>制作：デザインの方向性を2〜3案作って提示する（10/15 に1案に決める）</li>
-    <li>制作：ワイヤーの修正がある場合は決めた期限までに反映する</li>
-    <li>全体：HP 素材集めと Stripe 申請を始める</li>
-  </ul>
 </section>
 
-<section>
-  <h2>当日決めたいこと</h2>
+<section class="item">
+  <h2><span class="time">0:15–0:35</span>3. メディアのワイヤー確認（画面共有）</h2>
+  <p class="goal">ワイヤーを fix するか決まる</p>
+  <ol>
+    <li><a href="https://liofval.github.io/nmj/project.html#wireframe">ワイヤーフレーム</a>を画面共有。進行役がクリックして進め、<b>全員で一緒に見る</b></li>
+    <li><b>参加者の流れ（10分）</b>：ホーム → イベント一覧 → イベント詳細 → 申込 → 決済 → 完了 → マイページ</li>
+    <li><b>主催者の流れ（7分）</b>：団体作成 → イベント作成 → ダッシュボード → 参加者リスト → お知らせ配信</li>
+    <li><b>エラー時（3分）</b>：決済の失敗・期限切れ、定員オーバー</li>
+    <li>最後に聞く：<b>「この内容で fix でいい？」</b></li>
+  </ol>
+  <p class="say">各画面で聞くこと：「足りない項目は？」「言葉はわかりやすい？」「操作の順番に違和感は？」 ／ 気になった点はその場で声をかけてもらい、下に書く</p>
+  <div class="memo">
+    <div><b>指摘：</b></div>
+    <div><b>指摘：</b></div>
+    <div><b>指摘：</b></div>
+    <div><b>決定：</b>fix する ／ 修正してから fix（修正の期限：　　） </div>
+  </div>
+</section>
+
+<section class="item">
+  <h2><span class="time">0:35–0:45</span>4. メディアのルール確認</h2>
+  <p class="goal">ワイヤーに出てこない決めごとが決まる</p>
+  <ol>
+    <li><b>団体の権限</b>：「オーナー」と「管理者」の2種類でいい？</li>
+    <li><b>有料チケット</b>：支払い後は返金なし、支払期限は申込から24時間でいい？</li>
+    <li><b>ユーザーネーム</b>：あとから変更できるようにする？ 回数を制限する？</li>
+  </ol>
+  <div class="memo">
+    <div><b>決定：</b>権限 </div>
+    <div><b>決定：</b>返金・支払期限 </div>
+    <div><b>決定：</b>ユーザーネーム変更 </div>
+  </div>
+</section>
+
+<section class="item">
+  <h2><span class="time">0:45–0:55</span>5. 担当決め（Stripe・HP 素材）</h2>
+  <p class="goal">2つの作業の担当者が決まる（どちらも締切 10/22）</p>
+  <ol>
+    <li><b>Stripe の申請</b>：カード決済に必要なアカウント作成。必要なものは<b>法人の情報・代表者の本人確認書類・入金口座</b></li>
+    <li><b>HP の素材集め</b>：原稿・写真・活動実績・メンバー紹介・SNS アカウント</li>
+    <li>伝える：「学生団体が Stripe を使えるかは制作側で調べて 10/22 に報告します」</li>
+  </ol>
+  <div class="memo">
+    <div><b>担当：</b>Stripe 申請 → </div>
+    <div><b>担当：</b>HP 素材 → </div>
+  </div>
+</section>
+
+<section class="item">
+  <h2><span class="time">0:55–1:00</span>6. 宿題の確認</h2>
+  <p class="goal">次回 10/15（木）までに誰が何をするか全員がわかっている</p>
+  <ul>
+    <li><b>制作</b>：デザインの方向性を2〜3案作る（10/15 の定例で1案に決める）</li>
+    <li><b>制作</b>：ワイヤーに修正があれば、決めた期限までに直す</li>
+    <li><b>担当者</b>：Stripe 申請と HP 素材集めを始める</li>
+  </ul>
+  <div class="memo">
+    <div><b>その他の宿題：</b></div>
+  </div>
+</section>
+
+<section class="item">
+  <h2>今日決めることチェック</h2>
   <ul class="check">
-    <li>HP の掲載項目と並び順</li>
-    <li><b>ワイヤーフレームを fix にするか</b>（修正がある場合は内容と反映期限）</li>
-    <li>有料枠のルール・権限・ユーザーネーム変更の制限</li>
+    <li>HP の掲載項目・並び順・お問い合わせ先</li>
+    <li>ワイヤーを fix するか</li>
+    <li>権限・返金と支払期限・ユーザーネーム変更</li>
     <li>Stripe 申請と HP 素材の担当者</li>
   </ul>
 </section>
+
+</main>
 </body>
 </html>
