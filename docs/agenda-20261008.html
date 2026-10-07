@@ -29,6 +29,8 @@ li{margin:1px 0}
 .memo div{border-bottom:1px dashed #bbb;min-height:28px;padding-top:4px}
 .memo b{color:var(--orange)}
 a{color:var(--orange);font-weight:700}
+h3.sub{font-size:14.5px;margin:18px 0 4px;padding-left:8px;border-left:4px solid var(--orange)}
+table.steps{margin-top:6px}
 .check li{list-style:"☐ "}
 </style>
 </head>
@@ -79,15 +81,57 @@ a{color:var(--orange);font-weight:700}
 <section class="item">
   <h2><span class="time">0:15–0:35</span>3. メディアのワイヤー確認</h2>
   <p class="goal">ワイヤーフレームを fix するか決める</p>
-  <p><b>進め方</b>：<a href="https://liofval.github.io/nmj/project.html#wireframe">ワイヤーフレーム</a>を画面共有し、全員で操作しながら確認する</p>
-  <table>
-    <tr><th style="width:110px">流れ</th><th style="width:60px">目安</th><th>確認する画面</th></tr>
-    <tr><td>参加者</td><td>10分</td><td>ホーム → イベント一覧 → イベント詳細 → 申込 → 決済 → 完了 → マイページ</td></tr>
-    <tr><td>主催者</td><td>7分</td><td>団体作成 → イベント作成 → ダッシュボード → 参加者リスト → お知らせ配信</td></tr>
-    <tr><td>エラー時</td><td>3分</td><td>決済の失敗・期限切れ、定員オーバー</td></tr>
+  <p><b>進め方</b>：<a href="https://liofval.github.io/nmj/project.html#wireframe">ワイヤーフレーム</a>を画面共有し、全員で操作しながら確認する。番号はワイヤー上部のボタン名。</p>
+
+  <h3 class="sub">準備（開始前）</h3>
+  <ol>
+    <li>ワイヤーフレームを開き、右上「別タブで開く」で全画面表示にする</li>
+    <li>上部の表示切替を <b>PC+SP</b> にする（PC とスマホを並べて確認）</li>
+    <li><b>「リンク箇所を表示」</b>にチェック（押せる場所が青枠で表示される）</li>
+    <li>画面を戻すときは「◀ 戻る」またはキーボードの ←</li>
+  </ol>
+
+  <h3 class="sub">① 参加者の流れ（10分）</h3>
+  <table class="steps">
+    <tr><th style="width:36px">#</th><th style="width:150px">画面</th><th>確認すること</th></tr>
+    <tr><td>1</td><td>1 Home</td><td>トップに何が並ぶか／イベントを探し始められるか</td></tr>
+    <tr><td>2</td><td>2 Events一覧</td><td>一覧に出す情報（日時・場所・料金・主催者）／絞り込み</td></tr>
+    <tr><td>3</td><td>4 イベント詳細</td><td>参加を決めるのに必要な情報がそろっているか／申込ボタンの位置</td></tr>
+    <tr><td>4</td><td>4b 詳細の状態違い</td><td>受付中・満員・終了などの状態が、見ただけでわかるか</td></tr>
+    <tr><td>5</td><td>9 ログイン → 9b 初回設定</td><td>登録で聞く項目は多すぎないか</td></tr>
+    <tr><td>6</td><td>10 申込①枠 → 10b 申込②質問</td><td>参加枠の選び方／申込時の質問の出し方</td></tr>
+    <tr><td>7</td><td>10c 申込③確認</td><td>回答を見る人・利用目的・保持期間・<b>返金なし</b>が、申込前にはっきり見えるか</td></tr>
+    <tr><td>8</td><td>11 モック決済 → 11c 決済完了 → 10d 申込完了</td><td>支払いから完了までの流れ／完了後に次にやることがわかるか</td></tr>
+    <tr><td>9</td><td>12 マイページ</td><td>申し込んだイベントの確認・キャンセルのしやすさ</td></tr>
   </table>
-  <p><b>確認ポイント</b>：項目の過不足／言葉のわかりやすさ／操作の順番</p>
+
+  <h3 class="sub">② 主催者の流れ（7分）</h3>
+  <table class="steps">
+    <tr><th style="width:36px">#</th><th style="width:150px">画面</th><th>確認すること</th></tr>
+    <tr><td>1</td><td>15 団体作成</td><td>団体登録で入れる項目</td></tr>
+    <tr><td>2</td><td>17 イベント作成</td><td>入力項目と順番（主催者と大学 → 基本情報 → 参加枠 → 申込時の質問 → 参加者情報の扱い）</td></tr>
+    <tr><td>3</td><td>14 ダッシュボード</td><td>主催者が最初に見たい数字・情報が出ているか</td></tr>
+    <tr><td>4</td><td>18 参加者リスト</td><td>一覧で見たい項目／CSV で書き出せること／当日の受付</td></tr>
+    <tr><td>5</td><td>19 告知配信</td><td>誰に送れるか（全員・枠ごとなど）／送信前の確認</td></tr>
+  </table>
+
+  <h3 class="sub">③ うまくいかない場合（3分）</h3>
+  <table class="steps">
+    <tr><th style="width:36px">#</th><th style="width:150px">画面</th><th>確認すること</th></tr>
+    <tr><td>1</td><td>11d 決済失敗</td><td>何が起きたか・どうすればいいかがわかるか</td></tr>
+    <tr><td>2</td><td>11e 期限切れ・12b 支払い待ち</td><td>支払期限（申込から24時間）の伝わり方</td></tr>
+    <tr><td>3</td><td>21 モーダル一覧</td><td>確認ダイアログの文言（キャンセル・中止など）</td></tr>
+  </table>
+  <p class="say">※ 時間が余れば：3 カレンダー／5 検索／6 Media・7 記事詳細／13 フォロー中・13b お気に入り</p>
+
+  <h3 class="sub">fix の判断</h3>
+  <ol>
+    <li>出た指摘を下の欄で読み返す</li>
+    <li>指摘を「今直す」「公開後に回す」に分ける</li>
+    <li>「今直す」が無ければ <b>fix</b>。あれば直す期限を決めて <b>修正後に fix</b>（デザイン着手に影響しないよう 10/15 までを目安）</li>
+  </ol>
   <div class="memo">
+    <div><b>指摘：</b></div>
     <div><b>指摘：</b></div>
     <div><b>指摘：</b></div>
     <div><b>指摘：</b></div>
