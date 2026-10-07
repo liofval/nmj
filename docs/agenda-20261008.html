@@ -24,10 +24,11 @@ aside.memo-panel{position:sticky;top:16px;align-self:start;margin-top:24px;max-h
 .memo-panel .btns{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
 .memo-panel button{font:700 12px/1 "Noto Sans JP";padding:9px 12px;border:1.5px solid var(--black);background:#fff;cursor:pointer}
 .memo-panel button.primary{background:var(--black);color:#fff}
+#memoDoc iframe{width:100%;height:calc(100vh - 170px);min-height:480px;border:1px solid var(--g200);display:block}
 .memo-panel .note{font-size:11px;color:var(--g600);margin-top:8px;line-height:1.6}
 @media (max-width:1100px){.layout{grid-template-columns:1fr;padding:0 32px 40px}aside.memo-panel{position:static;max-height:none}}
 @media (max-width:720px){.layout{padding:0 16px 40px}header{padding:24px 16px 20px}}
-@media print{aside.memo-panel .btns,aside.memo-panel .note{display:none}aside.memo-panel{position:static;max-height:none}}
+@media print{aside.memo-panel{display:none}}
 table{border-collapse:collapse;width:100%;font-size:14px;margin-top:16px}
 th,td{border:1px solid var(--g200);padding:6px 12px;text-align:left;vertical-align:top}
 th{background:var(--black);color:#fff;font-size:12px}
@@ -216,75 +217,21 @@ ul.ops{margin:0;padding-left:1.1em}
 
 </main>
 <aside class="memo-panel" id="memoPanel">
-  <h2>メモ <small id="memoStatus">自動保存</small></h2>
-  <div id="memoFields"></div>
-  <div class="btns">
-    <button type="button" class="primary" id="memoExport">メモ入りHTMLを保存</button>
-    <button type="button" id="memoClear">メモを消去</button>
-  </div>
-  <p class="note">入力はこのブラウザに自動保存されます。他の人に渡すときは「メモ入りHTMLを保存」で出したファイルを共有してください（開くとメモが入った状態で表示されます）。</p>
+  <h2>メモ <small>Google ドキュメント・自動保存</small></h2>
+  <div id="memoDoc"></div>
+  <p class="note">メモは Google ドキュメントに自動保存され、このページを開いた全員に表示されます。書き込めるのは共有設定で招待された人だけです。表示されない・編集できないときは <a id="memoOpen" href="#" target="_blank" rel="noopener">別タブで開く ↗</a>（Safari やシークレットウィンドウでは別タブで開いてください）。</p>
 </aside>
 </div>
-<script type="application/json" id="memoEmbedded">{}</script>
 <script>
 (function(){
-  var KEY='nmj-agenda-20261008-memo';
-  var fields=document.getElementById('memoFields'), status=document.getElementById('memoStatus');
-  var embEl=document.getElementById('memoEmbedded'), emb={};
-  try{emb=JSON.parse(embEl.textContent||'{}')||{}}catch(e){emb={}}
-  var key=KEY+(emb.savedAt?'@'+emb.savedAt:'');
-  var local={}; try{local=JSON.parse(localStorage.getItem(key)||'{}')||{}}catch(e){local={}}
-  var data=Object.assign({},emb.memo||{},local);
-  var items=[{id:'all',label:'全体'}];
-  document.querySelectorAll('section.item h2').forEach(function(h,i){
-    var t=h.cloneNode(true); var tm=t.querySelector('.time'); if(tm) tm.remove();
-    items.push({id:'s'+(i+1),label:t.textContent.trim()});
-  });
-  var tas={}, dirty={}, timer;
-  items.forEach(function(it){
-    var l=document.createElement('label'); l.textContent=it.label; l.htmlFor='memo-'+it.id;
-    var ta=document.createElement('textarea'); ta.id='memo-'+it.id; ta.value=data[it.id]||'';
-    ta.addEventListener('input',function(){dirty[it.id]=true; clearTimeout(timer); timer=setTimeout(flush,400);});
-    fields.appendChild(l); fields.appendChild(ta); tas[it.id]=ta;
-  });
-  function readStored(){try{return JSON.parse(localStorage.getItem(key)||'{}')||{}}catch(e){return {}}}
-  function collect(){var o={}; Object.keys(tas).forEach(function(k){if(tas[k].value)o[k]=tas[k].value}); return o;}
-  // 変更した欄だけを最新の保存内容に重ねて書く（別タブの保存を消さない）。空欄も "" として保存し、埋め込み値の復活を防ぐ
-  function flush(){
-    clearTimeout(timer);
-    var ids=Object.keys(dirty); if(!ids.length) return;
-    var cur=readStored(); ids.forEach(function(k){cur[k]=tas[k].value});
-    try{localStorage.setItem(key,JSON.stringify(cur)); dirty={}; status.textContent='保存しました '+new Date().toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'});}
-    catch(e){status.textContent='自動保存できません（HTMLで保存してください）';}
-  }
-  window.addEventListener('pagehide',flush);
-  document.addEventListener('visibilitychange',function(){if(document.visibilityState==='hidden')flush();});
-  // 別タブで保存された内容を、編集中でない欄に反映する
-  window.addEventListener('storage',function(e){
-    if(e.key!==key) return;
-    var cur=readStored();
-    Object.keys(tas).forEach(function(k){ if(!dirty[k] && document.activeElement!==tas[k] && k in cur) tas[k].value=cur[k]; });
-  });
-  document.getElementById('memoExport').addEventListener('click',function(){
-    var doc=document.documentElement.cloneNode(true);
-    var memo=collect();
-    doc.querySelectorAll('#memoFields').forEach(function(f){f.innerHTML='';});
-    var e=doc.querySelector('#memoEmbedded');
-    e.textContent=JSON.stringify({savedAt:new Date().toISOString(),memo:memo}).replace(/</g,'\\u003c');
-    var html='<!doctype html>\n'+doc.outerHTML;
-    var a=document.createElement('a');
-    var d=new Date(), pad=function(n){return ('0'+n).slice(-2)};
-    a.download='NMJ定例_20261008_メモ入り_'+pad(d.getHours())+pad(d.getMinutes())+'.html';
-    a.href=URL.createObjectURL(new Blob([html],{type:'text/html'}));
-    document.body.appendChild(a); a.click(); a.remove();
-    setTimeout(function(){URL.revokeObjectURL(a.href)},1000);
-  });
-  document.getElementById('memoClear').addEventListener('click',function(){
-    if(!confirm('このブラウザに保存したメモを消去します。よろしいですか？'))return;
-    Object.keys(tas).forEach(function(k){tas[k].value=''; dirty[k]=true});
-    flush();
-    status.textContent='消去しました';
-  });
+  // 共有メモの Google ドキュメント（編集用 URL）。差し替えるときはここだけ直す
+  var DOC_URL='https://docs.google.com/document/d/1mSMrKbum0C3oRGg9MY-AZF72rF7l14CTSvu6DMa9Uw0/edit';
+  var box=document.getElementById('memoDoc'), open=document.getElementById('memoOpen');
+  var m=DOC_URL.match(/^https:\/\/docs\.google\.com\/document\/d\/([A-Za-z0-9_-]+)/);
+  if(!m){box.innerHTML='<p class="note">メモ用の Google ドキュメントが未設定です。</p>'; open.removeAttribute('href'); return;}
+  var edit='https://docs.google.com/document/d/'+m[1]+'/edit';
+  var f=document.createElement('iframe'); f.src=edit; f.title='共有メモ'; f.loading='lazy';
+  box.appendChild(f); open.href=edit;
 })();
 </script>
 </body>
