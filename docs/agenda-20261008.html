@@ -240,22 +240,31 @@ ul.ops{margin:0;padding-left:1.1em}
     var t=h.cloneNode(true); var tm=t.querySelector('.time'); if(tm) tm.remove();
     items.push({id:'s'+(i+1),label:t.textContent.trim()});
   });
-  var tas={};
+  var tas={}, dirty={}, timer;
   items.forEach(function(it){
     var l=document.createElement('label'); l.textContent=it.label; l.htmlFor='memo-'+it.id;
     var ta=document.createElement('textarea'); ta.id='memo-'+it.id; ta.value=data[it.id]||'';
-    ta.addEventListener('input',save);
+    ta.addEventListener('input',function(){dirty[it.id]=true; clearTimeout(timer); timer=setTimeout(flush,400);});
     fields.appendChild(l); fields.appendChild(ta); tas[it.id]=ta;
   });
-  var timer;
+  function readStored(){try{return JSON.parse(localStorage.getItem(key)||'{}')||{}}catch(e){return {}}}
   function collect(){var o={}; Object.keys(tas).forEach(function(k){if(tas[k].value)o[k]=tas[k].value}); return o;}
-  function save(){
+  // 変更した欄だけを最新の保存内容に重ねて書く（別タブの保存を消さない）。空欄も "" として保存し、埋め込み値の復活を防ぐ
+  function flush(){
     clearTimeout(timer);
-    timer=setTimeout(function(){
-      try{localStorage.setItem(key,JSON.stringify(collect())); status.textContent='保存しました '+new Date().toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'});}
-      catch(e){status.textContent='自動保存できません（HTMLで保存してください）';}
-    },400);
+    var ids=Object.keys(dirty); if(!ids.length) return;
+    var cur=readStored(); ids.forEach(function(k){cur[k]=tas[k].value}); dirty={};
+    try{localStorage.setItem(key,JSON.stringify(cur)); status.textContent='保存しました '+new Date().toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'});}
+    catch(e){status.textContent='自動保存できません（HTMLで保存してください）';}
   }
+  window.addEventListener('pagehide',flush);
+  document.addEventListener('visibilitychange',function(){if(document.visibilityState==='hidden')flush();});
+  // 別タブで保存された内容を、編集中でない欄に反映する
+  window.addEventListener('storage',function(e){
+    if(e.key!==key) return;
+    var cur=readStored();
+    Object.keys(tas).forEach(function(k){ if(!dirty[k] && document.activeElement!==tas[k] && k in cur) tas[k].value=cur[k]; });
+  });
   document.getElementById('memoExport').addEventListener('click',function(){
     var doc=document.documentElement.cloneNode(true);
     var memo=collect();
@@ -272,8 +281,8 @@ ul.ops{margin:0;padding-left:1.1em}
   });
   document.getElementById('memoClear').addEventListener('click',function(){
     if(!confirm('このブラウザに保存したメモを消去します。よろしいですか？'))return;
-    Object.keys(tas).forEach(function(k){tas[k].value=''});
-    try{localStorage.removeItem(key)}catch(e){}
+    Object.keys(tas).forEach(function(k){tas[k].value=''; dirty[k]=true});
+    flush();
     status.textContent='消去しました';
   });
 })();
