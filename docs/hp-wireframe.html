@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NEXT MOVE JAPAN HP ワイヤーフレーム v0.1</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700;900&family=Barlow+Condensed:wght@700;800&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#1f1f1f;--mid:#6b6b6b;--line:#c7c7c7;--fill:#f4f4f4;--fill2:#e6e6e6;--orange:#FF6002;--orange-w:#FFF1E8;--blue:#2394F4;--blue-w:#EAF4FE}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font:14px/1.75 "Noto Sans JP",sans-serif;color:var(--ink);background:#f7f7f7}
+a{color:inherit}
+.top{background:#111;color:#fff;padding:24px 40px 18px}
+.top .eb{font:700 13px/1 "Barlow Condensed";letter-spacing:.12em;color:var(--orange)}
+.top h1{font:900 24px/1.35 "Noto Sans JP";margin:6px 0 4px}
+.top p{margin:0;color:#bbb;font-size:13px}
+.jump{position:sticky;top:0;z-index:20;background:#fff;border-bottom:2px solid var(--ink);padding:8px 40px;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.jump b{font-size:12px;margin-right:6px}
+.jump a{font-size:12px;text-decoration:none;border:1px solid var(--line);padding:3px 10px;border-radius:2px;background:#fff}
+.jump a:hover{background:var(--fill)}
+.wrap{max-width:1600px;margin:0 auto;padding:24px 40px 80px}
+.row{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:28px;margin-bottom:28px;scroll-margin-top:56px}
+.wf{background:#fff;border:1.5px solid var(--ink);position:relative;align-self:start}
+.wf .lbl{position:absolute;top:-11px;left:12px;background:var(--ink);color:#fff;font:700 11px/1 "Noto Sans JP";padding:5px 8px}
+.ann{align-self:start;position:sticky;top:60px}
+.ann h3{font-size:15px;margin:0 0 8px}
+.card{border:1.5px solid var(--ink);background:#fff;padding:10px 14px;margin-bottom:10px}
+.card h4{margin:0 0 4px;font-size:12px;letter-spacing:.06em}
+.card.m h4{color:var(--orange)} .card.m{border-color:var(--orange);background:var(--orange-w)}
+.card.b h4{color:var(--blue)} .card.b{border-color:var(--blue);background:var(--blue-w)}
+.card ul{margin:0;padding-left:1.2em;font-size:13px}
+.card.note{font-size:12px;color:var(--mid)}
+/* wireframe primitives */
+.px{padding:28px 32px}
+.box{background:var(--fill);border:1px dashed #9a9a9a;display:flex;align-items:center;justify-content:center;color:var(--mid);font-size:12px;text-align:center}
+.h{font-weight:900;font-size:22px;line-height:1.4;margin:0 0 6px}
+.sh{font:800 13px/1 "Barlow Condensed";letter-spacing:.14em;color:var(--mid);margin-bottom:6px}
+.t{height:10px;background:var(--fill2);margin:6px 0;border-radius:2px}
+.btn{display:inline-block;border:1.5px solid var(--ink);padding:8px 18px;font-weight:700;font-size:13px;text-decoration:none;background:#fff}
+.btn.pri{background:var(--ink);color:#fff}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.nav{display:flex;align-items:center;gap:18px;padding:14px 24px;border-bottom:1px solid var(--line)}
+.nav .logo{width:120px;height:32px}
+.nav a{font-size:13px;text-decoration:none}
+.nav a:hover{text-decoration:underline}
+.nav .sp{flex:1}
+.stat{border:1px solid var(--line);padding:14px;text-align:center}
+.stat b{display:block;font-size:26px;font-family:"Barlow Condensed"}
+.in{border:1px solid var(--line);height:34px;margin:4px 0 10px;background:#fff}
+.in.big{height:96px}
+.f label{font-size:12px;font-weight:700}
+.foot{background:#2b2b2b;color:#ddd;padding:22px 32px;font-size:12px;display:flex;gap:18px;flex-wrap:wrap}
+@media (max-width:1100px){.row{grid-template-columns:1fr}.ann{position:static}.wrap,.jump,.top{padding-left:16px;padding-right:16px}}
+@media (max-width:640px){.g3,.g4{grid-template-columns:1fr 1fr}.nav{flex-wrap:wrap}}
+</style>
+</head>
+<body>
+<div class="top">
+  <div class="eb">HP WIREFRAME v0.1</div>
+  <h1>NEXT MOVE JAPAN ホームページ（1ページ）ワイヤーフレーム</h1>
+  <p>左がワイヤー、右がそのセクションの<b style="color:#fff">メリット（団体にとって）</b>と<b style="color:#fff">ベネフィット（見る人にとって）</b>。上のボタンやワイヤー内のナビで各セクションへ移動できます。</p>
+</div>
+<nav class="jump">
+  <b>移動：</b>
+  <a href="#s-header">ヘッダー</a><a href="#s-fv">ファーストビュー</a><a href="#s-about">団体紹介</a><a href="#s-results">活動実績</a><a href="#s-events">イベント</a><a href="#s-members">メンバー</a><a href="#s-contact">お問い合わせ</a><a href="#s-sns">SNS</a><a href="#s-footer">フッター</a>
+</nav>
+
+<div class="wrap">
+
+<section class="row" id="s-header">
+  <div class="wf"><span class="lbl">0 ヘッダー（常に上部に固定）</span>
+    <div class="nav"><div class="box logo">ロゴ</div><span class="sp"></span>
+      <a href="#s-about">団体紹介</a><a href="#s-results">活動実績</a><a href="#s-events">イベント</a><a href="#s-members">メンバー</a><a href="#s-contact" class="btn pri" style="padding:6px 14px">お問い合わせ</a></div>
+  </div>
+  <div class="ann"><h3>ヘッダー</h3>
+    <div class="card m"><h4>メリット</h4><ul><li>どこまでスクロールしても「お問い合わせ」へ1クリックで誘導できる</li></ul></div>
+    <div class="card b"><h4>ベネフィット</h4><ul><li>見たい情報へすぐ移動できる（ナビを押すとそのセクションへ飛ぶ）</li></ul></div>
+  </div>
+</section>
+
+<section class="row" id="s-fv">
+  <div class="wf"><span class="lbl">1 ファーストビュー</span>
+    <div class="box" style="height:360px;flex-direction:column;gap:10px">
+      <div>キービジュアル（ヨコワカ KV）</div>
+      <div class="h" style="color:var(--ink)">キャッチコピー（例：学生の「次の一歩」をつくる）</div>
+      <div>サブコピー：団体が何をしているかを1文で</div>
+      <div style="display:flex;gap:10px"><a class="btn pri" href="./project.html#wireframe" target="_top">イベントを見る（メディアへ）</a><a class="btn" href="#s-contact">お問い合わせ</a></div>
+    </div>
+  </div>
+  <div class="ann"><h3>ファーストビュー</h3>
+    <div class="card m"><h4>メリット</h4><ul><li>3秒で「何の団体か」を伝え、すぐ離脱されるのを防ぐ</li><li>メディア（イベント一覧）への入口になり、申込につながる</li></ul></div>
+    <div class="card b"><h4>ベネフィット</h4><ul><li>何をしている団体で、自分が何に参加できるかがすぐ分かる</li></ul></div>
+  </div>
+</section>
+
+<section class="row" id="s-about">
+  <div class="wf"><span class="lbl">2 団体紹介・ミッション</span>
+    <div class="px" style="display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:center">
+      <div><div class="sh">ABOUT</div><div class="h">ミッション（1〜2行）</div><div class="t"></div><div class="t"></div><div class="t" style="width:70%"></div><div class="t"></div><div class="t" style="width:60%"></div></div>
+      <div class="box" style="height:220px">活動の写真</div>
+    </div>
+  </div>
+  <div class="ann"><h3>団体紹介・ミッション</h3>
+    <div class="card m"><h4>メリット</h4><ul><li>協賛・連携先への説明にそのまま使え、信頼につながる</li><li>団体の考え方を一か所にまとめておける</li></ul></div>
+    <div class="card b"><h4>ベネフィット</h4><ul><li>活動の背景と目指すことが分かり、参加・協力するか判断できる</li></ul></div>
+  </div>
+</section>
+
+<section class="row" id="s-results">
+  <div class="wf"><span class="lbl">3 活動実績</span>
+    <div class="px"><div class="sh">RESULTS</div><div class="h">これまでの活動</div>
+      <div class="g4" style="margin:12px 0 18px"><div class="stat"><b>00</b>開催イベント数</div><div class="stat"><b>000</b>参加者数</div><div class="stat"><b>00</b>連携大学数</div><div class="stat"><b>00</b>協力団体数</div></div>
+      <div class="g3"><div><div class="box" style="height:120px">事例の写真</div><div class="t"></div><div class="t" style="width:60%"></div></div><div><div class="box" style="height:120px">事例の写真</div><div class="t"></div><div class="t" style="width:60%"></div></div><div><div class="box" style="height:120px">事例の写真</div><div class="t"></div><div class="t" style="width:60%"></div></div></div>
+    </div>
+  </div>
+  <div class="ann"><h3>活動実績</h3>
+    <div class="card m"><h4>メリット</h4><ul><li>数字で信頼を示し、協賛・取材・連携の相談を受けやすくなる</li></ul></div>
+    <div class="card b"><h4>ベネフィット</h4><ul><li>実際の活動規模と中身が分かり、安心して参加できる</li></ul></div>
+    <div class="card note">必要な素材：数字4つ・事例3件（写真＋1〜2行の説明）</div>
+  </div>
+</section>
+
+<section class="row" id="s-events">
+  <div class="wf"><span class="lbl">4 イベント</span>
+    <div class="px"><div class="sh">EVENTS</div><div class="h">開催予定のイベント</div>
+      <div class="g3" style="margin-top:12px"><div><div class="box" style="height:110px">カバー画像</div><div class="t"></div><div class="t" style="width:50%"></div></div><div><div class="box" style="height:110px">カバー画像</div><div class="t"></div><div class="t" style="width:50%"></div></div><div><div class="box" style="height:110px">カバー画像</div><div class="t"></div><div class="t" style="width:50%"></div></div></div>
+      <div style="text-align:center;margin-top:16px"><a class="btn" href="./project.html#wireframe" target="_top">すべてのイベントを見る（メディアへ）</a></div>
+    </div>
+  </div>
+  <div class="ann"><h3>イベント</h3>
+    <div class="card m"><h4>メリット</h4><ul><li>HP からメディアへ人を送り、申込を増やせる</li><li>イベント情報はメディアから自動で出すので、HP の更新が要らない（予定）</li></ul></div>
+    <div class="card b"><h4>ベネフィット</h4><ul><li>今申し込めるイベントにすぐたどり着ける</li></ul></div>
+    <div class="card note">メディア公開（1/28）までは「近日公開」表示。公開後にリンクを差し替え</div>
+  </div>
+</section>
+
+<section class="row" id="s-members">
+  <div class="wf"><span class="lbl">5 メンバー</span>
+    <div class="px"><div class="sh">MEMBERS</div><div class="h">運営メンバー</div>
+      <div style="display:grid;grid-template-columns:200px 1fr;gap:20px;margin:12px 0 18px;align-items:center"><div class="box" style="height:200px">代表の写真</div><div><b>代表メッセージ</b><div class="t"></div><div class="t"></div><div class="t" style="width:70%"></div></div></div>
+      <div class="g4"><div><div class="box" style="height:100px">写真</div><div class="t" style="width:60%"></div></div><div><div class="box" style="height:100px">写真</div><div class="t" style="width:60%"></div></div><div><div class="box" style="height:100px">写真</div><div class="t" style="width:60%"></div></div><div><div class="box" style="height:100px">写真</div><div class="t" style="width:60%"></div></div></div>
+    </div>
+  </div>
+  <div class="ann"><h3>メンバー</h3>
+    <div class="card m"><h4>メリット</h4><ul><li>運営の顔が見えることで親しみと信頼が生まれる</li><li>新メンバーの募集にもつながる</li></ul></div>
+    <div class="card b"><h4>ベネフィット</h4><ul><li>誰が運営しているかが分かり、安心して連絡・参加できる</li></ul></div>
+    <div class="card note">必要な素材：代表メッセージ・メンバーの写真と名前・役割</div>
+  </div>
+</section>
+
+<section class="row" id="s-contact">
+  <div class="wf"><span class="lbl">6 お問い合わせ</span>
+    <div class="px f" style="max-width:620px"><div class="sh">CONTACT</div><div class="h">お問い合わせ</div>
+      <label>種別</label><div class="in" style="display:flex;align-items:center;gap:14px;padding:0 10px;font-size:12px">◯ 協賛・連携　◯ 取材　◯ イベントについて　◯ その他</div>
+      <label>お名前</label><div class="in"></div>
+      <label>所属（大学・団体・会社）</label><div class="in"></div>
+      <label>メールアドレス</label><div class="in"></div>
+      <label>内容</label><div class="in big"></div>
+      <div style="font-size:12px;margin-bottom:10px">☐ プライバシーポリシーに同意する</div>
+      <span class="btn pri">送信する</span>
+      <div style="font-size:12px;color:var(--mid);margin-top:8px">送信後：完了表示＋自動返信メール（返信の目安：3営業日以内）</div>
+    </div>
+  </div>
+  <div class="ann"><h3>お問い合わせ</h3>
+    <div class="card m"><h4>メリット</h4><ul><li>協賛・取材・連携の窓口を一本化できる</li><li>種別で振り分けられ、対応の漏れを防げる</li></ul></div>
+    <div class="card b"><h4>ベネフィット</h4><ul><li>迷わず連絡でき、いつ返信が来るか分かる</li></ul></div>
+    <div class="card note">要決定：送信先メールアドレス（10/8 定例）</div>
+  </div>
+</section>
+
+<section class="row" id="s-sns">
+  <div class="wf"><span class="lbl">7 SNS</span>
+    <div class="px"><div class="sh">FOLLOW US</div><div class="h">最新の活動は SNS で</div>
+      <div class="g3" style="margin-top:12px"><div class="box" style="height:140px">Instagram の投稿</div><div class="box" style="height:140px">Instagram の投稿</div><div class="box" style="height:140px">Instagram の投稿</div></div>
+      <div style="display:flex;gap:10px;margin-top:14px"><span class="btn">Instagram</span><span class="btn">X</span></div>
+    </div>
+  </div>
+  <div class="ann"><h3>SNS</h3>
+    <div class="card m"><h4>メリット</h4><ul><li>フォロワーを増やせる</li><li>HP を頻繁に更新しなくても、最新の様子が伝わる</li></ul></div>
+    <div class="card b"><h4>ベネフィット</h4><ul><li>日々の活動を気軽に追える</li></ul></div>
+  </div>
+</section>
+
+<section class="row" id="s-footer">
+  <div class="wf"><span class="lbl">8 フッター</span>
+    <div class="foot"><span>ロゴ</span><span>団体名・所在地</span><span>プライバシーポリシー</span><span>お問い合わせ</span><span style="margin-left:auto">© NEXT MOVE JAPAN</span></div>
+  </div>
+  <div class="ann"><h3>フッター</h3>
+    <div class="card m"><h4>メリット</h4><ul><li>運営者情報・プライバシーポリシーを載せ、信頼を補う</li></ul></div>
+    <div class="card b"><h4>ベネフィット</h4><ul><li>運営者と個人情報の扱いを確認できる</li></ul></div>
+  </div>
+</section>
+
+</div>
+</body>
+</html>
