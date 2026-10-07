@@ -253,8 +253,8 @@ ul.ops{margin:0;padding-left:1.1em}
   function flush(){
     clearTimeout(timer);
     var ids=Object.keys(dirty); if(!ids.length) return;
-    var cur=readStored(); ids.forEach(function(k){cur[k]=tas[k].value}); dirty={};
-    try{localStorage.setItem(key,JSON.stringify(cur)); status.textContent='保存しました '+new Date().toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'});}
+    var cur=readStored(); ids.forEach(function(k){cur[k]=tas[k].value});
+    try{localStorage.setItem(key,JSON.stringify(cur)); dirty={}; status.textContent='保存しました '+new Date().toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'});}
     catch(e){status.textContent='自動保存できません（HTMLで保存してください）';}
   }
   window.addEventListener('pagehide',flush);
