@@ -13,7 +13,8 @@ header{background:var(--black);color:#fff;padding:32px 48px 26px}
 header .eyebrow{font:700 13px/1 "Barlow Condensed";letter-spacing:.12em;color:var(--orange)}
 header h1{font:900 26px/1.35 "Noto Sans JP";margin:8px 0 6px}
 header p{margin:0;color:#ccc;font-size:13.5px}
-main{max-width:960px;padding:8px 48px 48px}
+main{max-width:1440px;padding:8px 48px 48px}
+@media (max-width:720px){main{padding:8px 16px 40px}header{padding:24px 16px 20px}}
 table{border-collapse:collapse;width:100%;font-size:14px;margin-top:16px}
 th,td{border:1px solid var(--g200);padding:6px 12px;text-align:left;vertical-align:top}
 th{background:var(--black);color:#fff;font-size:12px}
@@ -95,8 +96,8 @@ ul.ops{margin:0;padding-left:1.1em}
   <h3 class="sub">① 参加者の流れ（10分）</h3>
   <table class="steps">
     <tr><th style="width:30px">#</th><th style="width:130px">画面</th><th style="width:28%">できること</th><th>操作 → こうなれば OK</th></tr>
-    <tr><td>1</td><td><b>1 Home</b></td><td>季節の特集・注目イベント・記事・大学から探す入口</td><td><ul class="ops"><li>「新歓イベントを探す →」を押す → <b>2 Events一覧</b>に移る</li><li>大学名（慶應義塾大学など）を押す → その大学で絞り込んだ一覧に移る</li></ul></td></tr>
-    <tr><td>2</td><td><b>2 Events一覧</b></td><td>キーワード・大学・開催日・会場・参加費で絞り込み／並び替え／カレンダー表示</td><td><ul class="ops"><li>「⚙ 絞り込み」を押す → 絞り込みのシートが開く</li><li>「カレンダー」を押す → 同じ条件のままカレンダー表示に切り替わる</li><li>カードに日時・会場・主催者・残席・価格が出ているか見る</li></ul></td></tr>
+    <tr><td>1</td><td><b>1 Home</b></td><td>季節の特集・注目イベント・記事・大学から探す入口</td><td><ul class="ops"><li>「新歓イベントを探す →」を押す → <b>2 Events一覧</b>に移る</li><li>大学名（慶應義塾大学など）を押す → その大学で絞り込んだ一覧に移る</li><li>注目のイベントのカードを押す → <b>4 イベント詳細</b>に移る</li></ul></td></tr>
+    <tr><td>2</td><td><b>2 Events一覧</b></td><td>キーワード・大学・開催日・会場・参加費で絞り込み／並び替え／カレンダー表示</td><td><ul class="ops"><li>「⚙ 絞り込み」を押す → 絞り込みのシートが開く</li><li>「カレンダー」を押す → 同じ条件のままカレンダー表示に切り替わる</li><li>カードに日時・会場・主催者・残席・価格が出ているか見る</li><li>イベントのカードを押す → <b>4 イベント詳細</b>に移る</li></ul></td></tr>
     <tr><td>3</td><td><b>4 イベント詳細</b></td><td>日時・会場・参加枠・申込時に聞かれる内容の確認／お気に入り・フォロー・シェア・通報</td><td><ul class="ops"><li>「♡ お気に入り」「＋ フォロー」を押す → 未ログインなので<b>ログインを促す画面</b>が出る</li><li>「シェア」「… 通報」を押す → それぞれの画面が開く</li><li>主催者名を押す → 主催者ページに移る</li><li>「申し込む →」を押す → <b>10 申込①枠</b>に移る</li></ul></td></tr>
     <tr><td>4</td><td><b>4b 詳細の状態違い</b></td><td>受付前／受付中／満員／締切／中止／終了／申込済み／支払い待ち／補欠中の表示</td><td><ul class="ops"><li>状態ごとの見た目を上から順に見る → <b>見ただけでどの状態かわかる</b></li><li>「支払いへ進む →」を押す → <b>11 モック決済</b>に移る</li></ul></td></tr>
     <tr><td>5</td><td><b>9 ログイン → 9b 初回設定</b></td><td>Google でログイン／初回だけアイコン・ユーザーネーム・あだ名・SNS を登録（本名は登録しない）</td><td><ul class="ops"><li>「Google で続ける」を押す → <b>9b 初回設定</b>に移る</li><li>「この内容ではじめる」を押す → <b>12 マイページ</b>に移る</li></ul></td></tr>
