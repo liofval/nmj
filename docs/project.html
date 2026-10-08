@@ -31,6 +31,9 @@ main .on{display:block}
 </nav>
 <main id="main"></main>
 <script>
+// 資料を更新したら V を変える（タブ内の iframe がブラウザのキャッシュで古いまま表示されるのを防ぐ）
+const V='20261008b';
+const withV=src=>src+(src.includes('?')?'&':'?')+'v='+V;
 const TABS=[
   {id:'schedule-lp',label:'スケジュール（HP）',src:'./schedule.html?p=lp'},
   {id:'schedule-ticket',label:'スケジュール（メディア）',src:'./schedule.html?p=ticket'},
@@ -57,12 +60,12 @@ function show(id){
     if(t.text){
       const d=document.createElement('div'); d.className='pane';
       d.innerHTML=`<pre>読み込み中…</pre>`;
-      fetch(t.src).then(r=>{if(!r.ok)throw 0;return r.text()})
+      fetch(withV(t.src)).then(r=>{if(!r.ok)throw 0;return r.text()})
         .then(x=>{d.firstChild.textContent=x})
         .catch(()=>{d.innerHTML=`<p>この環境では表示できません。<a href="${t.src}">${t.src}</a> を直接開いてください。</p>`});
       pane[t.id]=d;
     }else{
-      const f=document.createElement('iframe'); f.src=t.src; f.title=t.label; pane[t.id]=f;
+      const f=document.createElement('iframe'); f.src=withV(t.src); f.title=t.label; pane[t.id]=f;
     }
     main.appendChild(pane[t.id]);
   }
