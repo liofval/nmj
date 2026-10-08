@@ -11,9 +11,9 @@ GitHub Pages で公開しています:
 | ドキュメント | 内容 |
 | --- | --- |
 | [プロトタイプ](https://liofval.github.io/nmj/prototype.html) | 画面遷移つきデザインプロトタイプ (PC) |
-| [ワイヤーフレーム v0.3](https://liofval.github.io/nmj/wireframes.html) | クリック遷移ワイヤーフレーム (PC / SP) |
+| [ワイヤーフレーム v0.4](https://liofval.github.io/nmj/wireframes.html) | クリック遷移ワイヤーフレーム (PC / SP) |
 | [Figma プレビュー](https://liofval.github.io/nmj/figma-preview/) | Figma 出力 PNG プレビュー 全 8 画面 |
-| [ER 図 v0.1](https://liofval.github.io/nmj/er-diagram.html) | データモデルの ER 図 |
+| [ER 図 v0.2](https://liofval.github.io/nmj/er-diagram.html) | データモデルの ER 図 |
 | [Prisma スキーマ](https://liofval.github.io/nmj/schema.prisma) | DB スキーマ定義 |
 
 ## リポジトリ構成

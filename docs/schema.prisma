@@ -1,6 +1,7 @@
 // ============================================================
 // NEXT MOVE JAPAN 学生イベント基盤 — Prisma schema（ドラフト）
 // 要件定義 v0.4 §5 ＋ プロトタイプ画面から追加で必要になったもの
+// 2026-10-08 定例の決定を反映（支払い待ち・補欠の廃止、枠の種類、QR チケットと受付状態、保存、権限 admin/owner/user ほか）
 // DB: PostgreSQL
 // ※ Prisma で書けない制約（CHECK・部分一意インデックス）は末尾の SQL をマイグレーションに追記する
 // ============================================================
@@ -20,9 +21,21 @@ enum OrganizerType {
   GROUP
 }
 
+// サイト全体の権限。ADMIN = NMJ 運営
+enum UserRole {
+  USER
+  ADMIN
+}
+
+// 団体の権限は owner のみ（複数可）。将来ロールを増やす余地として enum のまま残す
 enum MemberRole {
   OWNER
-  ADMIN
+}
+
+enum JoinRequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
 }
 
 enum EventStatus {
@@ -41,12 +54,30 @@ enum AttendeeListVisibility {
   PUBLIC_NICKNAME // 参加者のあだ名を公開
 }
 
+// 支払い待ち・補欠は持たない。有料枠は決済完了の Webhook で初めて CONFIRMED の行を作る
 enum RegistrationStatus {
-  PENDING_PAYMENT
-  CONFIRMED
-  WAITLISTED
+  CONFIRMED // 参加予定
   CANCELLED
-  EXPIRED
+}
+
+// 参加枠の種類（絞り込みに使う）
+enum SlotKind {
+  STUDENT // 学生
+  ADULT // 大人
+  PARTY // 懇親会
+  OTHER
+}
+
+// 受付の状態（いつでも戻せる）
+enum CheckinStatus {
+  NOT_CHECKED_IN // 未受付
+  CHECKED_IN // 受付済
+  ABSENT // 欠席
+}
+
+enum CheckinMethod {
+  QR
+  MANUAL // 参加者リストから変更
 }
 
 enum QuestionType {
@@ -63,15 +94,16 @@ enum PaymentProvider {
 }
 
 enum PaymentStatus {
-  PENDING
+  PENDING // 決済画面にいる間。holdExpiresAt まで席を確保する
   PAID
   FAILED
+  EXPIRED // 確保の期限切れ（席を解放）
   REFUNDED
 }
 
 enum AnnouncementAudience {
-  CONFIRMED // 確定者のみ
-  ALL // 補欠を含む全員
+  ATTENDEES // 参加予定の人
+  SAVED // イベントを保存した人（未申込）
 }
 
 enum ReportTargetType {
@@ -94,21 +126,20 @@ enum ArticleStatus {
 }
 
 enum NotificationType {
-  REGISTRATION_CONFIRMED // 申込完了
-  WAITLIST_PROMOTED // 補欠からの繰り上げ
-  PAYMENT_DUE_REMINDER // 支払い期限
-  PAYMENT_EXPIRED // 期限切れ
+  REGISTRATION_CONFIRMED // 申込完了（QR チケットを載せる）
   EVENT_CANCELLED // 中止
   NEW_EVENT_FROM_FOLLOWING // フォロー先の新規公開
   ANNOUNCEMENT // 主催者からの告知
   ANSWER_DELETION_NOTICE // 回答削除の7日前予告（主催者宛て）
   INVITATION // メンバー招待
+  JOIN_REQUEST // 既存の団体への参加依頼（owner 宛て）
+  REPORT_RECEIVED // 通報の受付（NMJ 運営宛て）
 }
 
 enum EmailCategory {
-  EVENT_UPDATES // 申込・繰り上げ・期限・中止（取引メール）
+  EVENT_UPDATES // 申込・QR チケット・中止（取引メール）
   FOLLOW_NEWS // フォロー先の新規公開
-  ANNOUNCEMENTS // 主催者からの告知
+  ANNOUNCEMENTS // 主催者からのお知らせ（参加予定の人・保存した人）
 }
 
 enum NotificationStatus {
@@ -125,6 +156,7 @@ enum ReportStatus {
 }
 
 // ---------- マスタ ----------
+// 10/8 で大学の絞り込みはなくした。Event.targetUniversityId を残すかは未決
 model University {
   id          String  @id @default(cuid())
   name        String
@@ -133,29 +165,43 @@ model University {
   events      Event[]
 }
 
+// ジャンル（絞り込み用。運営が管理）
+model Genre {
+  id        String  @id @default(cuid())
+  name      String
+  slug      String  @unique
+  sortOrder Int     @default(0)
+  events    Event[]
+}
+
 // ---------- アカウント ----------
 // 認証と通知のための最小限。表示に関わる情報は Organizer（type=USER）が持つ。本名・大学は持たない
 model User {
   id        String   @id @default(cuid())
   googleSub String   @unique
   email     String   @unique
-  isStaff   Boolean  @default(false) // 運営（記事の審査・通報の対応）
+  role      UserRole @default(USER) // ADMIN = NMJ 運営（記事の審査・通報の対応・団体の統合と削除）
   createdAt DateTime @default(now())
 
-  organizer     Organizer?        @relation("PersonalOrganizer")
-  memberships   OrganizerMember[]
-  follows       Follow[]
-  favorites     Favorite[]
-  registrations Registration[]
-  invitationsCreated Invitation[] @relation("InvitationCreatedBy")
-  invitationsAccepted Invitation[] @relation("InvitationAcceptedBy")
-  exportLogs    AnswerExportLog[]
-  reports       Report[]
-  reportsResolved Report[] @relation("ReportResolvedBy")
-  articlesWritten  MediaArticle[] @relation("ArticleAuthor")
-  articlesReviewed MediaArticle[] @relation("ArticleReviewer")
-  notifications    NotificationLog[]
-  emailPreferences EmailPreference[]
+  organizer           Organizer?         @relation("PersonalOrganizer")
+  memberships         OrganizerMember[]
+  follows             Follow[]
+  savedEvents         SavedEvent[]
+  registrations       Registration[]
+  tickets             Ticket[]
+  payments            Payment[]
+  checkinLogs         CheckinLog[]
+  joinRequests        GroupJoinRequest[]
+  joinRequestsDecided GroupJoinRequest[] @relation("JoinRequestDecidedBy")
+  invitationsCreated  Invitation[]       @relation("InvitationCreatedBy")
+  invitationsAccepted Invitation[]       @relation("InvitationAcceptedBy")
+  exportLogs          AnswerExportLog[]
+  reports             Report[]
+  reportsResolved     Report[]           @relation("ReportResolvedBy")
+  articlesWritten     MediaArticle[]     @relation("ArticleAuthor")
+  articlesReviewed    MediaArticle[]     @relation("ArticleReviewer")
+  notifications       NotificationLog[]
+  emailPreferences    EmailPreference[]
 
   // Auth.js（Prisma アダプタ）
   accounts Account[]
@@ -175,18 +221,20 @@ model Organizer {
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
 
-  user           User?             @relation("PersonalOrganizer", fields: [userId], references: [id])
-  members        OrganizerMember[]
-  socialLinks    SocialLink[]
-  followers      Follow[]
-  events         Event[]
-  payoutAccounts PayoutAccount[]
-  invitations    Invitation[]
-  articleLinks   MediaArticleOrganizer[]
-  articlesAuthored MediaArticle[] @relation("ArticleAuthorOrganizer")
+  user             User?                   @relation("PersonalOrganizer", fields: [userId], references: [id])
+  members          OrganizerMember[]
+  socialLinks      SocialLink[]
+  followers        Follow[]
+  events           Event[]
+  payoutAccounts   PayoutAccount[]
+  invitations      Invitation[]
+  joinRequests     GroupJoinRequest[]
+  articleLinks     MediaArticleOrganizer[]
+  articlesAuthored MediaArticle[]          @relation("ArticleAuthorOrganizer")
 }
 
-// 運営メンバー（type=GROUP の Organizer にのみ作成。最後の OWNER は離脱不可 → アプリのトランザクションで検証）
+// 運営メンバー（type=GROUP の Organizer にのみ作成。owner は複数可。最後の owner は離脱不可 → アプリのトランザクションで検証）
+// 団体の作成に申請はない。削除・引き継ぎの扱いは未決（削除は NMJ 運営が行う想定）
 model OrganizerMember {
   organizerId String
   userId      String
@@ -203,22 +251,40 @@ model OrganizerMember {
 
 // 招待リンク（メンバー招待モーダル）
 model Invitation {
-  id          String     @id @default(cuid())
-  organizerId String
-  role        MemberRole @default(ADMIN)
-  token       String     @unique
-  expiresAt   DateTime
-  createdById String
+  id           String     @id @default(cuid())
+  organizerId  String
+  role         MemberRole @default(OWNER)
+  token        String     @unique
+  expiresAt    DateTime
+  createdById  String
   acceptedById String?
-  acceptedAt  DateTime?
-  revokedAt   DateTime?
-  createdAt   DateTime   @default(now())
+  acceptedAt   DateTime?
+  revokedAt    DateTime?
+  createdAt    DateTime   @default(now())
 
   organizer  Organizer @relation(fields: [organizerId], references: [id], onDelete: Cascade)
   createdBy  User      @relation("InvitationCreatedBy", fields: [createdById], references: [id])
   acceptedBy User?     @relation("InvitationAcceptedBy", fields: [acceptedById], references: [id])
 
   @@index([organizerId])
+}
+
+// 既存の団体への参加依頼（団体作成時に似た名前の団体が見つかったときの導線。同じ団体のページが増えるのを防ぐ）
+model GroupJoinRequest {
+  id          String            @id @default(cuid())
+  organizerId String
+  userId      String
+  message     String?
+  status      JoinRequestStatus @default(PENDING)
+  decidedById String?
+  decidedAt   DateTime?
+  createdAt   DateTime          @default(now())
+
+  organizer Organizer @relation(fields: [organizerId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  decidedBy User?     @relation("JoinRequestDecidedBy", fields: [decidedById], references: [id])
+
+  @@index([organizerId, status])
 }
 
 model SocialLink {
@@ -233,6 +299,7 @@ model SocialLink {
   @@index([organizerId, sortOrder])
 }
 
+// フォローできるのは type=GROUP の主催者だけ（アプリで検証）
 model Follow {
   userId      String
   organizerId String
@@ -250,7 +317,10 @@ model Follow {
 model Event {
   id                     String                 @id @default(cuid())
   organizerId            String // 移管はこの付け替えだけ
-  targetUniversityId     String? // NULL = 大学を問わない
+  targetUniversityId     String? // NULL = 大学を問わない（画面からは外した。残すか未決）
+  genreId                String
+  area                   String // 都道府県名。オンラインのみは "online"（絞り込み用）
+  capacity               Int? // イベント全体の参加者上限。NULL = 枠の定員だけ
   title                  String
   body                   String // Markdown
   startAt                DateTime
@@ -258,7 +328,7 @@ model Event {
   venueType              VenueType
   venueName              String?
   address                String?
-  onlineUrl              String? // 参加確定者にのみ開示
+  onlineUrl              String? // 参加予定の人にのみ開示
   status                 EventStatus            @default(DRAFT)
   publishedAt            DateTime?
   cancelledAt            DateTime?
@@ -271,27 +341,32 @@ model Event {
   createdAt              DateTime               @default(now())
   updatedAt              DateTime               @updatedAt
 
-  organizer         Organizer              @relation(fields: [organizerId], references: [id])
-  targetUniversity  University?            @relation(fields: [targetUniversityId], references: [id])
-  payoutAccount     PayoutAccount?         @relation(fields: [payoutAccountId], references: [id])
-  slots             Slot[]
-  questions         RegistrationQuestion[]
-  announcements     Announcement[]
-  favorites         Favorite[]
-  exportLogs        AnswerExportLog[]
-  articleLinks      MediaArticleEvent[]
-  notifications     NotificationLog[]
+  organizer        Organizer              @relation(fields: [organizerId], references: [id])
+  targetUniversity University?            @relation(fields: [targetUniversityId], references: [id])
+  genre            Genre                  @relation(fields: [genreId], references: [id])
+  payoutAccount    PayoutAccount?         @relation(fields: [payoutAccountId], references: [id])
+  slots            Slot[]
+  questions        RegistrationQuestion[]
+  announcements    Announcement[]
+  savedBy          SavedEvent[]
+  tickets          Ticket[]
+  payments         Payment[]
+  exportLogs       AnswerExportLog[]
+  articleLinks     MediaArticleEvent[]
+  notifications    NotificationLog[]
 
   @@index([status, startAt])
-  @@index([targetUniversityId, startAt])
+  @@index([genreId, startAt])
+  @@index([area, startAt])
   @@index([organizerId, startAt])
   @@index([endAt]) // 回答の自動削除 Cron
 }
 
-// 参加枠。定員と価格は枠の属性
+// 参加枠。種類・定員・価格は枠の属性
 model Slot {
   id          String    @id @default(cuid())
   eventId     String
+  kind        SlotKind
   name        String
   description String?
   capacity    Int
@@ -303,38 +378,78 @@ model Slot {
   event         Event          @relation(fields: [eventId], references: [id], onDelete: Cascade)
   registrations Registration[]
 
-  @@index([eventId, sortOrder])
+  @@index([eventId, kind])
 }
 
-// 申込。定員判定は Slot 行を SELECT ... FOR UPDATE してから数える（registerToSlot に集約）
+// 申込（枠ごと）。行があるのは参加予定かキャンセルだけ
+// 定員判定は Slot 行（と全体上限があれば Event 行）を SELECT ... FOR UPDATE してから、CONFIRMED と確保中の Payment を数える（registerToSlot に集約）
 model Registration {
-  id           String             @id @default(cuid())
-  slotId       String
-  userId       String
-  status       RegistrationStatus
-  appliedAt    DateTime           @default(now()) // 補欠の正の順序
-  waitlistPos  Int?
-  paymentDueAt DateTime? // min(申込+24h, 開始時刻)
-  checkedInAt  DateTime? // 当日の受付
-  cancelledAt  DateTime?
-  note         String?
+  id          String             @id @default(cuid())
+  slotId      String
+  userId      String
+  ticketId    String
+  paymentId   String? // 有料枠のときの決済
+  status      RegistrationStatus @default(CONFIRMED)
+  appliedAt   DateTime           @default(now())
+  cancelledAt DateTime?
+  note        String?
 
-  slot     Slot                 @relation(fields: [slotId], references: [id])
-  user     User                 @relation(fields: [userId], references: [id])
-  answers  RegistrationAnswer[]
-  payments Payment[] // 失敗→再試行があるため複数
+  slot          Slot                 @relation(fields: [slotId], references: [id])
+  user          User                 @relation(fields: [userId], references: [id])
+  ticket        Ticket               @relation(fields: [ticketId], references: [id])
+  payment       Payment?             @relation(fields: [paymentId], references: [id])
+  answers       RegistrationAnswer[]
   notifications NotificationLog[]
 
   // 同一枠に有効な申込は1件 → 部分一意インデックスを末尾 SQL で作成
-  @@index([slotId, status, appliedAt])
+  @@index([slotId, status])
   @@index([userId, status])
-  @@index([status, paymentDueAt]) // 期限切れ Cron
+  @@index([ticketId])
+}
+
+// QR チケット（1人1イベント1枚。複数枠でも1枚）。受付の状態もここで持つ
+model Ticket {
+  id            String        @id @default(cuid())
+  eventId       String
+  userId        String
+  token         String        @unique // QR に載せる推測できない値
+  checkinStatus CheckinStatus @default(NOT_CHECKED_IN)
+  checkedInAt   DateTime?
+  issuedAt      DateTime      @default(now())
+  revokedAt     DateTime? // 全枠キャンセルで無効化
+  walletPassUrl String? // Apple / Google Wallet（検討中）
+
+  event         Event          @relation(fields: [eventId], references: [id])
+  user          User           @relation(fields: [userId], references: [id])
+  registrations Registration[]
+  checkinLogs   CheckinLog[]
+
+  @@unique([eventId, userId])
+  @@index([eventId, checkinStatus])
+}
+
+// 受付の状態を変えた記録（誰が・いつ・QR かリストか）
+model CheckinLog {
+  id          String        @id @default(cuid())
+  ticketId    String
+  fromStatus  CheckinStatus
+  toStatus    CheckinStatus
+  method      CheckinMethod
+  changedById String
+  changedAt   DateTime      @default(now())
+
+  ticket    Ticket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  changedBy User   @relation(fields: [changedById], references: [id])
+
+  @@index([ticketId, changedAt])
 }
 
 // 申込時の質問。公開後は削除・type 変更禁止（アプリで検証）
+// commonKey がある行は全イベント共通の質問（作成時に自動で入り、削除・変更不可）。中身は未決（仮：NAME / KANA / AFFILIATION）
 model RegistrationQuestion {
   id             String       @id @default(cuid())
   eventId        String
+  commonKey      String?
   label          String
   helpText       String?
   type           QuestionType
@@ -365,12 +480,12 @@ model RegistrationAnswer {
 
 // CSV 出力の記録（誰がいつ出力したか。§8）
 model AnswerExportLog {
-  id             String   @id @default(cuid())
-  eventId        String
-  userId         String
-  includeAnswers Boolean
-  includeWaitlist Boolean @default(false)
-  exportedAt     DateTime @default(now())
+  id              String   @id @default(cuid())
+  eventId         String
+  userId          String
+  includeAnswers  Boolean
+  includeWaitlist Boolean  @default(false)
+  exportedAt      DateTime @default(now())
 
   event Event @relation(fields: [eventId], references: [id])
   user  User  @relation(fields: [userId], references: [id])
@@ -379,21 +494,30 @@ model AnswerExportLog {
 }
 
 // ---------- 決済 ----------
+// 決済画面に進んだ時点で作る。PENDING の間（holdExpiresAt まで）は選んだ枠の席を確保し、
+// PAID の Webhook で Registration（CONFIRMED）と Ticket を作る。FAILED / EXPIRED なら何も作らず席を解放する
 model Payment {
-  id             String          @id @default(cuid())
-  registrationId String
-  provider       PaymentProvider
-  providerRef    String          @unique // Webhook の冪等性
-  amountYen      Int
-  status         PaymentStatus   @default(PENDING)
-  failureReason  String?
-  paidAt         DateTime?
-  refundedAt     DateTime?
-  createdAt      DateTime        @default(now())
+  id            String          @id @default(cuid())
+  userId        String
+  eventId       String
+  slotIds       String[] // 申し込む枠（無料枠も含めて一緒に確定する）
+  answersDraft  Json? // 確定までの回答。確定時に RegistrationAnswer へ移し、失敗・期限切れで消す
+  provider      PaymentProvider
+  providerRef   String          @unique // Webhook の冪等性
+  amountYen     Int
+  status        PaymentStatus   @default(PENDING)
+  holdExpiresAt DateTime // 席の確保期限（Stripe Checkout の有効期限と合わせる）
+  failureReason String?
+  paidAt        DateTime?
+  refundedAt    DateTime?
+  createdAt     DateTime        @default(now())
 
-  registration Registration @relation(fields: [registrationId], references: [id])
+  user          User           @relation(fields: [userId], references: [id])
+  event         Event          @relation(fields: [eventId], references: [id])
+  registrations Registration[]
 
-  @@index([registrationId])
+  @@index([eventId, status, holdExpiresAt]) // 定員判定と期限切れ Cron
+  @@index([userId])
 }
 
 // 実決済フェーズで有効化（Stripe Connect Standard 想定）
@@ -413,13 +537,13 @@ model PayoutAccount {
 
 // ---------- 告知・お気に入り・通報 ----------
 model Announcement {
-  id             String               @id @default(cuid())
+  id             String                 @id @default(cuid())
   eventId        String
   subject        String
   body           String
-  audience       AnnouncementAudience
+  audiences      AnnouncementAudience[] // 参加予定の人・保存した人（両方可）
   recipientCount Int
-  sentAt         DateTime             @default(now())
+  sentAt         DateTime               @default(now())
 
   event         Event             @relation(fields: [eventId], references: [id], onDelete: Cascade)
   notifications NotificationLog[]
@@ -427,8 +551,8 @@ model Announcement {
   @@index([eventId, sentAt])
 }
 
-// 個別イベントの保存（仕様の細部は §14 で未決）
-model Favorite {
+// イベントの保存（UI 名「保存」。旧「お気に入り」）。主催者は保存した人にもお知らせを送れる
+model SavedEvent {
   userId    String
   eventId   String
   createdAt DateTime @default(now())
@@ -441,6 +565,7 @@ model Favorite {
 }
 
 // 通報（targetId は Event.id か Organizer.id。ポリモーフィックなので FK は張らない）
+// 理由は必須。OTHER のときは detail も必須（アプリで検証）。受け付けたら NMJ 運営へ REPORT_RECEIVED を送る。項目は検討中
 model Report {
   id             String           @id @default(cuid())
   reporterUserId String
@@ -482,9 +607,9 @@ model MediaArticle {
   createdAt         DateTime      @default(now())
   updatedAt         DateTime      @updatedAt
 
-  author          User       @relation("ArticleAuthor", fields: [authorUserId], references: [id])
-  authorOrganizer Organizer? @relation("ArticleAuthorOrganizer", fields: [authorOrganizerId], references: [id])
-  reviewedBy      User?      @relation("ArticleReviewer", fields: [reviewedById], references: [id])
+  author          User                    @relation("ArticleAuthor", fields: [authorUserId], references: [id])
+  authorOrganizer Organizer?              @relation("ArticleAuthorOrganizer", fields: [authorOrganizerId], references: [id])
+  reviewedBy      User?                   @relation("ArticleReviewer", fields: [reviewedById], references: [id])
   events          MediaArticleEvent[] // 関連イベント
   organizers      MediaArticleOrganizer[] // 記事に登場する主催者
 
@@ -513,12 +638,15 @@ model MediaArticleOrganizer {
   @@id([articleId, organizerId])
 }
 
-// ---------- メール通知（送信ログと配信停止） ----------
+// ---------- お知らせ（サイト内のお知らせ＋メール送信ログ）と配信停止 ----------
+// サイト内のお知らせとして表示し、同じ内容をメールでも送る
 model NotificationLog {
   id                String             @id @default(cuid())
   userId            String? // 宛先ユーザー（招待など未登録宛ては NULL）
   toEmail           String
   type              NotificationType
+  title             String // お知らせ一覧に出す件名
+  readAt            DateTime? // サイト内で既読にした日時
   status            NotificationStatus @default(QUEUED)
   eventId           String?
   registrationId    String?
@@ -601,9 +729,16 @@ model VerificationToken {
 // -- 定員・価格は 0 以上
 // ALTER TABLE "Slot" ADD CONSTRAINT slot_capacity_check CHECK (capacity >= 0 AND "priceYen" >= 0);
 //
-// -- 同一枠に有効な申込は1人1件（キャンセル・期限切れ後の再申込は許可）
+// -- 同一枠に有効な申込は1人1件（キャンセル後の再申込は許可）
 // CREATE UNIQUE INDEX registration_active_unique ON "Registration" ("slotId", "userId")
-//   WHERE status IN ('PENDING_PAYMENT', 'CONFIRMED', 'WAITLISTED');
+//   WHERE status = 'CONFIRMED';
+//
+// -- イベント全体の上限は 1 以上
+// ALTER TABLE "Event" ADD CONSTRAINT event_capacity_check CHECK (capacity IS NULL OR capacity >= 1);
+//
+// -- 共通の質問はイベントごとに1つずつ
+// CREATE UNIQUE INDEX question_common_unique ON "RegistrationQuestion" ("eventId", "commonKey")
+//   WHERE "commonKey" IS NOT NULL;
 //
 // -- キーワード検索（タイトル・説明）
 // CREATE EXTENSION IF NOT EXISTS pg_trgm;

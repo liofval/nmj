@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>NEXT MOVE JAPAN 学生イベント基盤 — ER 図 v0.1</title>
+<title>NEXT MOVE JAPAN 学生イベント基盤 — ER 図 v0.2</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800&family=Noto+Sans+JP:wght@400;500;700;900&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -46,10 +46,10 @@ footer{padding:32px 64px 64px;color:var(--g600);font-size:13px}
 <body>
 <header>
   <div class="en">ER DIAGRAM</div>
-  <div class="eyebrow">DATA MODEL / v0.1</div>
+  <div class="eyebrow">DATA MODEL / v0.2</div>
   <h1>学生イベント基盤 ER 図</h1>
-  <p>要件定義 v0.4 §5 のドメインモデルに、プロトタイプの画面と今回の決定（Media は自前 DB・運営と主催者が投稿、メール送信ログを持つ）を反映した 26 テーブル。正は <code>docs/schema.prisma</code>（PostgreSQL / Prisma、<code>prisma validate</code> 済み）。</p>
-  <div class="meta"><div>作成日<b>2026-09-22</b></div><div>DB<b>PostgreSQL</b></div><div>テーブル<b>26</b></div><div>正<b>schema.prisma</b></div></div>
+  <p>要件定義 v0.4 §5 のドメインモデルに、プロトタイプの画面と今回の決定（Media は自前 DB・運営と主催者が投稿、メール送信ログを持つ）を反映し、10/8 定例の決定（支払い待ち・補欠の廃止、枠の種類、QR チケットと受付状態、保存、権限 admin/owner/user ほか）を加えた 30 テーブル。正は <code>docs/schema.prisma</code>（PostgreSQL / Prisma、<code>prisma validate</code> 済み）。</p>
+  <div class="meta"><div>更新日<b>2026-10-08</b></div><div>DB<b>PostgreSQL</b></div><div>テーブル<b>30</b></div><div>正<b>schema.prisma</b></div></div>
 </header>
 <nav class="toc"><a href="#overview">00 全体図</a><a href="#account">01 アカウントと主催者</a><a href="#event">02 イベントと申込</a><a href="#payment">03 決済</a><a href="#notify">04 告知・通知・通報</a><a href="#media">05 Media</a><a href="#constraints">06 制約とインデックス</a><a href="#decisions">07 決定事項と未決</a></nav>
 
@@ -76,23 +76,29 @@ erDiagram
   Organizer ||--o{ Invitation : "招待"
   Organizer ||--o{ SocialLink : "SNS"
   User ||--o{ Follow : "フォローする"
-  Organizer ||--o{ Follow : "フォローされる"
+  Organizer ||--o{ Follow : "フォローされる（団体のみ）"
+  Organizer ||--o{ GroupJoinRequest : "参加依頼"
   User ||--o{ Account : "Google 連携"
   User ||--o{ Session : "ログイン"
   University |o--o{ Event : "対象の大学"
+  Genre ||--o{ Event : "ジャンル"
   Organizer ||--o{ Event : "主催する"
   Event ||--o{ Slot : "参加枠"
   Slot ||--o{ Registration : "申込"
   User ||--o{ Registration : "申し込む"
+  Event ||--o{ Ticket : "QR チケット"
+  Ticket ||--o{ Registration : "1枚に枠をまとめる"
+  Ticket ||--o{ CheckinLog : "受付の記録"
   Event ||--o{ RegistrationQuestion : "申込時の質問"
   Registration ||--o{ RegistrationAnswer : "回答"
   RegistrationQuestion ||--o{ RegistrationAnswer : ""
-  Registration ||--o{ Payment : "支払い"
+  Payment |o--o{ Registration : "決済完了で作る"
+  User ||--o{ Payment : "支払う"
   Organizer ||--o{ PayoutAccount : "入金先"
   PayoutAccount |o--o{ Event : "この回の入金先"
   Event ||--o{ Announcement : "告知"
-  User ||--o{ Favorite : "お気に入り"
-  Event ||--o{ Favorite : ""
+  User ||--o{ SavedEvent : "保存"
+  Event ||--o{ SavedEvent : ""
   Event ||--o{ AnswerExportLog : "CSV 出力記録"
   User ||--o{ Report : "通報する"
   User ||--o{ MediaArticle : "書く"
@@ -110,7 +116,7 @@ erDiagram
 
 <section id="account">
   <div class="snum">01</div><h2>アカウントと主催者</h2>
-  <p class="lead">登録と同時に type=USER の Organizer（個人主催者）を作る。団体を作ると type=GROUP の Organizer ができ、作成者が OWNER になる。<code>/@slug</code> はどちらも Organizer.slug。権限判定は <code>canManage(organizerId, userId)</code> に集約する。</p>
+  <p class="lead">登録と同時に type=USER の Organizer（個人主催者）を作る。団体を作ると（申請なし）type=GROUP の Organizer ができ、作成者が owner になる。権限は User.role（ADMIN = NMJ 運営 / USER）と団体の owner（複数可）の組み合わせで、admin / owner / user の3種類になる。<code>/@slug</code> はどちらも Organizer.slug。権限判定は <code>canManage(organizerId, userId)</code> に集約する。</p>
   <div class="diagram"><pre class="mermaid">
 erDiagram
   User ||--o| Organizer : "個人主催者"
@@ -123,11 +129,13 @@ erDiagram
   Organizer ||--o{ Follow : ""
   User ||--o{ Account : ""
   User ||--o{ Session : ""
+  Organizer ||--o{ GroupJoinRequest : ""
+  User ||--o{ GroupJoinRequest : "依頼する"
   User {
     string id PK
     string googleSub UK
     string email UK
-    boolean isStaff "運営フラグ"
+    UserRole role "USER / ADMIN（NMJ 運営）"
     datetime createdAt
   }
   Organizer {
@@ -143,7 +151,7 @@ erDiagram
   OrganizerMember {
     string organizerId PK,FK
     string userId PK,FK
-    MemberRole role "OWNER / ADMIN"
+    MemberRole role "OWNER のみ（複数可）"
     datetime invitedAt
     datetime joinedAt "NULL可"
   }
@@ -166,9 +174,16 @@ erDiagram
   }
   Follow {
     string userId PK,FK
-    string organizerId PK,FK
+    string organizerId PK,FK "団体のみ"
     boolean notifyEmail "新規公開メール"
     datetime createdAt
+  }
+  GroupJoinRequest {
+    string id PK
+    string organizerId FK
+    string userId FK
+    JoinRequestStatus status "PENDING / APPROVED / REJECTED"
+    string decidedById FK "NULL可"
   }
   Account {
     string id PK
@@ -184,27 +199,32 @@ erDiagram
   }
   </pre></div>
   <div class="notes">
-    <div><h4>ルール</h4><ul><li>Organizer.userId は type=USER のときだけ入る（CHECK 制約）</li><li>OrganizerMember は type=GROUP の主催者にだけ作る</li><li>最後の OWNER は離脱できない（アプリのトランザクションで検証）</li></ul></div>
+    <div><h4>ルール</h4><ul><li>Organizer.userId は type=USER のときだけ入る（CHECK 制約）</li><li>OrganizerMember は type=GROUP の主催者にだけ作る</li><li>owner は複数可。最後の owner は離脱できない（アプリのトランザクションで検証）</li><li>フォローできるのは type=GROUP だけ（アプリで検証）</li><li>団体の削除・引き継ぎの扱いは未決</li></ul></div>
     <div><h4>画面との対応</h4><ul><li>主催者ページ（団体・個人）、プロフィール編集、初回設定</li><li>団体作成・団体の設定（メンバー）・メンバー招待モーダル</li><li>フォロー中、Home の「フォロー中の新着」</li></ul></div>
-    <div><h4>補足</h4><ul><li><span class="tag new">追加</span> Invitation：招待リンク方式のため</li><li><span class="tag new">追加</span> User.isStaff：運営が記事審査と通報対応をするため</li><li><span class="tag gray">Auth.js</span> Account / Session / VerificationToken（VerificationToken は関連なしのため図から省略）</li></ul></div>
+    <div><h4>補足</h4><ul><li><span class="tag new">追加</span> Invitation：招待リンク方式のため</li><li><span class="tag new">追加</span> User.role：NMJ 運営（admin）が記事審査・通報対応・団体の統合と削除をするため</li><li><span class="tag new">追加</span> GroupJoinRequest：同じ団体のページが増えないよう、既存の団体へ参加を依頼する</li><li><span class="tag gray">Auth.js</span> Account / Session / VerificationToken（VerificationToken は関連なしのため図から省略）</li></ul></div>
   </div>
 </section>
 
 <section id="event">
   <div class="snum">02</div><h2>イベントと申込</h2>
-  <p class="lead">申込は Event ではなく Slot にぶら下げる（定員と価格は枠の属性）。定員判定は <code>Slot</code> 行を <code>SELECT … FOR UPDATE</code> でロックしてから数える。申込時の質問はイベントごとに主催者が設計し、回答だけが個人情報を持つ。</p>
+  <p class="lead">申込は Event ではなく Slot にぶら下げる（種類・定員・価格は枠の属性）。イベント全体の上限は Event.capacity。定員判定は <code>Slot</code>（と <code>Event</code>）行を <code>SELECT … FOR UPDATE</code> でロックしてから、参加予定と決済中の確保を数える。申込は「参加予定」か「キャンセル」しか持たない（支払い待ち・補欠はなし）。1人1イベントに QR チケットを1枚発行し、受付の状態はチケットで持つ。申込時の質問は全イベント共通の質問＋主催者の追加質問で、回答だけが個人情報を持つ。</p>
   <div class="diagram"><pre class="mermaid">
 erDiagram
   University |o--o{ Event : "対象の大学"
+  Genre ||--o{ Event : "ジャンル"
   Organizer ||--o{ Event : "主催する"
   Event ||--o{ Slot : "参加枠"
   Slot ||--o{ Registration : "申込"
   User ||--o{ Registration : "申し込む"
+  Event ||--o{ Ticket : ""
+  User ||--o{ Ticket : ""
+  Ticket ||--o{ Registration : ""
+  Ticket ||--o{ CheckinLog : ""
   Event ||--o{ RegistrationQuestion : ""
   Registration ||--o{ RegistrationAnswer : ""
   RegistrationQuestion ||--o{ RegistrationAnswer : ""
-  User ||--o{ Favorite : ""
-  Event ||--o{ Favorite : ""
+  User ||--o{ SavedEvent : ""
+  Event ||--o{ SavedEvent : ""
   Event ||--o{ AnswerExportLog : ""
   User ||--o{ AnswerExportLog : "出力した人"
   University {
@@ -212,6 +232,12 @@ erDiagram
     string name
     string slug UK
     string emailDomain "NULL可"
+  }
+  Genre {
+    string id PK
+    string name
+    string slug UK
+    int sortOrder
   }
   Organizer {
     string id PK
@@ -223,13 +249,16 @@ erDiagram
   Event {
     string id PK
     string organizerId FK "移管はここの付け替え"
-    string targetUniversityId FK "NULL=大学を問わない"
+    string targetUniversityId FK "NULL可・残すか未決"
+    string genreId FK
+    string area "都道府県 / online"
+    int capacity "全体の上限・NULL可"
     string title
     string body
     datetime startAt
     datetime endAt
     VenueType venueType "OFFLINE / ONLINE"
-    string onlineUrl "確定者にだけ開示"
+    string onlineUrl "参加予定の人にだけ開示"
     EventStatus status "DRAFT / PUBLISHED / CANCELLED"
     string cancelReason "NULL可"
     AttendeeListVisibility attendeeListVisibility
@@ -240,6 +269,7 @@ erDiagram
   Slot {
     string id PK
     string eventId FK
+    SlotKind kind "STUDENT / ADULT / PARTY / OTHER"
     string name
     int capacity
     int priceYen "0=無料"
@@ -250,15 +280,33 @@ erDiagram
     string id PK
     string slotId FK
     string userId FK
-    RegistrationStatus status
-    datetime appliedAt "補欠の順序"
-    int waitlistPos "NULL可"
-    datetime paymentDueAt "NULL可"
-    datetime checkedInAt "当日の受付"
+    string ticketId FK
+    string paymentId FK "有料のとき"
+    RegistrationStatus status "CONFIRMED / CANCELLED"
+    datetime appliedAt
+  }
+  Ticket {
+    string id PK
+    string eventId FK
+    string userId FK
+    string token UK "QR に載せる値"
+    CheckinStatus checkinStatus "未受付 / 受付済 / 欠席"
+    datetime checkedInAt "NULL可"
+    datetime revokedAt "NULL可"
+  }
+  CheckinLog {
+    string id PK
+    string ticketId FK
+    CheckinStatus fromStatus
+    CheckinStatus toStatus
+    CheckinMethod method "QR / MANUAL"
+    string changedById FK
+    datetime changedAt
   }
   RegistrationQuestion {
     string id PK
     string eventId FK
+    string commonKey "共通の質問・NULL可"
     string label
     QuestionType type
     json options "NULL可"
@@ -271,7 +319,7 @@ erDiagram
     string questionId PK,FK
     string value "本名・連絡先など"
   }
-  Favorite {
+  SavedEvent {
     string userId PK,FK
     string eventId PK,FK
     datetime createdAt
@@ -285,34 +333,39 @@ erDiagram
   }
   </pre></div>
   <div class="notes">
-    <div><h4>申込の状態遷移（§7）</h4><ul><li>空きあり・無料 → CONFIRMED ／ 空きあり・有料 → PENDING_PAYMENT ／ 満員 → WAITLISTED</li><li>PENDING_PAYMENT → 支払い完了で CONFIRMED、期限切れで EXPIRED（Cron）</li><li>キャンセル・期限切れで補欠の先頭（appliedAt 順）を繰り上げ</li></ul></div>
-    <div><h4>ルール</h4><ul><li>同じ枠に有効な申込は1人1件（部分一意インデックス）</li><li>公開後は質問の削除・type 変更を禁止</li><li>回答は Event.endAt ＋ answerRetentionDays を過ぎたら削除（Registration と Payment は残る）</li></ul></div>
-    <div><h4>補足</h4><ul><li><span class="tag new">追加</span> Favorite：お気に入り（仕様は未決）</li><li><span class="tag new">追加</span> AnswerExportLog：CSV 出力の記録（§8 で必須）</li><li><span class="tag new">追加</span> Event.cancelReason、RegistrationQuestion.slotIds</li></ul></div>
+    <div><h4>申込の流れ（10/8 改定）</h4><ul><li>無料枠だけ → その場で CONFIRMED（参加予定）＋ Ticket を発行</li><li>有料枠を含む → Payment（PENDING）で席を確保 → 決済完了の Webhook で全枠を CONFIRMED ＋ Ticket。失敗・期限切れは何も作らず席を解放</li><li>満員の枠・全体の上限に達したイベントは申し込めない（補欠なし）</li></ul></div>
+    <div><h4>ルール</h4><ul><li>同じ枠に有効な申込は1人1件（部分一意インデックス）</li><li>受付の状態はいつでも戻せる。変更はすべて CheckinLog に残す</li><li>共通の質問（commonKey あり）は削除・変更不可。公開後は質問の削除・type 変更を禁止</li><li>回答は Event.endAt ＋ answerRetentionDays を過ぎたら削除（Registration と Payment は残る）</li></ul></div>
+    <div><h4>補足</h4><ul><li><span class="tag new">追加</span> SavedEvent：保存（旧 Favorite）。保存した人にもお知らせを送れる</li><li><span class="tag new">追加</span> Genre・Event.area・Event.capacity・Slot.kind：絞り込みと全体の上限</li><li><span class="tag new">追加</span> Ticket・CheckinLog：QR チケットと受付の状態管理</li><li><span class="tag new">追加</span> AnswerExportLog：CSV 出力の記録（§8 で必須）</li><li><span class="tag new">追加</span> Event.cancelReason、RegistrationQuestion.slotIds</li></ul></div>
   </div>
 </section>
 
 <section id="payment">
   <div class="snum">03</div><h2>決済</h2>
-  <p class="lead">MVP はモック決済だが、実決済と同じく <b>Webhook で状態を確定</b>する。PENDING_PAYMENT → CONFIRMED の遷移は Webhook だけが行う。失敗→再試行があるため、1つの申込に Payment は複数できる。入金先はイベントごとに指定（Phase 8 で有効化）。</p>
+  <p class="lead">MVP はモック決済だが、実決済と同じく <b>Webhook で確定</b>する。決済画面に進んだ時点で Payment（PENDING）を作って席を確保し（holdExpiresAt まで）、PAID の Webhook で初めて Registration と Ticket を作る。申込に「支払い待ち」の状態は持たない。失敗→再試行は新しい Payment を作る。入金先はイベントごとに指定（Phase 8 で有効化）。</p>
   <div class="diagram"><pre class="mermaid">
 erDiagram
-  Registration ||--o{ Payment : "支払い"
+  Payment |o--o{ Registration : "決済完了で作る"
+  User ||--o{ Payment : ""
   Organizer ||--o{ PayoutAccount : "入金先を持つ"
   PayoutAccount |o--o{ Event : "この回の入金先"
   Event ||--o{ Slot : ""
   Slot ||--o{ Registration : ""
   Registration {
     string id PK
+    string paymentId FK "NULL可"
     RegistrationStatus status
-    datetime paymentDueAt
   }
   Payment {
     string id PK
-    string registrationId FK
+    string userId FK
+    string eventId FK
+    string_array slotIds "申し込む枠"
+    json answersDraft "確定までの回答"
     PaymentProvider provider "MOCK / STRIPE"
     string providerRef UK "Webhook の冪等性"
     int amountYen
-    PaymentStatus status "PENDING / PAID / FAILED / REFUNDED"
+    PaymentStatus status "PENDING / PAID / FAILED / EXPIRED / REFUNDED"
+    datetime holdExpiresAt "席の確保期限"
     string failureReason "NULL可"
     datetime paidAt "NULL可"
     datetime refundedAt "NULL可"
@@ -338,14 +391,14 @@ erDiagram
   }
   </pre></div>
   <div class="notes">
-    <div><h4>ルール</h4><ul><li>providerRef は一意（Webhook が二重に届いても状態を二重に進めない）</li><li>支払い済みの Payment があるイベントは移管できない</li><li>返金は MVP では持たない（運営が決済事業者の管理画面で対応）</li></ul></div>
-    <div><h4>画面との対応</h4><ul><li>モック決済・確認中・参加確定・失敗・期限切れ</li><li>マイページの支払い待ち、参加者リストの支払い状況</li></ul></div>
+    <div><h4>ルール</h4><ul><li>providerRef は一意（Webhook が二重に届いても状態を二重に進めない）</li><li>PENDING かつ holdExpiresAt 前の Payment は定員に数える。期限切れは Cron で EXPIRED にして answersDraft を消す</li><li>支払い済みの Payment があるイベントは移管できない</li><li>返金は MVP では持たない（運営が決済事業者の管理画面で対応）</li></ul></div>
+    <div><h4>画面との対応</h4><ul><li>モック決済・確認中・参加予定（決済完了）・失敗</li><li>参加者リストの支払い状況</li></ul></div>
   </div>
 </section>
 
 <section id="notify">
   <div class="snum">04</div><h2>告知・通知・通報</h2>
-  <p class="lead">主催者からの一斉連絡は Announcement。システムが送るメール（申込完了・繰り上げ・期限・中止・フォロー先の公開・回答削除の予告・招待）は、すべて NotificationLog に1通ずつ記録する。配信停止はカテゴリ単位で EmailPreference、フォロー先ごとの ON/OFF は Follow.notifyEmail。</p>
+  <p class="lead">主催者からの一斉連絡は Announcement（宛先は参加予定の人・保存した人）。お知らせ（申込完了と QR・中止・フォロー先の公開・主催者からのお知らせ・回答削除の予告・招待・参加依頼・通報）は NotificationLog に1通ずつ記録し、<b>サイト内のお知らせとして表示したうえでメールでも送る</b>。配信停止はカテゴリ単位で EmailPreference、フォロー先ごとの ON/OFF は Follow.notifyEmail。</p>
   <div class="diagram"><pre class="mermaid">
 erDiagram
   Event ||--o{ Announcement : "告知"
@@ -361,7 +414,7 @@ erDiagram
     string eventId FK
     string subject
     string body
-    AnnouncementAudience audience "確定者 / 全員"
+    AnnouncementAudience_array audiences "参加予定 / 保存した人"
     int recipientCount
     datetime sentAt
   }
@@ -370,6 +423,8 @@ erDiagram
     string userId FK "NULL可"
     string toEmail
     NotificationType type
+    string title "お知らせの件名"
+    datetime readAt "サイト内で既読・NULL可"
     NotificationStatus status "QUEUED / SENT / FAILED / SUPPRESSED"
     string eventId FK "NULL可"
     string registrationId FK "NULL可"
@@ -387,7 +442,8 @@ erDiagram
     string reporterUserId FK
     ReportTargetType targetType "EVENT / ORGANIZER"
     string targetId "FK なし"
-    ReportReason reason
+    ReportReason reason "必須"
+    string detail "OTHER のとき必須"
     ReportStatus status
     string resolvedById FK "NULL可"
     datetime resolvedAt "NULL可"
@@ -400,19 +456,19 @@ erDiagram
   }
   User {
     string id PK
-    boolean isStaff
+    UserRole role
   }
   </pre></div>
   <div class="notes">
-    <div><h4>メールの種類（NotificationType）</h4><ul><li>申込完了 / 繰り上げ / 支払い期限 / 期限切れ / 中止</li><li>フォロー先の新規公開 / 主催者からの告知</li><li>回答削除の7日前予告（主催者宛て） / メンバー招待</li></ul></div>
-    <div><h4>配信停止（EmailCategory）</h4><ul><li>EVENT_UPDATES：申込・繰り上げ・期限・中止（取引メール。停止させるかは要確認）</li><li>FOLLOW_NEWS：フォロー先の新規公開</li><li>ANNOUNCEMENTS：主催者からの告知</li></ul></div>
-    <div><h4>補足</h4><ul><li><span class="tag new">追加</span> NotificationLog / EmailPreference（今回の決定）</li><li><span class="tag new">追加</span> Report：targetId はイベントか主催者を指すので FK を張らない</li><li>Announcement.subject・recipientCount を追加</li></ul></div>
+    <div><h4>お知らせの種類（NotificationType）</h4><ul><li>申込完了（QR チケット付き） / 中止</li><li>フォロー先の新規公開 / 主催者からのお知らせ</li><li>回答削除の7日前予告（主催者宛て） / メンバー招待 / 参加依頼（owner 宛て） / 通報の受付（NMJ 運営宛て）</li></ul></div>
+    <div><h4>配信停止（EmailCategory）</h4><ul><li>EVENT_UPDATES：申込・QR チケット・中止（取引メール。停止させるかは要確認）</li><li>FOLLOW_NEWS：フォロー先の新規公開</li><li>ANNOUNCEMENTS：主催者からの告知</li></ul></div>
+    <div><h4>補足</h4><ul><li><span class="tag new">追加</span> NotificationLog / EmailPreference（今回の決定）</li><li><span class="tag new">追加</span> Report：targetId はイベントか主催者を指すので FK を張らない。理由は必須（項目は検討中）</li><li>Announcement.subject・recipientCount を追加</li></ul></div>
   </div>
 </section>
 
 <section id="media">
   <div class="snum">05</div><h2>Media（読みもの）</h2>
-  <p class="lead">記事は自前 DB で持ち、<b>運営と主催者の両方が投稿できる</b>。主催者として投稿した記事は authorOrganizerId を持ち、IN_REVIEW → 運営（User.isStaff）の審査を経て PUBLISHED。記事末尾の「関連イベント」「記事に登場する主催者」は中間テーブルで持つ。</p>
+  <p class="lead">記事は自前 DB で持ち、<b>運営と主催者の両方が投稿できる</b>。主催者として投稿した記事は authorOrganizerId を持ち、IN_REVIEW → 運営（User.role = ADMIN）の審査を経て PUBLISHED。記事末尾の「関連イベント」「記事に登場する主催者」は中間テーブルで持つ。</p>
   <div class="diagram"><pre class="mermaid">
 erDiagram
   User ||--o{ MediaArticle : "書く"
@@ -449,7 +505,7 @@ erDiagram
   }
   User {
     string id PK
-    boolean isStaff
+    UserRole role
   }
   Organizer {
     string id PK
@@ -469,14 +525,16 @@ erDiagram
   <p class="lead">Prisma で表現できないものは、マイグレーションに SQL で追記する（<code>schema.prisma</code> 末尾にコメントで記載）。</p>
   <table>
     <tr><th>対象</th><th>内容</th><th>理由</th></tr>
-    <tr><td>Slot（排他）</td><td>申込処理で <code>SELECT … FOR UPDATE</code> してから確定数を数える</td><td>新歓期の同時申込で定員超過を起こさない（§7）</td></tr>
-    <tr><td>Registration</td><td>部分一意インデックス <code>(slotId, userId) WHERE status IN (PENDING_PAYMENT, CONFIRMED, WAITLISTED)</code></td><td>同じ枠は1人1件。キャンセル・期限切れ後の再申込は許可</td></tr>
+    <tr><td>Slot・Event（排他）</td><td>申込処理で <code>SELECT … FOR UPDATE</code> してから、参加予定と決済中の確保（Payment PENDING）を数える</td><td>新歓期の同時申込で枠の定員・全体の上限を超えない（§7）</td></tr>
+    <tr><td>Registration</td><td>部分一意インデックス <code>(slotId, userId) WHERE status = 'CONFIRMED'</code></td><td>同じ枠は1人1件。キャンセル後の再申込は許可</td></tr>
+    <tr><td>Ticket</td><td><code>(eventId, userId)</code> 一意、<code>token</code> 一意</td><td>1人1イベント1枚。QR の値は推測できないものにする</td></tr>
+    <tr><td>RegistrationQuestion</td><td>部分一意インデックス <code>(eventId, commonKey) WHERE commonKey IS NOT NULL</code></td><td>共通の質問はイベントごとに1つずつ</td></tr>
     <tr><td>Organizer</td><td>CHECK <code>(type = 'USER') = (userId IS NOT NULL)</code>、slug 一意、予約語はアプリで拒否</td><td>個人と団体の差を型で守る</td></tr>
-    <tr><td>Event</td><td>CHECK <code>answerRetentionDays IN (30, 90, 365)</code></td><td>保持期間の選択肢（§8）</td></tr>
+    <tr><td>Event</td><td>CHECK <code>answerRetentionDays IN (30, 90, 365)</code>、CHECK <code>capacity IS NULL OR capacity &gt;= 1</code></td><td>保持期間の選択肢（§8）・全体の上限</td></tr>
     <tr><td>Slot</td><td>CHECK <code>capacity &gt;= 0 AND priceYen &gt;= 0</code></td><td>不正値の防止</td></tr>
     <tr><td>Payment</td><td><code>providerRef</code> 一意</td><td>Webhook の冪等性（§9）</td></tr>
-    <tr><td>Cron 用</td><td><code>Registration(status, paymentDueAt)</code>、<code>Event(endAt)</code></td><td>期限切れ→繰り上げ、回答の自動削除と7日前予告</td></tr>
-    <tr><td>一覧・検索用</td><td><code>Event(status, startAt)</code>、<code>Event(targetUniversityId, startAt)</code>、<code>pg_trgm</code> の GIN（title）</td><td>Events 一覧・カレンダー・キーワード検索</td></tr>
+    <tr><td>Cron 用</td><td><code>Payment(eventId, status, holdExpiresAt)</code>、<code>Event(endAt)</code></td><td>席の確保の期限切れ、回答の自動削除と7日前予告</td></tr>
+    <tr><td>一覧・検索用</td><td><code>Event(status, startAt)</code>、<code>Event(genreId, startAt)</code>、<code>Event(area, startAt)</code>、<code>Slot(eventId, kind)</code>、<code>pg_trgm</code> の GIN（title）</td><td>ジャンル・地域・参加枠の絞り込み、カレンダー、キーワード検索</td></tr>
     <tr><td>通知</td><td><code>NotificationLog(userId, createdAt)</code>、<code>(type, status)</code></td><td>再送・配信状況の確認</td></tr>
   </table>
 </section>
@@ -487,23 +545,42 @@ erDiagram
   <table>
     <tr><th>項目</th><th>決定</th><th>ER への反映</th></tr>
     <tr><td>Media の管理</td><td>自前 DB で持つ</td><td>MediaArticle ＋ 中間テーブル2つ</td></tr>
-    <tr><td>Media の入稿者</td><td>運営＋主催者も投稿できる</td><td>authorUserId / authorOrganizerId、審査ステータス、User.isStaff</td></tr>
+    <tr><td>Media の入稿者</td><td>運営＋主催者も投稿できる</td><td>authorUserId / authorOrganizerId、審査ステータス、User.isStaff（10/8 で User.role に変更）</td></tr>
     <tr><td>メール送信ログ</td><td>先に ER に入れる</td><td>NotificationLog / EmailPreference</td></tr>
     <tr><td>ユーザーネーム変更履歴</td><td>今は入れない</td><td>なし（Phase 1 で決める）</td></tr>
     <tr><td>合同イベント（複数大学）</td><td>今は入れない（要件どおり単一大学）</td><td>Event.targetUniversityId のまま</td></tr>
+  </table>
+  <h3>10/8 定例で決めたこと（2026-10-08）</h3>
+  <table>
+    <tr><th>項目</th><th>決定</th><th>ER への反映</th></tr>
+    <tr><td>絞り込み</td><td>ジャンル・地域・参加枠。大学・参加費はなし</td><td>Genre、Event.genreId・area、Slot.kind</td></tr>
+    <tr><td>参加枠</td><td>学生 / 大人 / 懇親会。イベント全体の上限も持つ</td><td>SlotKind、Event.capacity</td></tr>
+    <tr><td>フォロー</td><td>団体だけ</td><td>Follow はそのまま（アプリで検証）</td></tr>
+    <tr><td>支払い待ち・補欠</td><td>なくす。決済完了で参加予定</td><td>RegistrationStatus を CONFIRMED / CANCELLED に。Payment に席の確保と回答の下書き</td></tr>
+    <tr><td>お気に入り</td><td>「保存」に変更。保存した人にもお知らせ</td><td>SavedEvent、AnnouncementAudience.SAVED</td></tr>
+    <tr><td>通報</td><td>理由を必須にし、運営が把握できる</td><td>NotificationType.REPORT_RECEIVED</td></tr>
+    <tr><td>申込時の質問</td><td>最低限は共通、ほかは自由</td><td>RegistrationQuestion.commonKey</td></tr>
+    <tr><td>権限</td><td>admin（NMJ）/ owner（複数可）/ user。団体の作成に申請なし</td><td>User.role、MemberRole は OWNER のみ、GroupJoinRequest</td></tr>
+    <tr><td>お知らせ</td><td>サイト内に加えてメールでも送る</td><td>NotificationLog.title・readAt</td></tr>
+    <tr><td>受付・QR</td><td>受付の状態を管理し戻せる。申込後に QR、読み取りで受付</td><td>Ticket、CheckinLog、CheckinStatus</td></tr>
   </table>
   <h3>残っている未決（DB に効くもの）</h3>
   <table>
     <tr><th>項目</th><th>影響</th><th>期限</th></tr>
     <tr><td>取引メール（EVENT_UPDATES）を配信停止できるか</td><td>EmailPreference の扱い。法令上・運用上は止めない案が一般的</td><td>Phase 6</td></tr>
     <tr><td>Media のカテゴリ体系</td><td>category を文字列のままにするか、マスタテーブル化するか</td><td>Phase 2</td></tr>
-    <tr><td>お気に入りの仕様</td><td>並び順・リマインド・上限。リマインドするなら NotificationType を追加</td><td>Phase 2</td></tr>
+    <tr><td>団体の削除・引き継ぎ</td><td>削除時にイベント・フォロワー・申込をどうするか。論理削除列（deletedAt）を足すか</td><td>未定</td></tr>
+    <tr><td>個人情報をどこまで扱うか</td><td>共通の質問の中身（commonKey の種類）・保持期間</td><td>未定</td></tr>
+    <tr><td>通報の項目</td><td>ReportReason の種類</td><td>未定</td></tr>
+    <tr><td>Wallet 追加</td><td>Ticket.walletPassUrl を使うか</td><td>未定</td></tr>
+    <tr><td>対象の大学</td><td>Event.targetUniversityId と University を残すか</td><td>未定</td></tr>
+    <tr><td>保存の仕様</td><td>並び順・上限</td><td>Phase 2</td></tr>
     <tr><td>ユーザーネームの変更制限</td><td>SlugHistory テーブルの追加</td><td>Phase 1</td></tr>
     <tr><td>合同イベント</td><td>EventUniversity 中間テーブルへの変更</td><td>Phase 7</td></tr>
   </table>
 </section>
 
-<footer>v0.1 · 2026-09-22 · 正は docs/schema.prisma ／ 要件定義 v0.4 §5・§7・§8・§9・§14 ／ プロトタイプ docs/prototype.html</footer>
+<footer>v0.2 · 2026-10-08 · 正は docs/schema.prisma ／ 要件定義 v0.4 §5・§7・§8・§9・§14 ／ プロトタイプ docs/prototype.html</footer>
 
 <script type="module">
 import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs";

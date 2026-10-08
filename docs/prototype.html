@@ -98,6 +98,7 @@ body.show-links [data-go],body.show-links [data-modal]{outline:2px solid rgba(35
 .seg{display:inline-flex;border:2px solid var(--black)}
 .seg a{padding:8px 16px;font:700 18px/1 var(--en)}
 .seg a.on{background:var(--black);color:#fff}
+.tbl .seg a{font:700 13px/1 var(--jp);padding:7px 10px;cursor:pointer;white-space:nowrap}
 .ph{background:linear-gradient(135deg,#dbdbdb,#eeeeee);display:flex;align-items:center;justify-content:center;color:var(--g600);font:600 14px/1 var(--en);letter-spacing:.1em;flex:none}
 .ph::before{content:"PHOTO"}
 .ph.nolabel::before{content:none}
@@ -284,7 +285,7 @@ table.tbl tr.done td{background:var(--g100)}
     <div data-part="stitle" data-g="EVENTS" data-t="イベント" data-l="新歓・定例会・合宿。フォローしている団体の次の一本も、ここから。"></div>
     <div data-part="erow"></div>
     <div data-part="erow" data-d="4/11" data-w="SAT" data-t="新歓ライブ vol.1 — はじめての人も、楽器なしで遊びに来て" data-place="日吉キャンパス 来往舎" data-time="17:00〜20:00" data-price="500円 ／ 残り 40 席"></div>
-    <div data-part="erow" data-d="4/12" data-w="SUN" data-t="テニス新歓 体験会（他大学OK）" data-host="早稲田テニス同好会（@waseda-tennis）" data-u="大学を問わない" data-s="full" data-place="早稲田大学 東伏見キャンパス" data-time="10:00〜13:00" data-price="無料 ／ 満員・補欠受付中"></div>
+    <div data-part="erow" data-d="4/12" data-w="SUN" data-t="テニス新歓 体験会（他大学OK）" data-host="早稲田テニス同好会（@waseda-tennis）" data-u="スポーツ · 東京" data-s="full" data-place="早稲田大学 東伏見キャンパス" data-time="10:00〜13:00" data-price="無料 ／ 満員"></div>
     <div style="text-align:center;margin-top:40px"><a class="btn blk" style="min-width:360px" data-go="events">イベントをもっと見る</a></div>
   </div>
   <div class="inner" style="background:var(--black);color:#fff;padding-top:88px;padding-bottom:96px">
@@ -297,29 +298,31 @@ table.tbl tr.done td{background:var(--g100)}
     <a class="btn out mt40" style="min-width:360px" data-go="media">読みものをもっと見る</a>
   </div>
   <div class="inner" style="padding-top:72px;padding-bottom:72px">
-    <div class="shead"><span class="h2">大学から探す</span><span class="lbl-en">BY UNIVERSITY</span></div>
-    <div class="row"><a class="chip l" data-go="events">慶應義塾大学</a><a class="chip l" data-go="events">早稲田大学</a><a class="chip l" data-go="events">東京大学</a><a class="chip l" data-go="events">一橋大学</a><a class="chip l" data-go="events">大学を問わない</a><a class="chip l on" data-go="events">すべての大学 →</a></div>
+    <div class="shead"><span class="h2">ジャンルから探す</span><span class="lbl-en">BY GENRE</span></div>
+    <div class="row"><a class="chip l" data-go="events">音楽</a><a class="chip l" data-go="events">スポーツ</a><a class="chip l" data-go="events">勉強会</a><a class="chip l" data-go="events">ボランティア</a><a class="chip l" data-go="events">交流会</a><a class="chip l on" data-go="events">すべてのジャンル →</a></div>
+    <div class="shead mt40"><span class="h2">地域から探す</span><span class="lbl-en">BY AREA</span></div>
+    <div class="row"><a class="chip l" data-go="events">東京</a><a class="chip l" data-go="events">神奈川</a><a class="chip l" data-go="events">大阪</a><a class="chip l" data-go="events">オンライン</a></div>
   </div>
   <div data-part="ftr"></div>
 </section>
 
 <section class="screen" id="events" data-group="公開" data-label="02 Events 一覧" data-path="/events">
   <div data-part="hdr" data-active="events"></div>
-  <div class="tband"><div class="ghost">EVENTS</div><div class="slash"></div><h1>イベントを探す</h1><p>新歓・定例会・合宿・勉強会。大学・日付・キーワードで。</p></div>
+  <div class="tband"><div class="ghost">EVENTS</div><div class="slash"></div><h1>イベントを探す</h1><p>新歓・定例会・合宿・勉強会。ジャンル・地域・参加枠・日付で。</p></div>
   <div class="inner row" style="gap:56px;align-items:flex-start;padding-top:48px;padding-bottom:96px">
     <aside class="col" style="width:260px;flex:none;gap:14px">
       <div data-part="field" data-l="キーワード" data-v="軽音、合宿、読書会…" data-ph="1" data-h="タイトル・説明・主催者名から探します"></div>
-      <div data-part="field" data-l="大学" data-v="慶應義塾大学　▾" data-h="「大学を問わない」イベントも含めて表示"></div>
+      <div class="b">ジャンル</div><div class="row gap8" style="flex-wrap:wrap"><span class="chip on">音楽</span><span class="chip">スポーツ</span><span class="chip">勉強会</span><span class="chip">ボランティア</span><span class="chip">交流会</span></div>
+      <div data-part="field" data-l="地域" data-v="東京都　▾" data-h="オンラインのイベントも含めて表示"></div>
+      <div class="b">参加枠</div><div class="row gap8" style="flex-wrap:wrap"><span class="chip on">学生</span><span class="chip">大人</span><span class="chip">懇親会あり</span></div>
       <div class="b">開催日</div><div class="row gap8" style="flex-wrap:wrap"><span class="chip">すべて</span><span class="chip">今週</span><span class="chip on">今月</span><span class="chip">日付を指定</span></div>
-      <div class="b">会場</div><div class="row gap8"><span class="chip on">すべて</span><span class="chip">対面</span><span class="chip">オンライン</span></div>
-      <div class="b">参加費</div><div class="row gap8"><span class="chip on">すべて</span><span class="chip">無料枠あり</span></div>
     </aside>
     <div class="grow">
       <div class="row" style="padding-bottom:8px"><span class="en" style="font-size:40px;font-weight:700">48</span><span class="b">件のイベント</span><span class="grow"></span><span class="chip">並び順：開催日が近い順 ▾</span><div class="seg"><a class="on">LIST</a><a data-go="calendar">CALENDAR</a></div></div>
       <div data-part="erow" data-c="1"></div>
       <div data-part="erow" data-c="1" data-t="新歓ボウリング大会" data-host="慶應ボウリング部（@keio-bowling）" data-place="日吉 ボウリング場" data-time="19:00〜21:00" data-price="1,000円 ／ 残り 6 席"></div>
       <div data-part="erow" data-c="1" data-d="4/11" data-w="SAT" data-t="新歓ライブ vol.1" data-place="日吉キャンパス 来往舎" data-time="17:00〜20:00" data-price="500円 ／ 残り 40 席"></div>
-      <div data-part="erow" data-c="1" data-d="4/15" data-w="WED" data-t="読書会 #12（オンライン）" data-host="やまもと（@yamamoto）" data-u="オンライン" data-place="オンライン（URL は参加確定者に表示）" data-time="19:00〜21:00" data-price="無料 ／ 残り 5 席"></div>
+      <div data-part="erow" data-c="1" data-d="4/15" data-w="WED" data-t="読書会 #12（オンライン）" data-host="やまもと（@yamamoto）" data-u="勉強会 · オンライン" data-place="オンライン（URL は参加予定の人に表示）" data-time="19:00〜21:00" data-price="無料 ／ 残り 5 席"></div>
       <div style="text-align:center;margin-top:32px"><span class="btn out" style="min-width:320px">もっと読み込む</span></div>
     </div>
   </div>
@@ -330,15 +333,15 @@ table.tbl tr.done td{background:var(--g100)}
   <div data-part="hdr" data-active="events"></div>
   <div class="tband"><div class="ghost" style="left:560px">CALENDAR</div><h1>イベントを探す</h1><p>月ごとのカレンダーで、開催日から探す</p></div>
   <div class="inner" style="padding-top:40px;padding-bottom:96px">
-    <div class="row"><a class="chip" data-modal="m-filter">絞り込み (1)</a><span class="chip on">慶應 ×</span><span class="grow"></span><div class="seg"><a data-go="events">LIST</a><a class="on">CALENDAR</a></div></div>
+    <div class="row"><a class="chip" data-modal="m-filter">絞り込み (1)</a><span class="chip on">音楽 ×</span><span class="grow"></span><div class="seg"><a data-go="events">LIST</a><a class="on">CALENDAR</a></div></div>
     <div class="row mt24" style="align-items:baseline;gap:16px"><span class="h2">←</span><span class="date" style="font-size:48px">2026 / 04</span><span class="lbl-en">APRIL</span><span class="h2">→</span><span class="grow"></span><span class="chip">今月へ</span></div>
     <div class="row mt24" style="gap:40px;align-items:flex-start">
       <div class="cal" id="calGrid"></div>
       <div class="grow">
         <div class="row" style="align-items:baseline;gap:8px;padding-bottom:8px"><span class="date" style="font-size:36px">4/8</span><span class="en b">WED</span><span class="b">のイベント 3 件</span></div>
-        <a class="row" style="padding:12px 0;border-bottom:1px solid var(--g200)" data-go="event"><div class="ph" style="width:96px;height:64px"></div><div class="col"><span class="en b">18:00–20:00</span><span class="b">春の新歓ミーティング</span><span class="cap">慶應 · 対面 · 残 12 席</span></div></a>
-        <a class="row" style="padding:12px 0;border-bottom:1px solid var(--g200)" data-go="event"><div class="ph" style="width:96px;height:64px"></div><div class="col"><span class="en b">19:00–21:00</span><span class="b">新歓ボウリング大会</span><span class="cap">慶應 · 対面 · 残 6 席</span></div></a>
-        <a class="row" style="padding:12px 0;border-bottom:1px solid var(--g200)" data-go="event"><div class="ph" style="width:96px;height:64px"></div><div class="col"><span class="en b">17:00–18:30</span><span class="b">英語ディベート体験</span><span class="cap">慶應 · 対面 · 残 15 席</span></div></a>
+        <a class="row" style="padding:12px 0;border-bottom:1px solid var(--g200)" data-go="event"><div class="ph" style="width:96px;height:64px"></div><div class="col"><span class="en b">18:00–20:00</span><span class="b">春の新歓ミーティング</span><span class="cap">音楽 · 東京 · 残 12 席</span></div></a>
+        <a class="row" style="padding:12px 0;border-bottom:1px solid var(--g200)" data-go="event"><div class="ph" style="width:96px;height:64px"></div><div class="col"><span class="en b">19:00–21:00</span><span class="b">新歓ボウリング大会</span><span class="cap">スポーツ · 神奈川 · 残 6 席</span></div></a>
+        <a class="row" style="padding:12px 0;border-bottom:1px solid var(--g200)" data-go="event"><div class="ph" style="width:96px;height:64px"></div><div class="col"><span class="en b">17:00–18:30</span><span class="b">英語ディベート体験</span><span class="cap">勉強会 · 東京 · 残 15 席</span></div></a>
       </div>
     </div>
   </div>
@@ -351,7 +354,7 @@ table.tbl tr.done td{background:var(--g100)}
     <div class="grow col" style="gap:20px">
       <a class="en muted" data-go="events">← EVENTS に戻る</a>
       <div class="ph" style="height:403px"></div>
-      <div class="row gap8"><span class="bdg open">受付中</span><span class="tag">対面</span><span class="tag">慶應義塾大学</span></div>
+      <div class="row gap8"><span class="bdg open">受付中</span><span class="tag">音楽</span><span class="tag">東京都</span><span class="tag">対面</span></div>
       <div class="h1" style="font-size:40px">春の新歓ミーティング</div>
       <a class="row" data-go="org"><span style="width:32px;height:32px;background:var(--g200)"></span><b>慶應軽音サークル</b><span class="sm muted">@keio-lightmusic</span></a>
       <div class="row grayb" style="gap:32px;padding:24px 28px">
@@ -359,19 +362,19 @@ table.tbl tr.done td{background:var(--g100)}
         <div class="col grow b" style="gap:8px"><span>18:00 – 20:00</span><span>三田キャンパス 西校舎 512教室（対面）</span><span>募集期間　3/15(日) 9:00 〜 4/7(火) 23:59</span></div>
         <div class="col gap8"><a class="btn out m" data-modal="m-calendar">＋ Google カレンダー</a><span class="btn out m">地図を見る</span></div>
       </div>
-      <div class="row gap8"><a class="btn out m na" data-modal="m-login">♡ お気に入り</a><a class="btn out m na" data-modal="m-login">＋ 主催者をフォロー</a><a class="btn out m na" data-modal="m-share">シェア</a><a class="btn out m na" data-modal="m-report">… 通報</a></div>
+      <div class="row gap8"><a class="btn out m na" data-modal="m-login">🔖 保存</a><a class="btn out m na" data-modal="m-login">＋ 団体をフォロー</a><a class="btn out m na" data-toast="リンクをコピーしました">🔗 リンクをコピー</a><a class="btn out m na" data-modal="m-report">… 通報</a></div>
       <div class="shead mt24"><span class="h3">説明</span><span class="lbl-en">ABOUT</span></div>
       <p>新入生のみなさん、はじめまして！慶應軽音サークルの新歓ミーティングです。活動内容の紹介と、先輩バンドのミニライブ、そのあと懇親会（食事付き）を予定しています。楽器経験は問いません。ひとりでの参加も大歓迎です。</p>
       <p>当日は三田キャンパス西校舎の512教室に集合してください。懇親会は同じフロアの別教室で行います。</p>
       <div class="shead mt24"><span class="h3">申込時に聞かれること</span><span class="lbl-en">QUESTIONS</span></div>
       <div>
-        <div class="row" style="padding:12px 0;border-bottom:1px solid var(--g200)"><b>本名</b><span class="tag pi">個人情報</span><span class="sm muted">必須</span></div>
-        <div class="row" style="padding:12px 0;border-bottom:1px solid var(--g200)"><b>大学・学部・学年</b><span class="sm muted">必須</span></div>
-        <div class="row" style="padding:12px 0;border-bottom:1px solid var(--g200)"><b>アレルギー・食事制限</b><span class="tag pi">個人情報</span><span class="sm muted">懇親会枠のみ</span></div>
+        <div class="row" style="padding:12px 0;border-bottom:1px solid var(--g200)"><b>氏名・フリガナ</b><span class="tag pi">個人情報</span><span class="tag gray">共通</span><span class="sm muted">必須</span></div>
+        <div class="row" style="padding:12px 0;border-bottom:1px solid var(--g200)"><b>所属（学校名と学年 / 社会人）</b><span class="tag gray">共通</span><span class="sm muted">必須</span></div>
+        <div class="row" style="padding:12px 0;border-bottom:1px solid var(--g200)"><b>アレルギー・食事制限</b><span class="tag pi">個人情報</span><span class="sm muted">懇親会のみ</span></div>
       </div>
       <div class="note soft sm" style="display:grid;grid-template-columns:110px 1fr;gap:6px 16px"><b class="or">利用目的</b><span>懇親会の食事手配と名札の作成に使用します</span><b class="or">回答を見る人</b><span>慶應軽音サークルの運営メンバーのみ</span><b class="or">保持期間</b><span>イベント終了から 30 日で自動削除</span></div>
       <div class="shead mt24"><span class="h3">参加者</span><span class="lbl-en">ATTENDEES</span></div>
-      <div class="row" style="gap:0"><span style="width:36px;height:36px;border-radius:50%;background:var(--g200);border:2px solid #fff"></span><span style="width:36px;height:36px;border-radius:50%;background:var(--g300);border:2px solid #fff;margin-left:-8px"></span><span style="width:36px;height:36px;border-radius:50%;background:var(--g200);border:2px solid #fff;margin-left:-8px"></span><span style="width:36px;height:36px;border-radius:50%;background:var(--g300);border:2px solid #fff;margin-left:-8px"></span><b style="margin-left:12px">+21 人（25 / 40）</b></div>
+      <div class="row" style="gap:0"><span style="width:36px;height:36px;border-radius:50%;background:var(--g200);border:2px solid #fff"></span><span style="width:36px;height:36px;border-radius:50%;background:var(--g300);border:2px solid #fff;margin-left:-8px"></span><span style="width:36px;height:36px;border-radius:50%;background:var(--g200);border:2px solid #fff;margin-left:-8px"></span><span style="width:36px;height:36px;border-radius:50%;background:var(--g300);border:2px solid #fff;margin-left:-8px"></span><b style="margin-left:12px">+38 人（42 / 60 · イベント全体の上限）</b></div>
       <p class="cap">※ 主催者が「参加者のあだ名を公開」を選んだときだけ表示（既定は非公開）</p>
       <div class="shead mt24"><span class="h3">主催者</span><span class="lbl-en">ORGANIZER</span></div>
       <div data-part="ocard" data-modal-follow="m-login"></div>
@@ -380,11 +383,11 @@ table.tbl tr.done td{background:var(--g100)}
     </div>
     <aside class="col" style="width:340px;flex:none;gap:14px;position:sticky;top:152px">
       <div class="shead" style="margin:0"><span class="h3">参加枠</span><span class="lbl-en">SLOTS</span></div>
-      <div data-part="slot" data-n="一般枠" data-p="無料" data-r="残 25 / 40 席"></div>
-      <div data-part="slot" data-k="few" data-n="懇親会枠（食事付き）" data-p="¥1,500" data-r="残 3 / 20 席 — 残りわずか"></div>
-      <div data-part="slot" data-k="full" data-n="LT 登壇枠" data-p="無料" data-r="満員（定員 5）・補欠 3 人待ち" data-cta="補欠登録する"></div>
-      <p class="cap">有料枠は支払い後にキャンセルしても返金されません。支払い期限は申込から24時間です。</p>
-      <a class="sm b or" data-go="event-states">▸ 状態違い（申込済み・支払い待ち・中止など）を見る</a>
+      <div data-part="slot" data-kind="学生" data-n="学生枠" data-p="無料" data-r="残 25 / 40 席"></div>
+      <div data-part="slot" data-k="full" data-kind="大人" data-n="大人枠" data-p="¥1,000" data-r="満員（定員 10）"></div>
+      <div data-part="slot" data-k="few" data-kind="懇親会" data-n="懇親会（食事付き）" data-p="¥1,500" data-r="残 3 / 20 席 — 残りわずか"></div>
+      <p class="cap">イベント全体の上限 60 人（残り 18）。満員の枠は申し込めません（補欠なし）。有料枠は決済が完了した時点で参加予定になり、支払い後のキャンセルは返金されません。</p>
+      <a class="sm b or" data-go="event-states">▸ 状態違い（参加予定・満員・中止など）を見る</a>
     </aside>
   </div>
   <div data-part="ftr"></div>
@@ -397,9 +400,8 @@ table.tbl tr.done td{background:var(--g100)}
     <div class="h1 mt16">イベント詳細の状態違い</div>
     <p class="sm muted">スクリーンショットだけでどの状態か分かることを要件にする。上部の帯・枠カード・固定 CTA が変わる。</p>
     <div class="mt24" style="display:grid;grid-template-columns:repeat(3,1fr);gap:24px">
-      <div class="box col"><div style="background:var(--blue-w);color:var(--blue);padding:14px 16px"><b>一般枠で申込済みです</b><br><a class="sm" data-go="me">マイページで詳細を見る →</a></div><div class="col gap8" style="padding:16px"><span class="bdg joined" style="align-self:flex-start">申込済み</span><b>春の新歓ミーティング</b><div data-part="slot" data-n="一般枠" data-p="無料" data-r="申込済み" data-cta="マイページで見る" data-go2="me" data-k="joined"></div></div></div>
-      <div class="box col"><div style="background:var(--orange-w);color:var(--orange);padding:14px 16px"><b>支払い待ち：懇親会枠 ¥1,500</b><br><span class="sm">期限 4/3(金) 21:00 まで（あと 23 時間）</span></div><div class="col gap8" style="padding:16px"><span class="bdg few" style="align-self:flex-start">支払い待ち</span><b>春の新歓ミーティング</b><div data-part="slot" data-k="few" data-n="懇親会枠（食事付き）" data-p="¥1,500" data-r="期限を過ぎると自動キャンセル" data-cta="支払いへ進む" data-go2="checkout"></div></div></div>
-      <div class="box col"><div style="background:var(--g100);padding:14px 16px"><b>LT 登壇枠の補欠 2 番目です</b><br><span class="sm muted">空きが出ると自動で繰り上がり、メールでお知らせします</span></div><div class="col gap8" style="padding:16px"><span class="bdg full" style="align-self:flex-start">補欠中</span><b>春の新歓ミーティング</b><div data-part="slot" data-k="full" data-n="LT 登壇枠" data-p="無料" data-r="満員・あなたは補欠 2 番目" data-cta="補欠中（2番目）" data-go2="me-pending"></div></div></div>
+      <div class="box col"><div style="background:var(--blue-w);color:var(--blue);padding:14px 16px"><b>学生枠で参加予定です</b><br><a class="sm" data-go="ticket">QR チケットを表示 →</a></div><div class="col gap8" style="padding:16px"><span class="bdg joined" style="align-self:flex-start">参加予定</span><b>春の新歓ミーティング</b><div data-part="slot" data-kind="学生" data-n="学生枠" data-p="無料" data-r="参加予定" data-cta="QR チケットを表示" data-go2="ticket" data-k="joined"></div></div></div>
+      <div class="box col"><div style="background:var(--g100);padding:14px 16px"><b>大人枠は満員です</b><br><span class="sm muted">補欠はありません。保存しておくと主催者からのお知らせがメールで届きます</span></div><div class="col gap8" style="padding:16px"><span class="bdg full" style="align-self:flex-start">満員</span><b>春の新歓ミーティング</b><div data-part="slot" data-k="full" data-kind="大人" data-n="大人枠" data-p="¥1,000" data-r="満員（定員 10）"></div></div></div>
       <div class="box col"><div style="background:var(--g100);padding:14px 16px"><b>受付前：3/15(日) 9:00 から受付</b></div><div class="col gap8" style="padding:16px"><span class="bdg before" style="align-self:flex-start">受付前</span><b>合宿説明会</b><div class="slot"><div class="top"><b>一般枠</b><span class="pr">無料</span></div><span class="rm">残 40 / 40 席</span><span class="btn out full dis na">3/15(日) 9:00 から受付</span></div><div class="grayb sm"><span class="bdg closed">締切</span> 締切後は押せない状態＋「申込は締め切りました（〜4/7 23:59）」</div></div></div>
       <div class="box col"><div style="background:var(--danger);color:#fff;padding:14px 16px"><b>このイベントは中止されました</b><br><span class="sm">主催者より：会場の都合により中止します。申し訳ありません。</span></div><div class="col gap8" style="padding:16px"><span class="bdg cancel" style="align-self:flex-start">中止</span><b class="muted">春の新歓ミーティング</b><p class="sm muted">参加枠の申込は停止。CTA はすべて非表示。</p></div></div>
       <div class="box col"><div style="background:var(--g200);padding:14px 16px"><b>このイベントは終了しました</b></div><div class="col gap8" style="padding:16px"><span class="bdg closed" style="align-self:flex-start">終了</span><b>冬合宿 2026</b><p class="sm muted">参加枠は履歴として表示（CTA なし）。</p></div></div>
@@ -413,13 +415,13 @@ table.tbl tr.done td{background:var(--g100)}
   <div class="inner col" style="gap:20px;padding-top:48px;padding-bottom:96px">
     <div class="h1" style="font-size:44px">さがす</div>
     <div data-part="search" data-v=""></div>
-    <div class="row gap8"><span class="chip">大学：すべて ▾</span><span class="chip">日付：指定なし ▾</span></div>
+    <div class="row gap8"><span class="chip">ジャンル：すべて ▾</span><span class="chip">地域：すべて ▾</span><span class="chip">日付：指定なし ▾</span></div>
     <div class="shead mt24"><span class="h3">最近の検索</span><span class="lbl-en">RECENT</span></div>
     <div><a class="row" style="padding:12px 0;border-bottom:1px solid var(--g200)" data-go="search-result"><b>↺  軽音</b><span class="grow"></span><span class="muted">×</span></a><a class="row" style="padding:12px 0;border-bottom:1px solid var(--g200)" data-go="search-result"><b>↺  合宿</b><span class="grow"></span><span class="muted">×</span></a></div>
     <div class="shead mt24"><span class="h3">人気のキーワード</span><span class="lbl-en">TRENDING</span></div>
     <div class="row" style="gap:16px;flex-wrap:wrap;font:900 28px/1.2 var(--jp)"><a class="or" data-go="search-result">#新歓</a><a data-go="search-result">#軽音</a><a data-go="search-result">#ボランティア</a><a data-go="search-result">#ダンス</a><a data-go="search-result">#読書会</a><a data-go="search-result">#合宿</a><a data-go="search-result">#はじめての一本</a></div>
-    <div class="shead mt24"><span class="h3">大学から探す</span><span class="lbl-en">BY UNIVERSITY</span></div>
-    <div class="row"><a class="chip l" data-go="events">慶應義塾大学</a><a class="chip l" data-go="events">早稲田大学</a><a class="chip l" data-go="events">東京大学</a><a class="chip l" data-go="events">大学を問わない</a></div>
+    <div class="shead mt24"><span class="h3">ジャンルから探す</span><span class="lbl-en">BY GENRE</span></div>
+    <div class="row"><a class="chip l" data-go="events">音楽</a><a class="chip l" data-go="events">スポーツ</a><a class="chip l" data-go="events">勉強会</a><a class="chip l" data-go="events">ボランティア</a></div>
   </div>
   <div data-part="ftr"></div>
 </section>
@@ -428,14 +430,14 @@ table.tbl tr.done td{background:var(--g100)}
   <div data-part="hdr"></div>
   <div class="inner col" style="gap:20px;padding-top:48px;padding-bottom:96px">
     <div data-part="search" data-v="軽音"></div>
-    <div class="row gap8"><span class="chip">大学：すべて ▾</span><span class="chip on">日付：4/1〜4/30 ▾</span></div>
-    <div class="tabs"><a class="on">イベント <i class="or">12</i></a><a>主催者 <i>4</i></a></div>
+    <div class="row gap8"><span class="chip">ジャンル：すべて ▾</span><span class="chip">地域：すべて ▾</span><span class="chip on">日付：4/1〜4/30 ▾</span></div>
+    <div class="tabs"><a class="on">イベント <i class="or">12</i></a><a>団体 <i>4</i></a></div>
     <div>
       <div data-part="erow" data-c="1"></div>
       <div data-part="erow" data-c="1" data-d="4/11" data-w="SAT" data-t="新歓ライブ vol.1" data-place="日吉キャンパス 来往舎" data-time="17:00〜20:00" data-price="500円 ／ 残り 40 席"></div>
-      <div data-part="erow" data-c="1" data-d="4/25" data-w="SAT" data-t="軽音 合同ライブ（他大学OK）" data-host="早稲田ロック研究会（@waseda-rock）" data-u="大学を問わない" data-place="早稲田大学 学生会館" data-time="16:00〜20:00" data-price="1,000円 ／ 残り 80 席"></div>
+      <div data-part="erow" data-c="1" data-d="4/25" data-w="SAT" data-t="軽音 合同ライブ（他大学OK）" data-host="早稲田ロック研究会（@waseda-rock）" data-u="スポーツ · 東京" data-place="早稲田大学 学生会館" data-time="16:00〜20:00" data-price="1,000円 ／ 残り 80 席"></div>
     </div>
-    <div class="shead mt24"><span class="h3">主催者タブ（例）</span><span class="lbl-en">ORGANIZERS</span></div>
+    <div class="shead mt24"><span class="h3">団体タブ（例）</span><span class="lbl-en">ORGANIZERS</span></div>
     <div class="row gap16"><div data-part="ocard"></div><div data-part="ocard" data-n="早稲田ロック研究会" data-m="@waseda-rock · フォロワー 512"></div></div>
   </div>
   <div data-part="ftr"></div>
@@ -470,7 +472,7 @@ table.tbl tr.done td{background:var(--g100)}
       <p>個人のSNSで告知していた頃は、代が替わるたびにフォロワーがゼロに戻っていました。団体のページにイベントとフォロワーが残るようにしてから、新歓の集客が安定しました。</p>
       <h2 class="h2">新歓は“はじめての一本”から</h2>
       <p>最初の新歓は小さくていい。まず一本立てて、来てくれた人の声を次に活かすことが大事です。</p>
-      <a class="btn out m" style="align-self:flex-start" data-modal="m-share">この記事をシェア</a>
+      <a class="btn out m" style="align-self:flex-start" data-toast="リンクをコピーしました">🔗 リンクをコピー</a>
       <div class="shead mt24"><span class="h3">関連するイベント</span><span class="lbl-en">EVENTS</span></div>
       <div data-part="erow" data-c="1"></div>
       <div class="shead mt24"><span class="h3">記事に登場する主催者</span><span class="lbl-en">ORGANIZER</span></div>
@@ -492,7 +494,7 @@ table.tbl tr.done td{background:var(--g100)}
     <div style="width:140px;height:140px;background:var(--g200);flex:none"></div>
     <div class="grow col gap8"><span class="en" style="background:var(--black);color:#fff;padding:2px 8px;align-self:flex-start;font-weight:700">GROUP 団体</span><span class="h1" style="font-size:40px">慶應軽音サークル</span>
       <div class="row" style="gap:16px;align-items:baseline"><span class="en muted b">@keio-lightmusic</span><span class="en" style="font-size:30px;font-weight:700">234</span><span class="en muted b">FOLLOWERS</span><span class="en" style="font-size:30px;font-weight:700">18</span><span class="en muted b">EVENTS</span></div></div>
-    <div class="row gap8"><a class="btn pri" data-modal="m-login">＋ フォローする</a><span class="btn out na" style="min-width:0">X</span><span class="btn out na" style="min-width:0">IG</span><a class="btn out na" style="min-width:0" data-modal="m-report">…</a></div>
+    <div class="row gap8"><a class="btn pri" data-modal="m-login">＋ フォローする</a><a class="btn out na" style="min-width:0" data-toast="リンクをコピーしました">🔗</a><span class="btn out na" style="min-width:0">X</span><span class="btn out na" style="min-width:0">IG</span><a class="btn out na" style="min-width:0" data-modal="m-report">…</a></div>
   </div>
   <div class="inner row" style="gap:64px;align-items:flex-start;padding-top:24px;padding-bottom:96px">
     <div class="grow">
@@ -508,8 +510,8 @@ table.tbl tr.done td{background:var(--g100)}
       <p class="sm">三田・日吉で活動する軽音サークルです。年2回の定期ライブと夏合宿がメイン。初心者歓迎、楽器の貸し出しもあります。</p>
       <div class="shead" style="margin:0"><span class="b">運営メンバー</span><span class="lbl-en">MEMBERS</span></div>
       <div class="row"><span style="width:32px;height:32px;border-radius:50%;background:var(--g300)"></span><span class="sm">やまだ</span><span class="en muted b">OWNER</span></div>
-      <div class="row"><span style="width:32px;height:32px;border-radius:50%;background:var(--g300)"></span><span class="sm">みお</span><span class="en muted b">ADMIN</span></div>
-      <div class="row"><span style="width:32px;height:32px;border-radius:50%;background:var(--g300)"></span><span class="sm">たける</span><span class="en muted b">ADMIN</span></div>
+      <div class="row"><span style="width:32px;height:32px;border-radius:50%;background:var(--g300)"></span><span class="sm">みお</span><span class="en muted b">OWNER</span></div>
+      <div class="row"><span style="width:32px;height:32px;border-radius:50%;background:var(--g300)"></span><span class="sm">たける</span><span class="en muted b">OWNER</span></div>
     </aside>
   </div>
   <div data-part="ftr"></div>
@@ -520,20 +522,20 @@ table.tbl tr.done td{background:var(--g100)}
   <div class="inner row" style="gap:28px;background:var(--g100);padding-top:48px;padding-bottom:48px">
     <div style="width:140px;height:140px;border-radius:50%;background:var(--blue);flex:none"></div>
     <div class="grow col gap8"><span class="en" style="background:var(--blue);color:#fff;padding:2px 8px;align-self:flex-start;font-weight:700">PERSONAL 個人</span><span class="h1" style="font-size:40px">やまもと</span>
-      <div class="row" style="gap:16px;align-items:baseline"><span class="en muted b">@yamamoto</span><span class="en" style="font-size:30px;font-weight:700">41</span><span class="en muted b">FOLLOWERS</span><span class="en" style="font-size:30px;font-weight:700">12</span><span class="en muted b">EVENTS</span></div></div>
-    <div class="row gap8"><a class="btn pri" data-modal="m-login">＋ フォローする</a><span class="btn out na" style="min-width:0">X</span><span class="btn out na" style="min-width:0">GitHub</span><a class="btn out na" style="min-width:0" data-modal="m-report">…</a></div>
+      <div class="row" style="gap:16px;align-items:baseline"><span class="en muted b">@yamamoto</span><span class="en" style="font-size:30px;font-weight:700">12</span><span class="en muted b">EVENTS</span></div></div>
+    <div class="row gap8"><a class="btn out na" style="min-width:0" data-toast="リンクをコピーしました">🔗</a><span class="btn out na" style="min-width:0">X</span><span class="btn out na" style="min-width:0">GitHub</span><a class="btn out na" style="min-width:0" data-modal="m-report">…</a></div>
   </div>
   <div class="inner row" style="gap:64px;align-items:flex-start;padding-top:32px;padding-bottom:96px">
     <div class="grow">
       <div class="shead"><span class="h3">今後のイベント</span><span class="lbl-en">UPCOMING</span></div>
-      <div data-part="erow" data-c="1" data-d="5/13" data-w="WED" data-t="読書会 #13（オンライン）" data-host="やまもと（@yamamoto）" data-u="オンライン" data-place="オンライン（URL は参加確定者に表示）" data-time="19:00〜21:00" data-price="無料 ／ 残り 10 席"></div>
+      <div data-part="erow" data-c="1" data-d="5/13" data-w="WED" data-t="読書会 #13（オンライン）" data-host="やまもと（@yamamoto）" data-u="勉強会 · オンライン" data-place="オンライン（URL は参加予定の人に表示）" data-time="19:00〜21:00" data-price="無料 ／ 残り 10 席"></div>
       <div class="shead mt40"><span class="h3">過去のイベント</span><span class="lbl-en">ARCHIVE</span></div>
       <div class="row" style="padding:14px 0;border-bottom:1px solid var(--g200)"><span class="en b" style="font-size:20px">▸  2026</span><span class="grow"></span><span class="sm muted">11 件</span></div>
     </div>
     <aside class="grayb col gap16" style="width:380px;flex:none;padding:24px">
       <div class="shead" style="margin:0"><span class="h3">所属している団体</span><span class="lbl-en">GROUPS</span></div>
       <div data-part="ocard" data-n="慶應読書サークル" data-m="@keio-books · フォロワー 88" data-w="332"></div>
-      <p class="cap">個人ページには cover・紹介文を出さない（要件 §5）</p>
+      <p class="cap">個人ページには cover・紹介文を出さない（要件 §5）。個人はフォローできない（10/8 決定）</p>
     </aside>
   </div>
   <div data-part="ftr"></div>
@@ -572,9 +574,10 @@ table.tbl tr.done td{background:var(--g100)}
     <div data-part="stepper" data-cur="0"></div>
     <div class="h1" style="font-size:28px">申し込む枠を選んでください</div>
     <p class="sm muted">春の新歓ミーティング · 4/8(水) 18:00　複数の枠に同時に申し込めます</p>
-    <div class="row" style="border:2px solid var(--orange);background:var(--orange-w);padding:16px 20px;gap:14px"><span class="check on"></span><div class="grow col"><b>一般枠</b><span class="cap">残 25 / 40 席</span></div><span class="en" style="font-size:26px;font-weight:700">無料</span></div>
-    <div class="row" style="border:2px solid var(--orange);background:var(--orange-w);padding:16px 20px;gap:14px"><span class="check on"></span><div class="grow col"><b>懇親会枠（食事付き）</b><span class="cap">残 3 / 20 席 · 支払い期限は申込から24時間</span></div><span class="en" style="font-size:26px;font-weight:700">¥1,500</span></div>
-    <div class="row box" style="padding:16px 20px;gap:14px"><span class="check"></span><div class="grow col"><b>LT 登壇枠</b><span class="cap or">満員 — 選ぶと補欠登録（現在 3 人待ち）</span></div><span class="en" style="font-size:26px;font-weight:700">無料</span></div>
+    <div class="row" style="border:2px solid var(--orange);background:var(--orange-w);padding:16px 20px;gap:14px"><span class="check on"></span><div class="grow col"><b><span class="tag gray">学生</span> 学生枠</b><span class="cap">残 25 / 40 席</span></div><span class="en" style="font-size:26px;font-weight:700">無料</span></div>
+    <div class="row box" style="padding:16px 20px;gap:14px;background:var(--g100);opacity:.6"><span class="check"></span><div class="grow col"><b><span class="tag gray">大人</span> 大人枠</b><span class="cap or">満員 — 選べません（補欠なし）</span></div><span class="en" style="font-size:26px;font-weight:700">¥1,000</span></div>
+    <div class="row" style="border:2px solid var(--orange);background:var(--orange-w);padding:16px 20px;gap:14px"><span class="check on"></span><div class="grow col"><b><span class="tag gray">懇親会</span> 懇親会（食事付き）</b><span class="cap">残 3 / 20 席 · 決済が完了した時点で参加予定</span></div><span class="en" style="font-size:26px;font-weight:700">¥1,500</span></div>
+    <p class="cap">イベント全体の上限 60 人（残り 18）</p>
     <div class="row gap16"><a class="btn out na" data-go="event">← イベントに戻る</a><a class="btn pri grow" data-go="apply2">次へ：質問に答える</a></div>
   </div></div>
   <div data-part="ftr"></div>
@@ -586,9 +589,13 @@ table.tbl tr.done td{background:var(--g100)}
     <div data-part="stepper" data-cur="1"></div>
     <div class="h1" style="font-size:28px">質問に答えてください</div>
     <div class="grayb sm">回答は主催者の運営メンバーだけが見られます。イベント終了から 30 日で自動削除されます。</div>
-    <div data-part="field" data-l="本名" data-req="1" data-v="山田 太郎" data-h="個人情報 · 名札と食事手配に使用"></div>
-    <div data-part="field" data-l="大学・学部・学年" data-req="1" data-v="慶應 経済 1年"></div>
-    <div data-part="field" data-l="アレルギー・食事制限" data-v="なし" data-ta="1" data-h="個人情報 · 懇親会枠の方のみ"></div>
+    <b>共通の質問</b>
+    <div class="row gap16"><div data-part="field" data-l="氏名" data-req="1" data-v="山田 太郎" data-h="個人情報" data-grow="1"></div><div data-part="field" data-l="フリガナ" data-req="1" data-v="ヤマダ タロウ" data-grow="1"></div></div>
+    <div class="row" style="gap:24px"><span class="radio on">学生</span><span class="radio">社会人</span></div>
+    <div data-part="field" data-l="所属" data-req="1" data-v="慶應義塾大学 経済学部 1年"></div>
+    <b>主催者からの質問</b>
+    <div data-part="field" data-l="アレルギー・食事制限" data-v="なし" data-ta="1" data-h="個人情報 · 懇親会の方のみ"></div>
+    <p class="cap">共通の質問の中身は仮置き（個人情報をどこまで扱うかと合わせて検討）</p>
     <p class="cap">入力はブラウザの自動入力が使えます（プロフィールには保存しません）</p>
     <div class="row gap16"><a class="btn out na" data-go="apply1">← 戻る</a><a class="btn pri grow" data-go="apply3">内容を確認する</a></div>
   </div></div>
@@ -601,9 +608,9 @@ table.tbl tr.done td{background:var(--g100)}
     <div data-part="stepper" data-cur="2"></div>
     <div class="h1" style="font-size:30px">内容を確認してください</div>
     <p class="sm muted">春の新歓ミーティング　2026-04-08(水) 18:00</p>
-    <dl class="kv"><dt>一般枠</dt><dd>無料 — 申込と同時に参加確定</dd><dt>懇親会枠</dt><dd>¥1,500 — 支払い完了で参加確定</dd><dt>本名</dt><dd>山田 太郎</dd><dt>大学・学部・学年</dt><dd>慶應 経済 1年</dd><dt>アレルギー</dt><dd>なし</dd></dl>
+    <dl class="kv"><dt>学生枠</dt><dd>無料</dd><dt>懇親会</dt><dd>¥1,500</dd><dt>氏名</dt><dd>山田 太郎（ヤマダ タロウ）</dd><dt>所属</dt><dd>学生 · 慶應義塾大学 経済学部 1年</dd><dt>アレルギー</dt><dd>なし</dd></dl>
     <a class="sm b" data-go="apply2">← 回答を修正する</a>
-    <div class="note col gap8"><b class="or">個人情報の取り扱い</b><span class="sm">回答を見る人：慶應軽音サークルの運営メンバーのみ</span><span class="sm">保持期間：イベント終了から 30 日（2026-05-08 に自動削除）</span><span class="sm">利用目的：懇親会の食事手配と名札の作成</span><hr style="border:0;border-top:1px solid var(--orange)"><b class="or">キャンセルと返金</b><span class="sm">有料枠は支払い後にキャンセルしても返金されません。支払い期限は申込から24時間（開始時刻が早ければ開始まで）です。</span></div>
+    <div class="note col gap8"><b class="or">個人情報の取り扱い</b><span class="sm">回答を見る人：慶應軽音サークルの運営メンバーのみ</span><span class="sm">保持期間：イベント終了から 30 日（2026-05-08 に自動削除）</span><span class="sm">利用目的：懇親会の食事手配と名札の作成</span><hr style="border:0;border-top:1px solid var(--orange)"><b class="or">キャンセルと返金</b><span class="sm">有料枠は支払い後にキャンセルしても返金されません。有料枠を含む申込は、決済が完了した時点ですべての枠が参加予定になります（決済をやめた場合は申込されません）。</span></div>
     <span class="check on">上記に同意して申し込む</span>
     <div class="row gap16"><a class="btn out na" data-go="apply2">← 戻る</a><a class="btn pri grow" data-go="checkout">¥1,500 の支払いへ進む</a></div>
     <a class="cap" data-go="apply-done">（無料枠だけの場合は「申込を確定する」→ 申込完了へ）</a>
@@ -616,9 +623,9 @@ table.tbl tr.done td{background:var(--g100)}
   <div class="center"><div class="ccard c" style="width:640px">
     <div class="bigicon" style="background:var(--orange)">✓</div><div class="endisp" style="font-size:64px">THANK YOU</div><div class="h1">申込を受け付けました</div>
     <p class="sm muted">春の新歓ミーティング · 4/8(水) 18:00</p>
-    <div class="grayb col gap8" style="width:100%;text-align:left"><div class="row"><b>一般枠</b><span class="grow"></span><span class="bdg joined">参加確定</span></div><div class="row"><b>LT 登壇枠</b><span class="grow"></span><span class="bdg before">補欠 4番目</span></div></div>
-    <p class="sm">確認メールを送りました。繰り上がったらメールでお知らせします（有料枠は繰り上げ後に支払い期限が設定されます）。</p>
-    <a class="btn pri full" data-modal="m-calendar">＋ カレンダーに追加</a><a class="btn out full" data-go="me">マイページで確認</a><a class="btn out full" data-go="org">主催者をフォローする</a>
+    <div class="grayb col gap8" style="width:100%;text-align:left"><div class="row"><b>学生枠</b><span class="grow"></span><span class="bdg joined">参加予定</span></div></div>
+    <p class="sm">QR チケットをメールでも送りました。当日は受付で QR を見せてください。</p>
+    <a class="btn pri full" data-go="ticket">QR チケットを表示</a><a class="btn out full" data-modal="m-calendar">＋ カレンダーに追加</a><a class="btn out full" data-go="org">団体をフォローする</a>
   </div></div>
   <div data-part="ftr"></div>
 </section>
@@ -628,10 +635,10 @@ table.tbl tr.done td{background:var(--g100)}
   <div class="center"><div class="ccard" style="width:560px">
     <div style="background:var(--danger);color:#fff;padding:10px 16px"><span class="en b">MOCK — これはモック決済です</span><br><span class="cap" style="color:#fff">MVP 期間中は実際の請求は発生しません</span></div>
     <div class="h1" style="font-size:30px">お支払い</div>
-    <div class="grayb col gap8"><b>春の新歓ミーティング</b><div class="row sm"><span>懇親会枠 × 1</span><span class="grow"></span><span>¥1,500</span></div><hr style="border:0;border-top:1px solid var(--g300)"><div class="row" style="align-items:baseline"><b>合計</b><span class="grow"></span><span class="date" style="font-size:36px">¥1,500</span></div></div>
-    <b class="or">支払い期限：4/3(金) 21:00 まで</b>
+    <div class="grayb col gap8"><b>春の新歓ミーティング</b><div class="row sm"><span>学生枠 × 1</span><span class="grow"></span><span>無料</span></div><div class="row sm"><span>懇親会 × 1</span><span class="grow"></span><span>¥1,500</span></div><hr style="border:0;border-top:1px solid var(--g300)"><div class="row" style="align-items:baseline"><b>合計</b><span class="grow"></span><span class="date" style="font-size:36px">¥1,500</span></div></div>
+    <b class="or">この画面にいる間（最大 30 分）は席を確保しています</b>
     <a class="btn pri full" data-go="checkout-wait">支払う</a><a class="btn out full" data-go="checkout-fail">失敗させる</a>
-    <p class="cap">どちらも Webhook を経由して状態を確定します（この画面では確定しない）。Phase 8 で Stripe のホスト決済画面に差し替え。</p>
+    <p class="cap">どちらも Webhook を経由して確定します（この画面では確定しない）。決済完了の Webhook を受けて初めて申込（参加予定）を作ります。Phase 8 で Stripe のホスト決済画面に差し替え。</p>
   </div></div>
   <div data-part="ftr"></div>
 </section>
@@ -641,18 +648,18 @@ table.tbl tr.done td{background:var(--g100)}
   <div class="center"><div class="ccard c" style="width:560px">
     <svg width="80" height="80" viewBox="0 0 80 80"><circle cx="40" cy="40" r="32" fill="none" stroke="#E5E5E5" stroke-width="8"/><path d="M40 8 A32 32 0 0 1 72 40" fill="none" stroke="#FF6002" stroke-width="8" stroke-linecap="round"><animateTransform attributeName="transform" type="rotate" from="0 40 40" to="360 40 40" dur="1s" repeatCount="indefinite"/></path></svg>
     <div class="endisp">CONFIRMING</div><div class="h3">お支払いを確認しています</div>
-    <p class="sm muted">この画面のままお待ちください。確認が取れると自動で切り替わります。<br>時間がかかる場合はマイページの「支払い待ち」からも確認できます。</p>
+    <p class="sm muted">この画面のままお待ちください。確認が取れると自動で切り替わります。<br>時間がかかる場合はマイページの「参加予定」に表示されたかを確認してください。</p>
     <a class="btn out m na" data-go="checkout-done">（デモ：Webhook を受信 → 次へ）</a>
   </div></div>
   <div data-part="ftr"></div>
 </section>
 
-<section class="screen gray" id="checkout-done" data-group="参加者" data-label="11c 参加確定" data-path="戻り先 URL">
+<section class="screen gray" id="checkout-done" data-group="参加者" data-label="11c 参加予定（決済完了）" data-path="戻り先 URL">
   <div data-part="hdr" data-member="1"></div>
   <div class="center"><div class="ccard c" style="width:560px">
-    <div class="bigicon" style="background:var(--orange)">✓</div><div class="endisp">CONFIRMED</div><div class="h1" style="font-size:28px">参加が確定しました</div>
-    <p class="sm muted">春の新歓ミーティング · 一般枠 ＋ 懇親会枠（¥1,500）</p><p class="sm">確認メールを送りました。当日は受付であだ名をお伝えください。</p>
-    <a class="btn pri full" data-go="me">マイページで確認</a><a class="btn out full" data-go="event">イベントページへ</a>
+    <div class="bigicon" style="background:var(--orange)">✓</div><div class="endisp">CONFIRMED</div><div class="h1" style="font-size:28px">参加予定になりました</div>
+    <p class="sm muted">春の新歓ミーティング · 学生枠 ＋ 懇親会（¥1,500）</p><p class="sm">QR チケットをメールでも送りました。当日は受付で QR を見せてください。</p>
+    <a class="btn pri full" data-go="ticket">QR チケットを表示</a><a class="btn out full" data-go="me">マイページで確認</a>
   </div></div>
   <div data-part="ftr"></div>
 </section>
@@ -661,23 +668,13 @@ table.tbl tr.done td{background:var(--g100)}
   <div data-part="hdr" data-member="1"></div>
   <div class="center"><div class="ccard c" style="width:560px">
     <div class="bigicon" style="background:var(--danger)">!</div><div class="endisp">FAILED</div><div class="h1" style="font-size:28px">支払いに失敗しました</div>
-    <p class="sm">申込は「支払い待ち」のまま残っています。期限までにもう一度お試しください。</p>
-    <div class="note" style="width:100%"><b class="or">期限 4/3(金) 21:00（あと 23 時間 47 分）</b></div>
-    <a class="btn pri full" data-go="checkout">もう一度支払う</a><a class="btn out full" data-go="me-pending">マイページへ</a>
+    <p class="sm">申込はまだ完了していません。確保していた席は解放されました。もう一度お試しください。</p>
+    <div class="note" style="width:100%"><b class="or">空きがなくなった場合は申し込めません</b></div>
+    <a class="btn pri full" data-go="checkout">もう一度支払う</a><a class="btn out full" data-go="event">イベントページへ</a>
   </div></div>
   <div data-part="ftr"></div>
 </section>
 
-<section class="screen gray" id="checkout-expired" data-group="参加者" data-label="11e 期限切れ" data-path="/events/[id] ほか">
-  <div data-part="hdr" data-member="1"></div>
-  <div class="center"><div class="ccard c" style="width:560px">
-    <div class="bigicon" style="background:var(--g600)">⌛</div><div class="endisp">EXPIRED</div><div class="h1" style="font-size:28px">支払い期限が切れました</div>
-    <p class="sm">期限内に支払いが完了しなかったため、この申込は自動でキャンセルされました。空いた席には補欠の方が繰り上がります。</p>
-    <a class="btn pri full" data-go="apply1">もう一度申し込む</a><a class="btn out full" data-go="me">マイページへ</a>
-    <p class="cap">空きがなければ再申込は補欠になります</p>
-  </div></div>
-  <div data-part="ftr"></div>
-</section>
 
 <section class="screen" id="me" data-group="参加者" data-label="12 マイページ" data-path="/me">
   <div data-part="hdr" data-member="1"></div>
@@ -693,33 +690,31 @@ table.tbl tr.done td{background:var(--g100)}
       </div>
     </aside>
     <div class="grow col gap16">
-      <div class="tabs"><a class="on">参加予定 <i>2</i></a><a data-go="me-pending">支払い待ち <i class="or">1</i></a><a data-go="me-pending">補欠中 <i>1</i></a><a>履歴</a></div>
-      <div class="note row"><b class="sm grow">支払い待ちが 1 件あります（期限 4/3(金) 21:00）</b><a class="btn pri m" data-go="checkout">支払う</a></div>
-      <div class="row" style="gap:24px;padding:16px 0;border-bottom:1px solid var(--g200)"><div class="col"><span class="date" style="font-size:40px">4/8</span><span class="en b">WED</span></div><a class="grow col gap8" data-go="event"><span class="bdg joined" style="align-self:flex-start">参加確定</span><b>春の新歓ミーティング</b><span class="cap">一般枠 · 無料</span></a><div class="col gap8"><a class="btn out m na" data-modal="m-answers">申込内容</a><a class="btn out m na" data-modal="m-cancel">キャンセル</a></div></div>
-      <div class="row" style="gap:24px;padding:16px 0;border-bottom:1px solid var(--g200)"><div class="col"><span class="date" style="font-size:40px">4/15</span><span class="en b">WED</span></div><a class="grow col gap8" data-go="event"><span class="bdg joined" style="align-self:flex-start">参加確定</span><b>読書会 #12（オンライン）</b><span class="cap">参加枠 · 無料 · 参加 URL を表示</span></a><div class="col gap8"><a class="btn out m na" data-modal="m-answers">申込内容</a><a class="btn out m na" data-modal="m-cancel">キャンセル</a></div></div>
-      <div class="shead mt24" style="margin-bottom:0"><span class="h3">お気に入り</span><span class="lbl-en">FAVORITES</span><a class="sm b" style="margin-left:auto" data-go="favorites">すべて →</a></div>
+      <div class="shead" style="margin-bottom:0"><span class="h3">お知らせ</span><span class="lbl-en">NEWS</span><span class="cap" style="margin-left:auto">同じ内容がメールにも届きます</span></div>
+      <div class="col" style="background:var(--g100);padding:4px 16px"><div class="row" style="padding:10px 0;border-bottom:1px solid var(--g200)"><b class="or">●</b><span class="sm grow">慶應軽音サークル：集合場所の変更について</span><span class="cap">2時間前</span></div><div class="row" style="padding:10px 0"><span class="sm grow muted">春の新歓ミーティングの QR チケットを発行しました</span><span class="cap">昨日</span></div></div>
+      <div class="tabs"><a class="on">参加予定 <i>2</i></a><a>履歴</a></div>
+      <div class="row" style="gap:24px;padding:16px 0;border-bottom:1px solid var(--g200)"><div class="col"><span class="date" style="font-size:40px">4/8</span><span class="en b">WED</span></div><a class="grow col gap8" data-go="event"><span class="bdg joined" style="align-self:flex-start">参加予定</span><b>春の新歓ミーティング</b><span class="cap">学生枠 · 無料</span></a><div class="col gap8"><a class="btn pri m" data-go="ticket">QR チケット</a><a class="btn out m na" data-modal="m-answers">申込内容</a><a class="btn out m na" data-modal="m-cancel">キャンセル</a></div></div>
+      <div class="row" style="gap:24px;padding:16px 0;border-bottom:1px solid var(--g200)"><div class="col"><span class="date" style="font-size:40px">4/15</span><span class="en b">WED</span></div><a class="grow col gap8" data-go="event"><span class="bdg joined" style="align-self:flex-start">参加予定</span><b>読書会 #12（オンライン）</b><span class="cap">参加枠 · 無料 · 参加 URL を表示</span></a><div class="col gap8"><a class="btn out m na" data-modal="m-answers">申込内容</a><a class="btn out m na" data-modal="m-cancel">キャンセル</a></div></div>
+      <div class="shead mt24" style="margin-bottom:0"><span class="h3">保存したイベント</span><span class="lbl-en">SAVED</span><a class="sm b" style="margin-left:auto" data-go="favorites">すべて →</a></div>
       <div class="row" style="gap:16px;align-items:flex-start"><div data-part="ecard" data-d="4/12" data-w="SUN" data-t="写真部 撮影散歩" data-h="@photo-club · 写真部"></div><div data-part="ecard" data-d="4/15" data-w="WED" data-t="ボランティア説明会" data-h="@volunteer-k · ボランティアK"></div><div data-part="ecard" data-d="4/18" data-w="SAT" data-t="ダンス新歓公演" data-h="@dance-x · DANCE X"></div></div>
-      <div class="shead mt24" style="margin-bottom:0"><span class="h3">フォロー中</span><span class="lbl-en">FOLLOWING 12</span><a class="sm b" style="margin-left:auto" data-go="following">すべて →</a></div>
+      <div class="shead mt24" style="margin-bottom:0"><span class="h3">フォロー中の団体</span><span class="lbl-en">FOLLOWING 12</span><a class="sm b" style="margin-left:auto" data-go="following">すべて →</a></div>
       <a class="row" data-go="following"><span style="width:48px;height:48px;background:var(--g300)"></span><span style="width:48px;height:48px;background:var(--g200)"></span><span style="width:48px;height:48px;background:var(--g300)"></span><span style="width:48px;height:48px;background:var(--g200)"></span><span style="width:48px;height:48px;background:var(--g300)"></span><span class="en b muted">+7</span></a>
     </div>
   </div>
   <div data-part="ftr"></div>
 </section>
 
-<section class="screen" id="me-pending" data-group="参加者" data-label="12b 支払い待ち・補欠中" data-path="/me?tab=pending">
+<section class="screen gray" id="ticket" data-group="参加者" data-label="12b QR チケット" data-path="/me/tickets/[id]">
   <div data-part="hdr" data-member="1"></div>
-  <div style="display:flex;justify-content:center;padding:48px 0 96px"><div class="col gap16" style="width:800px">
-    <a class="sm muted" data-go="me">← マイページ</a><div class="h1" style="font-size:30px">マイページ</div>
-    <div class="tabs"><a data-go="me">参加予定 <i>2</i></a><a class="on">支払い待ち <i class="or">1</i></a><a>補欠中 <i>1</i></a><a>履歴</a></div>
-    <div class="col gap16" style="border:2px solid var(--orange);padding:24px">
-      <a class="row gap16" data-go="event"><div class="ph" style="width:160px;height:90px"></div><div class="col gap8"><span class="bdg few" style="align-self:flex-start">支払い待ち</span><b>春の新歓ミーティング</b><span class="cap">4/8(水) · 懇親会枠 · ¥1,500</span></div></a>
-      <div class="row" style="background:var(--orange-w);padding:12px 16px;align-items:baseline;gap:12px"><span class="lbl-en">DEADLINE</span><span class="date" style="font-size:32px">4/3 21:00</span><b class="or">あと 23 時間</b></div>
-      <p class="cap">期限を過ぎると自動でキャンセルされ、補欠の方が繰り上がります</p>
-      <div class="row gap16"><a class="btn pri grow" data-go="checkout">¥1,500 を支払う</a><a class="btn out na" data-modal="m-cancel">申込をやめる</a></div>
-      <a class="cap" data-go="checkout-expired">（期限切れ時の表示を見る）</a>
-    </div>
-    <div class="shead mt24" style="margin-bottom:0"><span class="h3">補欠中</span><span class="lbl-en">WAITLIST</span></div>
-    <div class="row box" style="padding:16px;gap:16px"><div class="grow col"><b>春の新歓ミーティング</b><span class="cap">4/8(水) · LT 登壇枠 · 無料</span></div><div class="col" style="align-items:center"><span class="date" style="font-size:36px">2</span><span class="cap">番目</span></div><a class="btn out m na" data-modal="m-cancel">やめる</a></div>
+  <div class="center"><div class="ccard c" style="width:520px">
+    <a class="sm muted" style="align-self:flex-start" data-go="me">← マイページ</a>
+    <span class="lbl-en">TICKET</span><div class="h1" style="font-size:28px">春の新歓ミーティング</div>
+    <p class="sm muted">2026-04-08(水) 18:00 · 三田キャンパス 西校舎 512教室</p>
+    <div class="ph" style="width:240px;height:240px;align-self:center"></div>
+    <b>やまだ（@yamada）</b><span class="cap">学生枠 ＋ 懇親会</span>
+    <div class="row gap8" style="justify-content:center"><span class="bdg joined">参加予定</span><span class="bdg before">未受付</span></div>
+    <span class="btn out full dis na">Apple Wallet に追加（検討中）</span><span class="btn out full dis na">Google ウォレットに追加（検討中）</span>
+    <p class="cap">同じ QR を確認メールにも載せています。受付で主催者が読み取ると「受付済」に変わります。</p>
   </div></div>
   <div data-part="ftr"></div>
 </section>
@@ -743,29 +738,29 @@ table.tbl tr.done td{background:var(--g100)}
   <div data-part="ftr"></div>
 </section>
 
-<section class="screen" id="following" data-group="参加者" data-label="13 フォロー中" data-path="/me/following">
+<section class="screen" id="following" data-group="参加者" data-label="13 フォロー中の団体" data-path="/me/following">
   <div data-part="hdr" data-member="1"></div>
   <div class="inner col gap16" style="padding-top:40px;padding-bottom:96px">
     <a class="sm muted" data-go="me">← マイページ</a>
     <div class="row" style="align-items:baseline"><span class="h1">フォロー中</span><span class="date or" style="font-size:36px">12</span><span class="en muted b">FOLLOWING</span></div>
     <div id="followGrid" style="display:grid;grid-template-columns:repeat(2,548px);gap:24px"></div>
-    <p class="cap">フォロー解除は1タップ（確認なし・トーストで元に戻せる）。主催者ごとに新規公開のメール通知を ON/OFF できます。</p>
+    <p class="cap">フォローできるのは団体だけ（10/8 決定）。フォロー解除は1タップ（確認なし・トーストで元に戻せる）。団体ごとに新規公開のメール通知を ON/OFF できます。</p>
   </div>
   <div data-part="ftr"></div>
 </section>
 
-<section class="screen" id="favorites" data-group="参加者" data-label="13b お気に入り" data-path="/me/favorites">
+<section class="screen" id="favorites" data-group="参加者" data-label="13b 保存したイベント" data-path="/me/favorites">
   <div data-part="hdr" data-member="1"></div>
   <div class="inner col gap16" style="padding-top:40px;padding-bottom:96px">
     <a class="sm muted" data-go="me">← マイページ</a>
-    <div class="row" style="align-items:baseline"><span class="h1">お気に入り</span><span class="date or" style="font-size:36px">8</span><span class="en muted b">FAVORITES</span></div>
+    <div class="row" style="align-items:baseline"><span class="h1">保存したイベント</span><span class="date or" style="font-size:36px">8</span><span class="en muted b">SAVED</span></div>
     <div class="tabs"><a class="on">開催予定 <i class="or">3</i></a><a>終了 <i>5</i></a></div>
     <div>
-      <div data-part="erow" data-c="1" data-d="4/12" data-w="SUN" data-t="写真部 撮影散歩" data-host="写真部（@photo-club）" data-u="大学を問わない" data-place="新宿御苑 大木戸門" data-time="10:00〜13:00" data-price="無料 ／ 残り 20 席"></div>
+      <div data-part="erow" data-c="1" data-d="4/12" data-w="SUN" data-t="写真部 撮影散歩" data-host="写真部（@photo-club）" data-u="スポーツ · 東京" data-place="新宿御苑 大木戸門" data-time="10:00〜13:00" data-price="無料 ／ 残り 20 席"></div>
       <div data-part="erow" data-c="1" data-d="4/15" data-w="WED" data-t="ボランティア説明会" data-host="ボランティアK（@volunteer-k）" data-place="三田キャンパス 南校舎" data-time="18:00〜19:30" data-price="無料 ／ 残り 30 席"></div>
-      <div data-part="erow" data-c="1" data-d="4/18" data-w="SAT" data-t="ダンス新歓公演" data-host="DANCE X（@dance-x）" data-u="早稲田大学" data-place="早稲田大学 大隈講堂" data-time="17:00〜19:00" data-price="500円 ／ 残り 60 席"></div>
+      <div data-part="erow" data-c="1" data-d="4/18" data-w="SAT" data-t="ダンス新歓公演" data-host="DANCE X（@dance-x）" data-u="ダンス · 東京" data-place="早稲田大学 大隈講堂" data-time="17:00〜19:00" data-price="500円 ／ 残り 60 席"></div>
     </div>
-    <p class="cap">並び順・開催前リマインド・上限数・共有可否は未決（要件 §14）</p>
+    <p class="cap">「お気に入り」から「保存」に名前を変更（10/8）。主催者は保存した人にもお知らせメールを送れます。並び順・上限数は未決。</p>
   </div>
   <div data-part="ftr"></div>
 </section>
@@ -785,10 +780,11 @@ table.tbl tr.done td{background:var(--g100)}
         <div class="shead" style="margin:0"><span class="h3">公開中のイベント</span><span class="lbl-en">PUBLISHED</span></div>
         <div class="col gap16" style="background:#fff;padding:22px 24px">
           <div class="row gap16"><a class="col" data-go="event"><span class="date" style="font-size:44px">4/8</span><span class="en b">WED 18:00</span></a><div class="grow col gap8"><span class="bdg open" style="align-self:flex-start">受付中</span><b>春の新歓ミーティング</b></div></div>
-          <div class="col gap8"><div class="row sm"><span>一般枠</span><span class="grow"></span><span class="en b">25 / 40</span></div><div class="progress"><i style="width:62.5%"></i></div></div>
-          <div class="col gap8"><div class="row sm"><span>懇親会枠</span><span class="grow"></span><b class="cap or">支払い待ち 2</b><span class="en b">17 / 20</span></div><div class="progress"><i style="width:85%"></i></div></div>
-          <div class="col gap8"><div class="row sm"><span>LT 登壇枠</span><span class="grow"></span><b class="cap or">補欠 3</b><span class="en b">5 / 5</span></div><div class="progress"><i class="full" style="width:100%"></i></div></div>
-          <div class="row gap8" style="flex-wrap:wrap"><a class="btn blk m" data-go="attendees">参加者・受付</a><a class="btn out m na" data-go="announce">告知</a><a class="btn out m na" data-go="event-new">編集</a><span class="btn out m na">複製</span><a class="btn out m na" data-go="transfer">移管</a><a class="btn out m na" data-modal="m-stop">中止</a></div>
+          <div class="col gap8"><div class="row sm"><span>学生枠</span><span class="grow"></span><span class="en b">25 / 40</span></div><div class="progress"><i style="width:62.5%"></i></div></div>
+          <div class="col gap8"><div class="row sm"><span>大人枠</span><span class="grow"></span><span class="en b">10 / 10</span></div><div class="progress"><i class="full" style="width:100%"></i></div></div>
+          <div class="col gap8"><div class="row sm"><span>懇親会</span><span class="grow"></span><span class="en b">17 / 20</span></div><div class="progress"><i style="width:85%"></i></div></div>
+          <div class="row sm"><b>イベント全体 42 / 60</b><span class="grow"></span><span class="cap">保存した人 38</span></div>
+          <div class="row gap8" style="flex-wrap:wrap"><a class="btn blk m" data-go="attendees">参加者・受付</a><a class="btn pri m" data-go="checkin-qr">QR で受付</a><a class="btn out m na" data-go="announce">告知</a><a class="btn out m na" data-go="event-new">編集</a><span class="btn out m na">複製</span><a class="btn out m na" data-go="transfer">移管</a><a class="btn out m na" data-modal="m-stop">中止</a></div>
         </div>
         <div class="shead mt8" style="margin:0"><span class="h3">下書き</span><span class="lbl-en">DRAFTS</span></div>
         <div class="row" style="background:#fff;padding:14px 16px"><div class="grow col"><b>追いコン 2026</b><span class="cap">更新 3日前</span></div><a class="btn out m na" data-go="event-new">編集</a><a class="btn pri m" data-modal="m-publish">公開する</a></div>
@@ -796,9 +792,9 @@ table.tbl tr.done td{background:var(--g100)}
       <aside class="col gap16" style="width:380px;flex:none">
         <div class="shead" style="margin:0"><span class="h3">最近の申込</span><span class="lbl-en">RECENT</span></div>
         <div style="background:#fff;padding:0 16px">
-          <div class="row" style="padding:12px 0;border-bottom:1px solid var(--g200)"><span style="width:28px;height:28px;border-radius:50%;background:var(--g300)"></span><div class="grow col"><b>みお</b><span class="cap">LT 登壇枠（補欠）</span></div><span class="cap">15分前</span></div>
-          <div class="row" style="padding:12px 0;border-bottom:1px solid var(--g200)"><span style="width:28px;height:28px;border-radius:50%;background:var(--g300)"></span><div class="grow col"><b>たける</b><span class="cap">一般枠</span></div><span class="cap">1時間前</span></div>
-          <div class="row" style="padding:12px 0"><span style="width:28px;height:28px;border-radius:50%;background:var(--g300)"></span><div class="grow col"><b>さき</b><span class="cap">懇親会枠（支払い待ち）</span></div><span class="cap">2時間前</span></div>
+          <div class="row" style="padding:12px 0;border-bottom:1px solid var(--g200)"><span style="width:28px;height:28px;border-radius:50%;background:var(--g300)"></span><div class="grow col"><b>みお</b><span class="cap">学生枠</span></div><span class="cap">15分前</span></div>
+          <div class="row" style="padding:12px 0;border-bottom:1px solid var(--g200)"><span style="width:28px;height:28px;border-radius:50%;background:var(--g300)"></span><div class="grow col"><b>たける</b><span class="cap">学生枠＋懇親会</span></div><span class="cap">1時間前</span></div>
+          <div class="row" style="padding:12px 0"><span style="width:28px;height:28px;border-radius:50%;background:var(--g300)"></span><div class="grow col"><b>さき</b><span class="cap">大人枠</span></div><span class="cap">2時間前</span></div>
         </div>
         <div class="note col gap8"><b class="or">回答の自動削除まで 7 日</b><span class="sm">「冬合宿 2026」の申込回答は 3/22 に削除されます。必要なら CSV で控えを取ってください。</span><a class="btn out m" style="align-self:flex-start" data-modal="m-csv">CSV を出力</a></div>
       </aside>
@@ -810,13 +806,14 @@ table.tbl tr.done td{background:var(--g100)}
   <div data-part="hdr" data-member="1"></div>
   <div class="center"><div class="ccard" style="width:680px">
     <span class="lbl-en">NEW GROUP</span><div class="h1" style="font-size:32px">団体を作る</div>
-    <p class="sm muted">サークル・学生団体のページです。代表が交代しても、イベントとフォロワーは団体に残ります。</p>
+    <p class="sm muted">サークル・学生団体のページです。申請なしで作れます。代表が交代しても、イベントとフォロワーは団体に残ります。</p>
     <div style="position:relative;height:180px"><div class="ph" style="height:140px"></div><div style="position:absolute;left:16px;top:92px;width:88px;height:88px;background:var(--g200);border:4px solid #fff"></div><span class="cap" style="position:absolute;left:120px;top:150px">cover・アイコン（任意）</span></div>
     <div data-part="field" data-l="団体名（あだ名）" data-req="1" data-v="慶應軽音サークル"></div>
+    <div class="note col gap8"><b class="or">似た名前の団体があります</b><span class="sm">慶應軽音楽サークル（@keio-music · フォロワー 120）</span><div class="row gap8"><a class="btn out m na" data-toast="参加の依頼を送りました">この団体の owner に参加を依頼</a><span class="sm muted">／ 別の団体として作る</span></div></div>
     <div data-part="field" data-l="ユーザーネーム" data-req="1" data-v="@keio-lightmusic" data-h="✓ 使えます ／ ページの URL になります"></div>
     <div data-part="field" data-l="紹介文" data-v="活動内容・頻度・雰囲気など" data-ph="1" data-ta="1"></div>
     <div data-part="field" data-l="SNS リンク" data-v="https://instagram.com/…" data-ph="1" data-h="＋ リンクを追加"></div>
-    <div class="note soft sm">作成するとあなたが OWNER になります。あとから副代表などを管理者（ADMIN）として招待できます。</div>
+    <div class="note soft sm">作成するとあなたが OWNER になります。OWNER は複数人にできるので、副代表なども OWNER として招待してください。</div>
     <a class="btn pri full" data-go="manage" data-toast="団体を作成しました">団体を作成する</a>
   </div></div>
   <div data-part="ftr"></div>
@@ -829,13 +826,15 @@ table.tbl tr.done td{background:var(--g100)}
     <div class="tabs"><a>プロフィール</a><a class="on">メンバー</a><a>入金先 <span class="tag gray">後日</span></a></div>
     <div class="row"><span class="en" style="font-size:30px;font-weight:700">3</span><b>人のメンバー</b><span class="grow"></span><a class="btn pri m" data-modal="m-invite">＋ 招待する</a></div>
     <div style="background:#fff">
-      <div class="row" style="padding:14px 20px;border-bottom:1px solid var(--g200)"><span style="width:36px;height:36px;border-radius:50%;background:var(--blue)"></span><b class="grow">やまだ（あなた）</b><span class="en b" style="background:var(--black);color:#fff;padding:4px 10px">OWNER</span><span class="btn out m na dis">離脱</span></div>
-      <div class="row" style="padding:14px 20px;border-bottom:1px solid var(--g200)"><span style="width:36px;height:36px;border-radius:50%;background:var(--g300)"></span><b class="grow">みお</b><span class="en b" style="border:1.5px solid var(--black);padding:3px 10px">ADMIN ▾</span><span class="btn out m na">外す</span></div>
-      <div class="row" style="padding:14px 20px"><span style="width:36px;height:36px;border-radius:50%;background:var(--g300)"></span><b class="grow">たける</b><span class="en b" style="border:1.5px solid var(--black);padding:3px 10px">ADMIN ▾</span><span class="btn out m na">外す</span></div>
+      <div class="row" style="padding:14px 20px;border-bottom:1px solid var(--g200)"><span style="width:36px;height:36px;border-radius:50%;background:var(--blue)"></span><b class="grow">やまだ（あなた）</b><span class="en b" style="background:var(--black);color:#fff;padding:4px 10px">OWNER</span><span class="btn out m na">離脱</span></div>
+      <div class="row" style="padding:14px 20px;border-bottom:1px solid var(--g200)"><span style="width:36px;height:36px;border-radius:50%;background:var(--g300)"></span><b class="grow">みお</b><span class="en b" style="background:var(--black);color:#fff;padding:4px 10px">OWNER</span><span class="btn out m na">外す</span></div>
+      <div class="row" style="padding:14px 20px"><span style="width:36px;height:36px;border-radius:50%;background:var(--g300)"></span><b class="grow">たける</b><span class="en b" style="background:var(--black);color:#fff;padding:4px 10px">OWNER</span><span class="btn out m na">外す</span></div>
     </div>
-    <div class="note sm">あなたは唯一の OWNER のため離脱できません。代替わりの場合は、先に次の代表を OWNER にしてください。</div>
+    <div class="note sm">団体の権限は OWNER だけ（複数可）。OWNER が1人だけのときは離脱できません。代替わりの場合は、先に次の代表を OWNER として招待してください。</div>
     <div class="shead mt16" style="margin:0"><span class="h3">招待中</span><span class="lbl-en">PENDING</span></div>
-    <div class="row" style="background:#fff;padding:14px 20px"><span class="sm grow">招待リンク（ADMIN）· 有効期限 4/1 まで</span><span class="btn out m na">取り消す</span></div>
+    <div class="row" style="background:#fff;padding:14px 20px"><span class="sm grow">招待リンク（OWNER）· 有効期限 4/1 まで</span><span class="btn out m na">取り消す</span></div>
+    <div class="shead mt16" style="margin:0"><span class="h3">団体の削除</span><span class="lbl-en">DELETE</span></div>
+    <div class="row" style="background:#fff;padding:14px 20px"><span class="sm grow">削除は NMJ 運営に依頼します（イベント・フォロワー・申込の扱いは検討中）</span><span class="btn out m na">運営に依頼</span></div>
   </div>
 </section>
 
@@ -844,28 +843,29 @@ table.tbl tr.done td{background:var(--g100)}
   <div class="row" style="padding:32px 80px 0"><span class="h1" style="font-size:32px">イベントを作成</span><span class="grow"></span><span class="btn out m na">過去のイベントから複製</span></div>
   <div class="row" style="gap:40px;align-items:flex-start;padding:24px 80px 40px">
     <nav class="col gap16" style="width:220px;flex:none;position:sticky;top:148px;padding-top:8px">
-      <span class="row" style="align-items:baseline"><span class="lbl-en">01</span><b>主催者と大学</b></span><span class="row" style="align-items:baseline"><span class="en b" style="color:var(--g300)">02</span><b class="muted">基本情報</b></span><span class="row" style="align-items:baseline"><span class="en b" style="color:var(--g300)">03</span><b class="muted">参加枠</b></span><span class="row" style="align-items:baseline"><span class="en b" style="color:var(--g300)">04</span><b class="muted">申込時の質問</b></span><span class="row" style="align-items:baseline"><span class="en b" style="color:var(--g300)">05</span><b class="muted">参加者情報の扱い</b></span><span class="row" style="align-items:baseline"><span class="en b" style="color:var(--g300)">06</span><b class="muted">入金先（後日）</b></span>
+      <span class="row" style="align-items:baseline"><span class="lbl-en">01</span><b>主催者・ジャンル・地域</b></span><span class="row" style="align-items:baseline"><span class="en b" style="color:var(--g300)">02</span><b class="muted">基本情報</b></span><span class="row" style="align-items:baseline"><span class="en b" style="color:var(--g300)">03</span><b class="muted">参加枠</b></span><span class="row" style="align-items:baseline"><span class="en b" style="color:var(--g300)">04</span><b class="muted">申込時の質問</b></span><span class="row" style="align-items:baseline"><span class="en b" style="color:var(--g300)">05</span><b class="muted">参加者情報の扱い</b></span><span class="row" style="align-items:baseline"><span class="en b" style="color:var(--g300)">06</span><b class="muted">入金先（後日）</b></span>
     </nav>
     <div class="grow col gap16">
-      <div class="col gap16" style="background:#fff;padding:24px"><div class="row" style="align-items:baseline"><span class="date or" style="font-size:32px">01</span><span class="h3">主催者と大学</span><span class="en muted b">WHO / WHERE</span></div>
+      <div class="col gap16" style="background:#fff;padding:24px"><div class="row" style="align-items:baseline"><span class="date or" style="font-size:32px">01</span><span class="h3">主催者・ジャンル・地域</span><span class="en muted b">WHO / WHAT / WHERE</span></div>
         <div data-part="field" data-l="主催者" data-req="1" data-v="慶應軽音サークル（@keio-lightmusic） ▾" data-h="自分 / 管理している団体から選ぶ"></div>
-        <b>対象の大学 <span class="cap or">必須</span></b><div class="row" style="gap:24px"><span class="radio on">特定の大学：慶應義塾大学 ▾</span><span class="radio">大学を問わない</span></div></div>
+        <div class="row gap16"><div data-part="field" data-l="ジャンル" data-req="1" data-v="音楽 ▾" data-grow="1"></div><div data-part="field" data-l="地域" data-req="1" data-v="東京都 ▾" data-h="オンラインのみの場合は「オンライン」" data-grow="1"></div></div></div>
       <div class="col gap16" style="background:#fff;padding:24px"><div class="row" style="align-items:baseline"><span class="date or" style="font-size:32px">02</span><span class="h3">基本情報</span><span class="en muted b">BASICS</span></div>
         <div data-part="field" data-l="タイトル" data-req="1" data-v="春の新歓ミーティング"></div>
         <div class="ph" style="width:600px;height:160px"></div>
         <div class="row gap16"><div data-part="field" data-l="開始" data-req="1" data-v="2026/04/08 18:00" data-grow="1"></div><div data-part="field" data-l="終了" data-req="1" data-v="2026/04/08 20:00" data-grow="1"></div></div>
         <b>会場 <span class="cap or">必須</span></b><div class="row gap8"><span class="chip on">対面</span><span class="chip">オンライン</span></div>
-        <div data-part="field" data-l="会場名・住所" data-v="三田キャンパス 西校舎 512教室" data-h="オンラインの URL は参加確定者にだけ表示されます"></div>
+        <div data-part="field" data-l="会場名・住所" data-v="三田キャンパス 西校舎 512教室" data-h="オンラインの URL は参加予定の人にだけ表示されます"></div>
         <div data-part="field" data-l="説明" data-req="1" data-v="Markdown で書けます" data-ph="1" data-ta="1"></div></div>
       <div class="col gap16" style="background:#fff;padding:24px"><div class="row" style="align-items:baseline"><span class="date or" style="font-size:32px">03</span><span class="h3">参加枠</span><span class="en muted b">SLOTS</span></div>
-        <div class="grayb col gap8"><div class="row"><span class="muted">≡</span><b class="grow">一般枠</b><span class="muted">×</span></div><div class="row gap16"><div data-part="field" data-l="定員" data-v="40" data-grow="1"></div><div data-part="field" data-l="価格（円）" data-v="0" data-h="0 で無料" data-grow="1"></div></div></div>
-        <div class="grayb col gap8"><div class="row"><span class="muted">≡</span><b class="grow">懇親会枠（食事付き）</b><span class="muted">×</span></div><div class="row gap16"><div data-part="field" data-l="定員" data-v="20" data-grow="1"></div><div data-part="field" data-l="価格（円）" data-v="1500" data-grow="1"></div></div></div>
+        <div data-part="field" data-l="イベント全体の参加者上限" data-v="60" data-h="枠の定員の合計より少なくできる。空欄なら枠の定員だけ"></div>
+        <div class="grayb col gap8"><div class="row"><span class="muted">≡</span><span class="tag">学生 ▾</span><b class="grow">学生枠</b><span class="muted">×</span></div><div class="row gap16"><div data-part="field" data-l="定員" data-req="1" data-v="40" data-grow="1"></div><div data-part="field" data-l="価格（円）" data-v="0" data-h="0 で無料" data-grow="1"></div></div></div>
+        <div class="grayb col gap8"><div class="row"><span class="muted">≡</span><span class="tag">懇親会 ▾</span><b class="grow">懇親会（食事付き）</b><span class="muted">×</span></div><div class="row gap16"><div data-part="field" data-l="定員" data-v="20" data-grow="1"></div><div data-part="field" data-l="価格（円）" data-v="1500" data-grow="1"></div></div></div>
         <b class="or">＋ 枠を追加</b></div>
       <div class="col gap16" style="background:#fff;padding:24px"><div class="row" style="align-items:baseline"><span class="date or" style="font-size:32px">04</span><span class="h3">申込時の質問</span><span class="en muted b">QUESTIONS</span></div>
-        <span class="cap">プリセットから追加</span><div class="row gap8" style="flex-wrap:wrap"><span class="chip">＋ 本名</span><span class="chip">＋ フリガナ</span><span class="chip">＋ 電話番号</span><span class="chip">＋ 緊急連絡先</span><span class="chip">＋ 大学・学部・学年</span><span class="chip">＋ アレルギー・食事制限</span><span class="chip">＋ 自由記述</span></div>
-        <div><div class="row" style="padding:12px 0;border-bottom:1px solid var(--g200)"><span class="muted">≡</span><div class="grow col"><span class="row gap8"><b>本名</b><span class="tag pi">個人情報</span></span><span class="cap">必須 · 1行テキスト</span></div><span class="sm">編集</span></div>
-          <div class="row" style="padding:12px 0;border-bottom:1px solid var(--g200)"><span class="muted">≡</span><div class="grow col"><b>大学・学部・学年</b><span class="cap">必須 · 1行テキスト</span></div><span class="sm">編集</span></div>
-          <div class="row" style="padding:12px 0;border-bottom:1px solid var(--g200)"><span class="muted">≡</span><div class="grow col"><span class="row gap8"><b>アレルギー・食事制限</b><span class="tag pi">個人情報</span></span><span class="cap">懇親会枠のみ · 複数行</span></div><span class="sm">編集</span></div></div>
+        <span class="cap">全イベント共通の質問（削除・変更不可）</span>
+        <div class="grayb"><div class="row" style="padding:8px 0"><span class="muted">🔒</span><div class="grow col"><span class="row gap8"><b>氏名・フリガナ</b><span class="tag pi">個人情報</span></span><span class="cap">必須</span></div></div><div class="row" style="padding:8px 0"><span class="muted">🔒</span><div class="grow col"><b>所属（学校名と学年 / 社会人）</b><span class="cap">必須</span></div></div></div>
+        <span class="cap">追加の質問（自由に設定）・プリセット</span><div class="row gap8" style="flex-wrap:wrap"><span class="chip">＋ 電話番号</span><span class="chip">＋ 緊急連絡先</span><span class="chip">＋ アレルギー・食事制限</span><span class="chip">＋ 自由記述</span></div>
+        <div><div class="row" style="padding:12px 0;border-bottom:1px solid var(--g200)"><span class="muted">≡</span><div class="grow col"><span class="row gap8"><b>アレルギー・食事制限</b><span class="tag pi">個人情報</span></span><span class="cap">懇親会のみ · 複数行</span></div><span class="sm">編集</span></div></div>
         <span class="cap or">公開後は質問の削除・形式変更はできません（追加・並べ替え・文言修正のみ）</span></div>
       <div class="col gap16" style="background:#fff;padding:24px"><div class="row" style="align-items:baseline"><span class="date or" style="font-size:32px">05</span><span class="h3">参加者情報の扱い</span><span class="en muted b">PRIVACY</span></div>
         <b>参加者リストの公開</b><div class="row" style="gap:24px"><span class="radio on">主催者のみ（既定）</span><span class="radio">参加者のあだ名を公開</span></div>
@@ -882,13 +882,31 @@ table.tbl tr.done td{background:var(--g100)}
   <div data-part="ohdr" data-active="events"></div>
   <div class="col" style="gap:18px;padding:32px 80px 80px">
     <a class="sm muted" data-go="manage">← ダッシュボード</a>
-    <div class="row"><div class="grow col"><span class="h1" style="font-size:30px">春の新歓ミーティング</span><span class="cap">参加者リスト · 4/8(水) 18:00</span></div><a class="btn out m" data-modal="m-csv">CSV</a></div>
-    <div class="row" style="background:var(--black);color:#fff;padding:16px 28px;align-items:baseline"><span class="lbl-en">CHECKED IN</span><span class="date" id="ciCount">12</span><span class="date" style="font-size:28px;color:var(--g300)">/ 45</span><span class="grow"></span><span class="cap" style="color:var(--g300)">回答は 2026-05-08 に自動削除</span></div>
-    <div class="row gap8"><span class="chip on">すべて 45</span><span class="chip">一般 25</span><span class="chip">懇親会 17</span><span class="chip">LT 5</span><span class="chip">未受付のみ</span></div>
-    <div data-part="field" data-l="検索" data-v="🔍  あだ名・本名で検索" data-ph="1"></div>
-    <table class="tbl" id="attTable"><tr><th style="width:130px">受付</th><th>あだ名</th><th>本名</th><th>枠</th><th>支払い</th><th>大学・学部・学年</th><th>アレルギー</th></tr></table>
-    <div class="shead mt16" style="margin:0"><span class="h3">補欠</span><span class="lbl-en">WAITLIST 3</span></div>
-    <p class="sm">1.  けん · LT 登壇枠 · 4/1 12:00</p>
+    <div class="row"><div class="grow col"><span class="h1" style="font-size:30px">春の新歓ミーティング</span><span class="cap">参加者リスト · 4/8(水) 18:00</span></div><a class="btn pri m" data-go="checkin-qr">QR で受付</a><a class="btn out m" data-modal="m-csv">CSV</a></div>
+    <div class="row" style="background:var(--black);color:#fff;padding:16px 28px;align-items:baseline"><span class="lbl-en">CHECKED IN</span><span class="date" id="ciCount">12</span><span class="date" style="font-size:28px;color:var(--g300)">/ 42</span><span class="grow"></span><span class="cap" style="color:var(--g300)">回答は 2026-05-08 に自動削除</span></div>
+    <div class="row gap8"><span class="chip on">すべて 42</span><span class="chip">学生 25</span><span class="chip">大人 10</span><span class="chip">懇親会 17</span><span class="chip">未受付</span><span class="chip">受付済</span><span class="chip">欠席</span></div>
+    <div data-part="field" data-l="検索" data-v="🔍  あだ名・氏名で検索" data-ph="1"></div>
+    <table class="tbl" id="attTable"><tr><th style="width:200px">受付</th><th>あだ名</th><th>氏名</th><th>枠</th><th>支払い</th><th>所属</th><th>アレルギー</th></tr></table>
+    <p class="cap">受付の状態は 未受付 / 受付済 / 欠席 をいつでも切り替えられます（誰がいつ変えたかを記録）。QR で受付した人は自動で受付済になります。</p>
+  </div>
+</section>
+
+<section class="screen gray" id="checkin-qr" data-group="主催" data-label="18b QR で受付" data-path="/manage/events/[id]/checkin">
+  <div data-part="ohdr" data-active="events"></div>
+  <div class="row" style="gap:28px;align-items:flex-start;padding:32px 80px 80px">
+    <div class="col gap16" style="width:520px;flex:none">
+      <a class="sm muted" data-go="attendees">← 参加者リスト</a>
+      <span class="h1" style="font-size:30px">QR で受付</span><span class="cap">春の新歓ミーティング · 4/8(水) 18:00</span>
+      <div class="ph" style="height:420px;background:#222"></div>
+      <p class="cap">スマホのカメラで参加者の QR チケットを読み取ると、その場で受付済になります。</p>
+    </div>
+    <div class="grow col gap16">
+      <div class="row" style="background:var(--black);color:#fff;padding:16px 28px;align-items:baseline"><span class="lbl-en">CHECKED IN</span><span class="date">13</span><span class="date" style="font-size:28px;color:var(--g300)">/ 42</span></div>
+      <div class="col gap8" style="background:#fff;padding:20px 24px;border:2px solid var(--blue)"><div class="row"><b class="grow">みお（佐藤 美緒）</b><span class="bdg joined">受付済 18:02</span></div><span class="cap">学生枠＋懇親会 · 支払済 · アレルギー：なし</span><div class="row gap8"><a class="btn out m na" data-toast="未受付に戻しました">取り消す</a><span class="grow"></span><a class="btn pri m" data-toast="次の QR を読み取ります">次を読む</a></div></div>
+      <div class="note sm"><b class="or">受付済みのチケットです</b>　たける · 18:04 に受付済</div>
+      <div class="redb sm"><b style="color:var(--danger)">このイベントのチケットではありません</b></div>
+      <a class="btn out m" style="align-self:flex-start" data-go="attendees">リストで受付する</a>
+    </div>
   </div>
 </section>
 
@@ -897,17 +915,17 @@ table.tbl tr.done td{background:var(--g100)}
   <div class="row" style="gap:28px;align-items:flex-start;padding:32px 80px 80px">
     <div class="grow col gap16" style="background:#fff;padding:32px 36px">
       <a class="sm muted" data-go="manage">← 春の新歓ミーティング</a>
-      <span class="h1" style="font-size:30px">参加者に告知</span>
-      <b>宛先 <span class="cap or">必須</span></b><span class="radio on">参加確定者のみ（43 人）</span><span class="radio">補欠を含む全員（46 人）</span>
+      <span class="h1" style="font-size:30px">お知らせを送る</span>
+      <b>宛先 <span class="cap or">必須</span></b><span class="check on">参加予定の人（42 人）</span><span class="check">保存した人・未申込（38 人）</span>
       <div data-part="field" data-l="件名" data-req="1" data-v="【春の新歓】集合場所の変更について"></div>
       <div data-part="field" data-l="本文" data-req="1" data-v="新入生のみなさん&#10;集合場所が西校舎512教室から513教室に変わりました。当日は入口の案内に従ってください。" data-ta="1"></div>
-      <p class="cap">配信停止リンクが自動で付きます。返信先は要確認。</p>
-      <div class="row gap16"><span class="btn out na">プレビュー</span><a class="btn pri grow" data-go="manage" data-toast="43 人に送信しました">43 人に送信</a></div>
+      <p class="cap">サイト内のお知らせとメールの両方に届きます。配信停止リンクが自動で付きます。返信先は要確認。</p>
+      <div class="row gap16"><span class="btn out na">プレビュー</span><a class="btn pri grow" data-go="manage" data-toast="42 人に送信しました">42 人に送信</a></div>
     </div>
     <aside style="width:380px;flex:none;background:#fff;padding:16px 20px">
       <div class="shead"><span class="h3">送信履歴</span><span class="lbl-en">HISTORY</span></div>
-      <div class="col" style="padding:12px 0;border-top:1px solid var(--g200)"><b>当日の持ち物について</b><span class="cap">4/6 20:00 · 確定者 41 人</span></div>
-      <div class="col" style="padding:12px 0;border-top:1px solid var(--g200)"><b>懇親会のお店が決まりました</b><span class="cap">4/2 12:00 · 全員 44 人</span></div>
+      <div class="col" style="padding:12px 0;border-top:1px solid var(--g200)"><b>当日の持ち物について</b><span class="cap">4/6 20:00 · 参加予定 41 人</span></div>
+      <div class="col" style="padding:12px 0;border-top:1px solid var(--g200)"><b>残りわずかです</b><span class="cap">4/2 12:00 · 保存した人 35 人</span></div>
     </aside>
   </div>
 </section>
@@ -918,7 +936,7 @@ table.tbl tr.done td{background:var(--g100)}
     <a class="sm muted" data-go="manage">← 読書会 #12</a><span class="lbl-en">TRANSFER</span><span class="h1" style="font-size:30px">団体へ移す</span>
     <p class="sm muted">個人で作ったイベントを、あなたが管理する団体の主催に変更します。</p>
     <div class="row gap16"><div class="grayb grow col"><span class="en muted b">FROM</span><b>やまだ（個人）</b></div><span class="h1 or">→</span><div class="note grow col" style="padding:12px 16px"><span class="lbl-en">TO</span><b>慶應読書サークル ▾</b></div></div>
-    <p class="cap">あなたが OWNER / ADMIN の団体だけが候補です</p>
+    <p class="cap">あなたが OWNER の団体だけが候補です</p>
     <div class="grayb col gap8 sm"><span>✓ 参加者・申込・回答はそのまま引き継がれます</span><span>✓ イベントの URL は変わりません</span><span>・移管先のフォロワーへの通知は送られません</span><span>・移管後は団体の運営メンバーが管理します</span></div>
     <div class="row gap16"><a class="btn out na" data-go="manage">戻る</a><a class="btn pri grow" data-go="manage" data-toast="団体へ移しました">団体へ移す</a></div>
     <a class="cap" data-go="transfer-ng">（支払い済みがある場合の表示を見る）</a>
@@ -936,74 +954,87 @@ table.tbl tr.done td{background:var(--g100)}
   </div></div>
 </section>
 
+<!-- =================================================================== 運営 -->
+<section class="screen gray" id="admin-reports" data-group="運営" data-label="22 通報の確認（NMJ 運営）" data-path="/admin/reports">
+  <div data-part="ohdr" data-active="dashboard" data-org="NMJ 運営"></div>
+  <div class="col gap16" style="padding:40px 80px 80px">
+    <span class="h1" style="font-size:32px">通報</span>
+    <p class="sm muted">admin（NMJ 運営）だけが入れる画面。通報が届くと運営にメールが届き、ここで対応状況を管理します。団体の統合・削除もここから（扱いは検討中）。</p>
+    <div class="row gap8"><span class="chip on">未対応 3</span><span class="chip">対応済み</span><span class="chip">対応しない</span></div>
+    <table class="tbl"><tr><th>受付日時</th><th>対象</th><th>理由</th><th>詳細</th><th>通報者</th><th></th></tr>
+      <tr><td>4/2 21:10</td><td><a data-go="event">春の新歓ミーティング</a></td><td>詐欺・架空のイベント</td><td>同じ内容のイベントが別団体名で…</td><td>@yamada</td><td><span class="btn out m na">対応する</span></td></tr>
+      <tr><td>4/1 09:30</td><td><a data-go="org">慶應軽音楽サークル</a></td><td>その他</td><td>同じ団体のページが2つあります</td><td>@mio</td><td><span class="btn out m na">対応する</span></td></tr></table>
+    <p class="cap">対応：イベント非公開・団体の統合・削除・対応しない（理由を記録）。通報の項目は検討中。</p>
+  </div>
+</section>
+
 <!-- =================================================================== 共通 -->
 <section class="screen gray" id="modals" data-group="共通" data-label="21 モーダル一覧" data-path="—">
   <div data-part="hdr" data-member="1"></div>
   <div class="inner col gap16" style="padding-top:48px;padding-bottom:96px">
     <span class="h1">モーダル一覧</span>
-    <p class="sm muted">PC は中央ダイアログ（SP はボトムシート）。ESC・背景・× で閉じる。破壊的操作は警告色＋キャンセルを左。1タップで戻せる操作（フォロー・お気に入り）は確認を出さない。</p>
+    <p class="sm muted">PC は中央ダイアログ（SP はボトムシート）。ESC・背景・× で閉じる。破壊的操作は警告色＋キャンセルを左。1タップで戻せる操作（フォロー・保存）は確認を出さない。</p>
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px" id="modalList"></div>
   </div>
   <div data-part="ftr"></div>
 </section>
 
 <!-- =================================================================== Modals -->
-<template id="m-login" data-t="ログインが必要です" data-from="お気に入り・フォロー・申込（未ログイン）">
-  <p class="sm muted">お気に入り・フォロー・申込にはログインしてください</p>
+<template id="m-login" data-t="ログインが必要です" data-from="保存・フォロー・申込（未ログイン）">
+  <p class="sm muted">保存・フォロー・申込にはログインしてください</p>
   <a class="row box" style="justify-content:center;padding:16px;gap:12px" data-go="login"><b style="color:var(--blue)">G</b><b>Google で続ける</b></a>
   <a class="b muted" style="text-align:center" data-close>あとで</a>
 </template>
 <template id="m-cancel" data-t="申込をキャンセルしますか？" data-from="マイページ">
   <b>春の新歓ミーティング<br>懇親会枠（¥1,500・支払済）</b>
   <div class="redb"><b style="color:var(--danger)">有料枠の返金は行いません</b></div>
-  <p class="cap">空いた席には補欠の方が繰り上がります</p>
+  <p class="cap">QR チケットは使えなくなります</p>
   <div class="row gap16"><a class="btn out na grow" data-close>戻る</a><a class="btn danger na grow" data-close data-toast="キャンセルしました">キャンセルする</a></div>
 </template>
-<template id="m-share" data-t="シェア" data-from="イベント詳細・主催者ページ・記事">
-  <div class="row"><div class="field grow"><div class="in ph-t">https://…/events/abc123</div></div><a class="btn blk m na" data-close data-toast="URL をコピーしました">コピー</a></div>
-  <div class="row gap8"><span class="btn out m na">X</span><span class="btn out m na">LINE</span><span class="btn out m na">その他…</span></div>
-</template>
+
 <template id="m-calendar" data-t="カレンダーに追加" data-from="イベント詳細・申込完了">
   <span class="radio on">Google カレンダー</span><span class="radio">Apple カレンダー / .ics ダウンロード</span><span class="radio">Outlook</span>
   <a class="btn pri full" data-close data-toast="カレンダーに追加しました">追加する</a>
 </template>
 <template id="m-stop" data-t="イベントを中止しますか？" data-from="ダッシュボード">
   <b>春の新歓ミーティング<br>申込 47 人（うち支払済 15 人）</b>
-  <div class="redb col gap8 sm"><span>・全参加者と補欠に中止メールが届きます</span><span>・以後の申込は停止します</span><span>・支払済みの返金は運営への個別依頼になります</span><span style="color:var(--danger)">・この操作は取り消せません</span></div>
+  <div class="redb col gap8 sm"><span>・参加予定の全員に中止のお知らせ（メール）が届きます</span><span>・以後の申込は停止します</span><span>・支払済みの返金は運営への個別依頼になります</span><span style="color:var(--danger)">・この操作は取り消せません</span></div>
   <div class="field"><span class="lb">参加者への説明<em>必須</em></span><div class="in">会場の都合により…</div></div>
   <div class="row gap16"><a class="btn out na grow" data-close>戻る</a><a class="btn danger na grow" data-go="event-states" data-toast="中止しました">中止する</a></div>
 </template>
 <template id="m-report" data-t="通報" data-from="イベント詳細・主催者ページ">
-  <p class="sm muted">理由を選んでください</p>
-  <span class="radio on">詐欺・架空のイベント</span><span class="radio">不適切な内容</span><span class="radio">個人情報の不正な収集</span><span class="radio">その他</span>
-  <div class="field"><span class="lb">詳細（任意）</span><div class="in ta"></div></div>
+  <b>理由 <span class="cap or">必須</span></b>
+  <span class="radio">詐欺・架空のイベント</span><span class="radio">不適切な内容</span><span class="radio">個人情報の不正な収集</span><span class="radio">その他</span>
+  <div class="field"><span class="lb">詳細（「その他」のときは必須）</span><div class="in ta"></div></div>
   <a class="btn pri full" data-close data-toast="通報を受け付けました">送信する</a>
+  <p class="cap">理由を選ぶまで送信できません。送信すると NMJ 運営にメールが届き、運営の通報一覧に載ります。項目は検討中。</p>
 </template>
 <template id="m-answers" data-t="申込内容" data-from="マイページ">
   <p class="sm muted">春の新歓ミーティング · 懇親会枠</p>
-  <div class="field"><span class="lb">本名</span><div class="in">山田 太郎</div></div>
+  <div class="field"><span class="lb">氏名</span><div class="in">山田 太郎</div></div>
   <div class="field"><span class="lb">アレルギー・食事制限</span><div class="in">なし</div></div>
   <p class="cap">主催者の運営メンバーだけが見られます。2026-05-08 に自動削除されます。</p>
   <a class="btn pri full" data-close data-toast="訂正しました">訂正を保存</a><span class="btn out full na dis">回答を削除（終了後のみ）</span>
 </template>
 <template id="m-invite" data-t="メンバーを招待" data-from="団体の設定">
   <p class="sm muted">招待リンクを LINE などで共有します。受け取った人は Google ログイン後に参加できます。</p>
-  <b>権限</b><span class="radio on">ADMIN（イベントの作成・編集・参加者の閲覧）</span>
+  <b>権限</b><span class="radio on">OWNER（イベントの作成・編集・参加者の閲覧・メンバー招待）</span>
   <div class="field"><span class="lb">有効期限</span><div class="in">7日 ▾</div></div>
   <a class="btn pri full" data-close data-toast="招待リンクをコピーしました">招待リンクを発行</a>
-  <p class="cap">OWNER への昇格はメンバー一覧から</p>
+  <p class="cap">OWNER は複数人にできます</p>
 </template>
 <template id="m-csv" data-t="CSV を出力" data-from="参加者リスト・ダッシュボード">
   <div class="note sm">本名・連絡先などの個人情報を含みます。利用目的（懇親会の食事手配と名札の作成）以外に使わず、不要になったら削除してください。</div>
   <p class="cap">出力した人と日時は記録されます</p>
-  <span class="check on">申込時の回答を含める</span><span class="check">補欠・キャンセルを含める</span>
+  <span class="check on">申込時の回答を含める</span><span class="check">キャンセルを含める</span>
   <div class="row gap16"><a class="btn out na grow" data-close>戻る</a><a class="btn pri grow" data-close data-toast="CSV を出力しました">出力する</a></div>
 </template>
 <template id="m-filter" data-t="絞り込み" data-from="Events（主に SP）">
-  <div class="field"><span class="lb">大学</span><div class="in">慶應義塾大学 ▾</div></div>
-  <span class="check on">「大学を問わない」も含める</span>
+  <b>ジャンル</b><div class="row gap8" style="flex-wrap:wrap"><span class="chip on">音楽</span><span class="chip">スポーツ</span><span class="chip">勉強会</span><span class="chip">ボランティア</span></div>
+  <div class="field"><span class="lb">地域</span><div class="in">東京都 ▾</div></div>
+  <span class="check">オンラインを含める</span>
+  <b>参加枠</b><div class="row gap8"><span class="chip on">学生</span><span class="chip">大人</span><span class="chip">懇親会あり</span></div>
   <b>開催日</b><div class="row gap8"><span class="chip">すべて</span><span class="chip">今週</span><span class="chip on">今月</span><span class="chip">日付を指定</span></div>
-  <span class="check">無料枠ありのみ</span>
   <a class="btn blk full" data-close>48 件を表示</a>
 </template>
 <template id="m-publish" data-t="イベントを公開しますか？" data-from="イベント作成・下書き">
@@ -1023,7 +1054,7 @@ const ICON = {
   time:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#111"/><path d="M12 6v6l4 3" stroke="#fff" stroke-width="2.2" fill="none" stroke-linecap="round"/></svg>',
   price:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#111"/><path d="M8 6.5l4 5 4-5M12 11.5V18M8.5 12.5h7M8.5 15h7" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round"/></svg>'
 };
-const BADGE = {open:["open","受付中"],few:["few","残りわずか"],full:["full","満員・補欠受付中"],before:["before","受付前"]};
+const BADGE = {open:["open","受付中"],few:["few","残りわずか"],full:["full","満員"],before:["before","受付前"]};
 const P = {
   hdr:d=>`<header class="hdr"><a class="brand" data-go="home"><img src="${LOGO}" alt=""><div><div class="wm">NEXT MOVE JAPAN</div><small>学生イベント・プラットフォーム</small></div></a><span class="grow"></span>
     <nav class="gnav">${["home","media","events"].map(k=>`<a data-go="${k}" class="${d.active===k?"on":""}">${k.toUpperCase()}</a>`).join("")}</nav>
@@ -1035,12 +1066,12 @@ const P = {
   ftr:()=>`<footer class="ftr"><div class="row"><a class="fb" data-go="home"><img src="${LOGO}" alt=""><span>NEXT MOVE<br>JAPAN</span></a>
     <div class="links"><a data-go="home">HOME<small>ホーム</small></a><a data-go="media">MEDIA<small>読みもの</small></a><a data-go="events">EVENTS<small>イベントを探す</small></a><a data-go="group-new">FOR ORGANIZERS<small>団体をつくる</small></a></div></div><hr>
     <div class="bt"><span>利用規約</span><span>プライバシーポリシー</span><span>特定商取引法に基づく表記</span><span>お問い合わせ</span><span class="cp">© 2026 NEXT MOVE JAPAN — THE FUTURE STARTS WITH YOUTH</span></div></footer>`,
-  ecard:d=>{const b=BADGE[d.s||"open"]; return `<a class="ecard" data-go="event"><div class="ph"></div><div class="dr"><span class="d">${d.d}</span><span class="w">${d.w}</span><span class="bdg ${b[0]}">${b[1]}</span></div><div class="t">${d.t}</div><div class="cap">${d.h||"@keio-lightmusic · 慶應軽音サークル"}</div><div class="row gap8"><span class="tag">慶應義塾大学</span><span class="tag">対面</span></div></a>`;},
+  ecard:d=>{const b=BADGE[d.s||"open"]; return `<a class="ecard" data-go="event"><div class="ph"></div><div class="dr"><span class="d">${d.d}</span><span class="w">${d.w}</span><span class="bdg ${b[0]}">${b[1]}</span></div><div class="t">${d.t}</div><div class="cap">${d.h||"@keio-lightmusic · 慶應軽音サークル"}</div><div class="row gap8"><span class="tag">音楽</span><span class="tag">東京</span></div></a>`;},
   erow:d=>{const b=BADGE[d.s||"open"]; return `<a class="erow ${d.c?"compact":""}" data-go="event"><div class="dc"><div class="y">2026</div><div class="date">${d.d||"4/8"}</div><div class="w">${d.w||"WED"}</div></div><div class="ph"></div>
-    <div class="info"><div class="row gap8"><span class="tag">${d.u||"慶應義塾大学"}</span><span class="bdg ${b[0]}">${b[1]}</span></div><div class="t">${d.t||"春の新歓ミーティング"}</div><div class="sm muted">${d.host||"慶應軽音サークル（@keio-lightmusic）"}</div>
+    <div class="info"><div class="row gap8"><span class="tag">${d.u||"音楽 · 東京"}</span><span class="bdg ${b[0]}">${b[1]}</span></div><div class="t">${d.t||"春の新歓ミーティング"}</div><div class="sm muted">${d.host||"慶應軽音サークル（@keio-lightmusic）"}</div>
     <div class="meta"><span>${ICON.place}${d.place||"三田キャンパス 西校舎 512教室"}</span><span>${ICON.time}${d.time||"18:00〜20:00"}</span><span>${ICON.price}${d.price||"無料 〜 1,500円 ／ 残り 12 席"}</span></div></div></a>`;},
   ocard:d=>`<div class="ocard" ${d.w?`style="width:${d.w}px"`:""}><a class="ic" data-go="org"></a><a class="grow col" data-go="org"><b>${d.n||"慶應軽音サークル"}</b><span class="cap">${d.m||"@keio-lightmusic · フォロワー 234"}</span></a><a class="btn blk m na" ${d.modalFollow?`data-modal="${d.modalFollow}"`:`data-toast="フォローしました"`}>＋ フォロー</a></div>`,
-  slot:d=>{const k=d.k||""; const cta=d.cta||"この枠に申し込む"; const out=k==="full"||k==="joined"; return `<div class="slot ${k}" ${k==="joined"?'style="background:var(--g100)"':""}><div class="top"><b>${d.n}</b><span class="pr">${d.p}</span></div><span class="rm">${d.r}</span><a class="btn ${out?"out":"pri"} full" data-go="${d.go2||"apply1"}">${cta}</a></div>`;},
+  slot:d=>{const k=d.k||""; const cta=d.cta||"この枠に申し込む"; const btn=k==="full"?`<span class="btn out full dis na">${d.cta||"満員のため申し込めません"}</span>`:`<a class="btn ${k==="joined"?"out":"pri"} full" data-go="${d.go2||"apply1"}">${cta}</a>`; return `<div class="slot ${k}" ${k==="joined"?'style="background:var(--g100)"':""}><div class="top"><b>${d.kind?`<span class="tag gray">${d.kind}</span> `:""}${d.n}</b><span class="pr">${d.p}</span></div><span class="rm">${d.r}</span>${btn}</div>`;},
   field:d=>`<div class="field" ${d.grow?'style="flex:1"':""}><span class="lb">${d.l}${d.req?"<em>必須</em>":""}</span><div class="in ${d.ph?"ph-t":""} ${d.ta?"ta":""}" style="white-space:pre-line">${d.v}</div>${d.h?`<span class="hp">${d.h}</span>`:""}</div>`,
   stitle:d=>`<div class="stitle"><span class="ghost">${d.g}</span><div class="tx"><span class="t">${d.t}</span><span class="sm">${d.l}</span></div></div>`,
   stepper:d=>`<div class="stepper">${["枠を選ぶ","質問に答える","確認"].map((l,i)=>`<span class="${i==+d.cur?"on":(i<+d.cur?"done":"")}"><b>${i<+d.cur?"✓":"0"+(i+1)}</b>${l}</span>`).join("")}</div>`,
@@ -1057,11 +1088,12 @@ expand(document);
 document.getElementById("mediaGrid").innerHTML=[["新歓ガイド","新歓で失敗しない、サークルの選び方 5つの視点","8"],["インタビュー","代替わりしても続く団体をつくる：軽音サークル代表に聞く","6"],["ノウハウ","はじめての一本：個人でイベントを立てるときのチェックリスト","5"],["学園祭","模擬店の会計を“立て替えゼロ”で回すには","4"],["新歓ガイド","オンライン新歓で雰囲気を伝える3つの工夫","3"],["インタビュー","写真部の部長に聞く、はじめての撮影散歩","5"]]
   .map(([c,t,m])=>`<a class="col gap8" data-go="article"><div class="ph" style="height:195px"></div><div class="row gap8"><span class="tag gray">${c}</span><span class="en muted b">${m} MIN READ</span></div><b class="h3">${t}</b></a>`).join("");
 // following
-document.getElementById("followGrid").innerHTML=[["慶應軽音サークル","@keio-lightmusic · フォロワー 234","春の新歓ミーティング · 4/8(水)","org"],["早稲田テニス同好会","@waseda-tennis · フォロワー 410","テニス新歓 体験会 · 4/12(日)","org"],["写真部","@photo-club · フォロワー 96",null,"org"],["やまもと（個人）","@yamamoto · フォロワー 41","読書会 #13 · 5/13(水)","user"]]
+document.getElementById("followGrid").innerHTML=[["慶應軽音サークル","@keio-lightmusic · フォロワー 234","春の新歓ミーティング · 4/8(水)","org"],["早稲田テニス同好会","@waseda-tennis · フォロワー 410","テニス新歓 体験会 · 4/12(日)","org"],["写真部","@photo-club · フォロワー 96",null,"org"]]
   .map(([n,m,next,go])=>`<div><div class="ocard" style="width:100%"><a class="ic" data-go="${go}"></a><a class="grow col" data-go="${go}"><b>${n}</b><span class="cap">${m}</span></a><a class="btn blk m na" data-toast="フォローを解除しました（元に戻す）">フォロー中</a></div><div class="row" style="background:var(--g100);padding:12px 16px"><span class="lbl-en">NEXT</span>${next?`<a class="b sm" data-go="event">${next}</a>`:`<span class="sm muted">予定されているイベントはありません</span>`}</div></div>`).join("");
 // attendees
-(function(){ const t=document.getElementById("attTable"); const rows=[["みお","佐藤 美緒","懇親会","paid","支払済","慶應 文 1年","なし",0],["たける","鈴木 健","一般","free","無料","慶應 理工 1年","—",1],["さき","田中 咲","懇親会","wait","支払い待ち","慶應 法 2年","えび",0],["けんた","伊藤 健太","一般","free","無料","慶應 経済 1年","—",1],["ゆい","高橋 結衣","LT","free","無料","慶應 商 3年","—",0]];
-  t.insertAdjacentHTML("beforeend",rows.map(([a,b,c,pk,pl,u,al,done])=>`<tr class="${done?"done":""}"><td class="ck">${done?'<span class="en b" style="color:var(--blue)">✓ 18:04</span>':'<a class="btn blk m na" data-checkin>受付</a>'}</td><td class="b">${a}</td><td>${b}</td><td>${c}</td><td><span class="pay ${pk}">${pl}</span></td><td>${u}</td><td>${al}</td></tr>`).join("")); })();
+(function(){ const t=document.getElementById("attTable"); const rows=[["みお","佐藤 美緒","学生＋懇親会","paid","支払済","慶應 文 1年","なし","none"],["たける","鈴木 健","学生","free","無料","慶應 理工 1年","—","in"],["さき","田中 咲","大人","paid","支払済","社会人","えび","none"],["けんた","伊藤 健太","学生","free","無料","慶應 経済 1年","—","in"],["ゆい","高橋 結衣","大人","paid","支払済","社会人","—","absent"]];
+  const ST=[["none","未受付"],["in","受付済"],["absent","欠席"]];
+  t.insertAdjacentHTML("beforeend",rows.map(([a,b,c,pk,pl,u,al,st])=>`<tr class="${st==="in"?"done":""}"><td class="ck"><div class="seg" data-ci>${ST.map(([k,l])=>`<a class="${k===st?"on":""}" data-st="${k}">${l}</a>`).join("")}</div></td><td class="b">${a}</td><td>${b}</td><td>${c}</td><td><span class="pay ${pk}">${pl}</span></td><td>${u}</td><td>${al}</td></tr>`).join("")); })();
 // modal list
 document.getElementById("modalList").innerHTML=A("template[id^='m-']").map(t=>`<a class="box col gap8" style="padding:20px" data-modal="${t.id}"><span class="lbl-en">${t.id.toUpperCase()}</span><b class="h3">${t.dataset.t}</b><span class="cap">呼び出し元：${t.dataset.from}</span><span class="sm b or">開く ↗</span></a>`).join("");
 
@@ -1084,7 +1116,7 @@ function closeModal(){ ov.classList.remove("on"); }
 ov.addEventListener("click",e=>{ if(e.target===ov) closeModal(); });
 let tt; function toast(m){ const el=document.getElementById("toast"); el.textContent=m; el.classList.add("on"); clearTimeout(tt); tt=setTimeout(()=>el.classList.remove("on"),1800); }
 document.addEventListener("click",e=>{
-  const ck=e.target.closest("[data-checkin]"); if(ck){ const tr=ck.closest("tr"); tr.classList.add("done"); ck.parentElement.innerHTML='<span class="en b" style="color:var(--blue)">✓ 18:'+String(10+Math.floor(Math.random()*40)).padStart(2,"0")+'</span>'; const c=document.getElementById("ciCount"); c.textContent=+c.textContent+1; toast("受付済みにしました"); return; }
+  const st=e.target.closest("[data-ci] [data-st]"); if(st){ const seg=st.parentElement, tr=st.closest("tr"), was=seg.querySelector(".on")?.dataset.st, now=st.dataset.st; if(was===now) return; A("a",seg).forEach(a=>a.classList.toggle("on",a===st)); tr.classList.toggle("done",now==="in"); const c=document.getElementById("ciCount"); c.textContent=+c.textContent+(now==="in")-(was==="in"); toast(st.textContent+"にしました"); return; }
   const el=e.target.closest("[data-go],[data-modal],[data-close],[data-toast]"); if(!el) return; e.preventDefault();
   if(el.dataset.toast) toast(el.dataset.toast);
   if(el.dataset.modal){ openModal(el.dataset.modal); return; }
