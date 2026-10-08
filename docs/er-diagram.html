@@ -391,7 +391,7 @@ erDiagram
   }
   </pre></div>
   <div class="notes">
-    <div><h4>ルール</h4><ul><li>providerRef は一意（Webhook が二重に届いても状態を二重に進めない）</li><li>PENDING かつ holdExpiresAt 前の Payment は定員に数える。期限切れは Cron で EXPIRED にして answersDraft を消す</li><li>支払い済みの Payment があるイベントは移管できない</li><li>返金は MVP では持たない（運営が決済事業者の管理画面で対応）</li></ul></div>
+    <div><h4>ルール</h4><ul><li>providerRef は一意（Webhook が二重に届いても状態を二重に進めない）</li><li>Registration と Ticket は同じ userId・eventId であることをアプリで検証する</li><li>PENDING の Payment は定員に数える。同じ人・同じイベントで PENDING は1件だけ（部分一意インデックス）</li><li>期限切れの解放は、先に決済事業者側のセッションを失効させてから行う。失効できなければ支払い済みとして確定。解放後に支払い通知が届いて定員を超える場合は自動返金して知らせる</li><li>answersDraft は失敗時は再試行へ引き継ぎ、EXPIRED で消す</li><li>支払い済みの Payment があるイベントは移管できない</li><li>返金は MVP では持たない（運営が決済事業者の管理画面で対応）</li></ul></div>
     <div><h4>画面との対応</h4><ul><li>モック決済・確認中・参加予定（決済完了）・失敗</li><li>参加者リストの支払い状況</li></ul></div>
   </div>
 </section>
@@ -527,6 +527,7 @@ erDiagram
     <tr><th>対象</th><th>内容</th><th>理由</th></tr>
     <tr><td>Slot・Event（排他）</td><td>申込処理で <code>SELECT … FOR UPDATE</code> してから、参加予定と決済中の確保（Payment PENDING）を数える</td><td>新歓期の同時申込で枠の定員・全体の上限を超えない（§7）</td></tr>
     <tr><td>Registration</td><td>部分一意インデックス <code>(slotId, userId) WHERE status = 'CONFIRMED'</code></td><td>同じ枠は1人1件。キャンセル後の再申込は許可</td></tr>
+    <tr><td>Payment</td><td>部分一意インデックス <code>(userId, eventId) WHERE status = 'PENDING'</code></td><td>2タブからの二重決済を防ぐ</td></tr>
     <tr><td>Ticket</td><td><code>(eventId, userId)</code> 一意、<code>token</code> 一意</td><td>1人1イベント1枚。QR の値は推測できないものにする</td></tr>
     <tr><td>RegistrationQuestion</td><td>部分一意インデックス <code>(eventId, commonKey) WHERE commonKey IS NOT NULL</code></td><td>共通の質問はイベントごとに1つずつ</td></tr>
     <tr><td>Organizer</td><td>CHECK <code>(type = 'USER') = (userId IS NOT NULL)</code>、slug 一意、予約語はアプリで拒否</td><td>個人と団体の差を型で守る</td></tr>

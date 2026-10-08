@@ -382,6 +382,7 @@ model Slot {
 }
 
 // 申込（枠ごと）。行があるのは参加予定かキャンセルだけ
+// ticketId の Ticket は同じ userId・eventId のものに限る（アプリで検証）
 // 定員判定は Slot 行（と全体上限があれば Event 行）を SELECT ... FOR UPDATE してから、CONFIRMED と確保中の Payment を数える（registerToSlot に集約）
 model Registration {
   id          String             @id @default(cuid())
@@ -496,12 +497,15 @@ model AnswerExportLog {
 // ---------- 決済 ----------
 // 決済画面に進んだ時点で作る。PENDING の間（holdExpiresAt まで）は選んだ枠の席を確保し、
 // PAID の Webhook で Registration（CONFIRMED）と Ticket を作る。FAILED / EXPIRED なら何も作らず席を解放する
+// 期限切れの解放は、先に決済事業者側のセッションを失効させてから行う（Stripe なら checkout.sessions.expire）。
+//   失効できなかった＝支払い済みなら PAID として確定する。解放後に支払い済みの通知が届き定員を超える場合は自動返金して本人に知らせる
+// 同じ人・同じイベントで PENDING は1件だけ（末尾 SQL の部分一意インデックス）。決済をやり直すときは前の Payment を失効させてから作る
 model Payment {
   id            String          @id @default(cuid())
   userId        String
   eventId       String
   slotIds       String[] // 申し込む枠（無料枠も含めて一緒に確定する）
-  answersDraft  Json? // 確定までの回答。確定時に RegistrationAnswer へ移し、失敗・期限切れで消す
+  answersDraft  Json? // 確定までの回答。確定時に RegistrationAnswer へ移す。失敗時は再試行の Payment へ引き継ぎ、EXPIRED になったら消す
   provider      PaymentProvider
   providerRef   String          @unique // Webhook の冪等性
   amountYen     Int
@@ -732,6 +736,10 @@ model VerificationToken {
 // -- 同一枠に有効な申込は1人1件（キャンセル後の再申込は許可）
 // CREATE UNIQUE INDEX registration_active_unique ON "Registration" ("slotId", "userId")
 //   WHERE status = 'CONFIRMED';
+//
+// -- 決済中の確保は同じ人・同じイベントで1件だけ（2タブからの二重決済を防ぐ）
+// CREATE UNIQUE INDEX payment_pending_unique ON "Payment" ("userId", "eventId")
+//   WHERE status = 'PENDING';
 //
 // -- イベント全体の上限は 1 以上
 // ALTER TABLE "Event" ADD CONSTRAINT event_capacity_check CHECK (capacity IS NULL OR capacity >= 1);

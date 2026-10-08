@@ -988,7 +988,7 @@ table.tbl tr.done td{background:var(--g100)}
 <template id="m-cancel" data-t="申込をキャンセルしますか？" data-from="マイページ">
   <b>春の新歓ミーティング<br>懇親会枠（¥1,500・支払済）</b>
   <div class="redb"><b style="color:var(--danger)">有料枠の返金は行いません</b></div>
-  <p class="cap">QR チケットは使えなくなります</p>
+  <p class="cap">枠ごとにキャンセルできます。すべての枠をキャンセルすると QR チケットは使えなくなります</p>
   <div class="row gap16"><a class="btn out na grow" data-close>戻る</a><a class="btn danger na grow" data-close data-toast="キャンセルしました">キャンセルする</a></div>
 </template>
 
@@ -1006,7 +1006,7 @@ table.tbl tr.done td{background:var(--g100)}
   <b>理由 <span class="cap or">必須</span></b>
   <span class="radio">詐欺・架空のイベント</span><span class="radio">不適切な内容</span><span class="radio">個人情報の不正な収集</span><span class="radio">その他</span>
   <div class="field"><span class="lb">詳細（「その他」のときは必須）</span><div class="in ta"></div></div>
-  <a class="btn pri full" data-close data-toast="通報を受け付けました">送信する</a>
+  <a class="btn pri full" data-need-reason>送信する</a>
   <p class="cap">理由を選ぶまで送信できません。送信すると NMJ 運営にメールが届き、運営の通報一覧に載ります。項目は検討中。</p>
 </template>
 <template id="m-answers" data-t="申込内容" data-from="マイページ">
@@ -1117,6 +1117,8 @@ ov.addEventListener("click",e=>{ if(e.target===ov) closeModal(); });
 let tt; function toast(m){ const el=document.getElementById("toast"); el.textContent=m; el.classList.add("on"); clearTimeout(tt); tt=setTimeout(()=>el.classList.remove("on"),1800); }
 document.addEventListener("click",e=>{
   const st=e.target.closest("[data-ci] [data-st]"); if(st){ const seg=st.parentElement, tr=st.closest("tr"), was=seg.querySelector(".on")?.dataset.st, now=st.dataset.st; if(was===now) return; A("a",seg).forEach(a=>a.classList.toggle("on",a===st)); tr.classList.toggle("done",now==="in"); const c=document.getElementById("ciCount"); c.textContent=+c.textContent+(now==="in")-(was==="in"); toast(st.textContent+"にしました"); return; }
+  const rd=e.target.closest("#dialog .radio"); if(rd){ A(".radio",rd.parentElement).forEach(r=>r.classList.toggle("on",r===rd)); return; }
+  const nr=e.target.closest("[data-need-reason]"); if(nr){ e.preventDefault(); if(!document.querySelector("#dialog .radio.on")){ toast("理由を選んでください"); return; } closeModal(); toast("通報を受け付けました"); return; }
   const el=e.target.closest("[data-go],[data-modal],[data-close],[data-toast]"); if(!el) return; e.preventDefault();
   if(el.dataset.toast) toast(el.dataset.toast);
   if(el.dataset.modal){ openModal(el.dataset.modal); return; }

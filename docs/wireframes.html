@@ -1223,7 +1223,7 @@ body.full .scr.ov{position:fixed}
   </template>
   <div class="spec">
     <div><h4>公開時のチェック</h4><ul><li>必須：主催者・ジャンル・地域・タイトル・日時・会場・枠1つ以上（枠ごとに種類と定員）</li><li>個人情報の質問があれば利用目的が必須</li><li>公開でフォロワーにメール通知（確認モーダルで件数を表示）</li></ul></div>
-    <div><h4>公開後の編集制限</h4><ul><li>質問：削除・形式変更は不可。追加・並べ替え・文言修正は可</li><li>枠・全体の上限：参加予定の人数より少なくできない</li><li>保持期間は短くする方向のみ（要確認）</li></ul></div>
+    <div><h4>公開後の編集制限</h4><ul><li>質問：削除・形式変更は不可。追加・並べ替え・文言修正は可</li><li>枠・全体の上限：参加予定の人数＋決済中で確保している席の数より少なくできない</li><li>保持期間は短くする方向のみ（要確認）</li></ul></div>
   </div>
 </section>
 
@@ -1422,14 +1422,14 @@ body.full .scr.ov{position:fixed}
   <div class="lbl req">理由</div>
   <div class="stack" style="margin-top:4px"><div class="radio">詐欺・架空のイベント</div><div class="radio">不適切な内容</div><div class="radio">個人情報の不正な収集</div><div class="radio">その他</div></div>
   <div class="lbl">詳細（「その他」のときは必須）</div><div class="in ta"></div>
-  <div style="margin-top:12px"><span class="btn pri block" data-close="1" data-toast="通報を受け付けました">送信</span></div>
+  <div style="margin-top:12px"><span class="btn pri block dis">送信（理由を選ぶと押せる）</span></div>
   <div class="muted" style="margin-top:6px">理由を選ぶまで送信できない。送信すると NMJ 運営にメールが届き、運営の通報一覧に載る。項目は検討中</div>
 </template>
 <template id="m-cancel" data-label="申込キャンセル確認">
   <div class="row between"><div class="h2">申込をキャンセルしますか？</div><span data-close="1">×</span></div>
   <div style="margin-top:8px">春の新歓ミーティング<br><span class="muted">懇親会枠（1,500円・支払済）</span></div>
   <div class="redbox" style="margin-top:10px">有料枠の返金は行いません</div>
-  <div class="muted" style="margin-top:6px">ⓘ QR チケットは使えなくなります</div>
+  <div class="muted" style="margin-top:6px">ⓘ 枠ごとにキャンセルできます。すべての枠をキャンセルすると QR チケットは使えなくなります</div>
   <div class="row nw" style="margin-top:14px"><span class="btn grow" data-close="1">戻る</span><span class="btn danger grow" data-close="1" data-toast="キャンセルしました">キャンセルする</span></div>
 </template>
 <template id="m-answers" data-label="申込内容の確認・訂正">
