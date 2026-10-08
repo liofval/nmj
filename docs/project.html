@@ -32,13 +32,14 @@ main .on{display:block}
 <main id="main"></main>
 <script>
 // 資料を更新したら V を変える（タブ内の iframe がブラウザのキャッシュで古いまま表示されるのを防ぐ）
-const V='20261008b';
+const V='20261015a';
 const withV=src=>src+(src.includes('?')?'&':'?')+'v='+V;
 const TABS=[
   {id:'schedule-lp',label:'スケジュール（HP）',src:'./schedule.html?p=lp'},
   {id:'schedule-ticket',label:'スケジュール（メディア）',src:'./schedule.html?p=ticket'},
   {id:'todo',label:'TODO',src:'./todo.html'},
-  {id:'agenda',label:'定例アジェンダ 10/8',src:'./agenda-20261008.html'},
+  {id:'agenda',label:'定例アジェンダ 10/15',src:'./agenda-20261015.html'},
+  {id:'agenda-1008',label:'定例アジェンダ 10/8',src:'./agenda-20261008.html',hidden:true},
   {id:'hp-wireframe',label:'HP ワイヤー',src:'./hp-wireframe.html'},
   {id:'wireframe',label:'メディア ワイヤー',src:'./wireframes.html'},
   {id:'prototype',label:'デザイン（プロトタイプ）',src:'./prototype.html'},

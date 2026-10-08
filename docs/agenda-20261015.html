@@ -1,0 +1,315 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NEXT MOVE JAPAN 定例 10/15（木）アジェンダ・議事録</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700;900&family=Barlow+Condensed:wght@700;800&display=swap" rel="stylesheet">
+<style>
+:root{--black:#111;--g600:#7C7C7C;--g200:#E5E5E5;--g100:#F5F5F5;--orange:#FF6002;--orange-w:#FFF1E8}
+*{box-sizing:border-box}
+body{margin:0;font:14.5px/1.75 "Noto Sans JP",sans-serif;color:var(--black);background:#fff}
+header{background:var(--black);color:#fff;padding:32px 48px 26px}
+header .eyebrow{font:700 13px/1 "Barlow Condensed";letter-spacing:.12em;color:var(--orange)}
+header h1{font:900 26px/1.35 "Noto Sans JP";margin:8px 0 6px}
+header p{margin:0;color:#ccc;font-size:13.5px}
+.hd-top{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
+.mtg{display:flex;align-items:center;gap:8px;font-size:12px;color:#aaa}
+.mtg select{font:700 14px/1.4 "Noto Sans JP",sans-serif;color:#fff;background:#222;border:1.5px solid var(--orange);padding:8px 34px 8px 12px;border-radius:4px;max-width:100%;cursor:pointer;appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--orange) 50%),linear-gradient(135deg,var(--orange) 50%,transparent 50%);background-position:calc(100% - 16px) 55%,calc(100% - 11px) 55%;background-size:5px 5px;background-repeat:no-repeat}
+.mtg select option{color:#111;background:#fff}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:32px;max-width:1800px;padding:0 48px 48px}
+main{min-width:0;padding-top:8px}
+aside.memo-panel{position:sticky;top:16px;align-self:start;margin-top:24px;max-height:calc(100vh - 32px);overflow:auto;border:2px solid var(--black);background:#fff;padding:14px 16px}
+.memo-panel h2{font:900 16px/1.4 "Noto Sans JP";margin:0 0 4px;display:flex;justify-content:space-between;align-items:baseline}
+.memo-panel h2 small{font:400 11px/1 "Noto Sans JP";color:var(--g600)}
+.memo-panel label{display:block;font-size:12px;font-weight:700;margin:10px 0 3px}
+.memo-panel textarea{width:100%;min-height:64px;resize:vertical;font:13px/1.6 "Noto Sans JP",sans-serif;border:1px solid var(--g200);padding:6px 8px;background:var(--g100)}
+.memo-panel textarea:focus{outline:2px solid var(--orange);background:#fff}
+.memo-panel .btns{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.memo-panel button{font:700 12px/1 "Noto Sans JP";padding:9px 12px;border:1.5px solid var(--black);background:#fff;cursor:pointer}
+.memo-panel button.primary{background:var(--black);color:#fff}
+.memo-panel .note{font-size:11px;color:var(--g600);margin-top:8px;line-height:1.6}
+@media (max-width:1100px){.layout{grid-template-columns:1fr;padding:0 32px 40px}aside.memo-panel{position:static;max-height:none}}
+@media (max-width:720px){.layout{padding:0 16px 40px}header{padding:24px 16px 20px}}
+@media print{aside.memo-panel{display:none}}
+.memo-note{margin-top:10px;border-left:4px solid var(--orange);background:#fff7f0;padding:8px 14px;font-size:13.5px;white-space:pre-wrap;line-height:1.7}
+.memo-note b{display:block;color:var(--orange);font-size:12px;margin-bottom:2px}
+table{border-collapse:collapse;width:100%;font-size:14px;margin-top:16px}
+th,td{border:1px solid var(--g200);padding:6px 12px;text-align:left;vertical-align:top}
+th{background:var(--black);color:#fff;font-size:12px}
+.item{border-top:3px solid var(--black);margin-top:28px;padding-top:10px}
+.item h2{font:900 18px/1.4 "Noto Sans JP";margin:0;display:flex;gap:12px;align-items:baseline}
+.item h2 .time{font:700 15px/1 "Barlow Condensed";color:var(--orange);letter-spacing:.04em}
+.goal{margin:4px 0 8px;font-weight:700}
+.goal::before{content:"ゴール：";color:var(--orange)}
+ol,ul{margin:4px 0;padding-left:1.4em}
+li{margin:1px 0}
+.say{color:var(--g600);font-size:13px}
+.memo{margin-top:10px;background:var(--g100);padding:8px 14px;font-size:13.5px}
+.memo div{border-bottom:1px dashed #bbb;min-height:28px;padding-top:4px}
+.memo b{color:var(--orange)}
+a{color:var(--orange);font-weight:700}
+h3.sub{font-size:14.5px;margin:18px 0 4px;padding-left:8px;border-left:4px solid var(--orange)}
+table.steps{margin-top:6px;font-size:13px}
+ul.ops{margin:0;padding-left:1.1em}
+.check li{list-style:"☐ "}
+</style>
+</head>
+<body>
+<header>
+  <div class="hd-top"><div class="eyebrow">MEETING 10/15 THU</div>
+    <label class="mtg"><span>定例を選ぶ</span><select id="meetingSelect" aria-label="定例の日付を選ぶ"></select></label></div>
+  <h1>メディア・HP 定例（60分）アジェンダ・議事録</h1>
+  <p>今日のゴール：<b style="color:#fff">デザインの方向性を1案に決め、メディアの開発準備と HP の素材集めの状況をそろえる</b></p>
+</header>
+<div class="layout">
+<main>
+
+<table>
+  <tr><th style="width:96px">時間</th><th>議題</th><th style="width:70px">種類</th></tr>
+  <tr><td>0:00–0:05</td><td>1. 前回の決定と提出状況の確認</td><td>確認</td></tr>
+  <tr><td>0:05–0:25</td><td>2. デザイン提案（HP・メディア）</td><td><b>決める</b></td></tr>
+  <tr><td>0:25–0:35</td><td>3. メディアの更新版ワイヤーの確認</td><td><b>決める</b></td></tr>
+  <tr><td>0:35–0:45</td><td>4. メディアの開発準備（要件定義・Stripe・環境・DB）</td><td>共有</td></tr>
+  <tr><td>0:45–0:50</td><td>5. HP の進み具合（ワイヤー・素材・外部への確認）</td><td>確認</td></tr>
+  <tr><td>0:50–0:55</td><td>6. 未決事項の決め方</td><td><b>決める</b></td></tr>
+  <tr><td>0:55–1:00</td><td>7. ネクストアクション</td><td>確認</td></tr>
+</table>
+
+<section class="item">
+  <h2><span class="time">0:00–0:05</span>1. 前回の決定と提出状況の確認</h2>
+  <p class="goal">10/8 に決めたことと、10/15 までの提出物がそろっているかを確認する</p>
+  <p><b>10/8 の主な決定</b>（メディア）：絞り込みはジャンル・地域・参加枠／参加枠は学生・大人・懇親会／フォローは団体だけ／支払い待ち・補欠なし／お気に入り→保存／通報は理由必須／シェアはリンクコピー／共通の質問＋自由な質問／権限は admin・owner・user／お知らせはメールでも／受付は状態管理／申込後に QR チケット</p>
+  <table>
+    <tr><th style="width:90px">担当</th><th>提出物（提出日）</th><th style="width:90px">状況</th></tr>
+    <tr><td><b>パミ</b></td><td>メディアのデザイン方向性3案（10/9）→ 各案のデザイン提案（10/13）→ 提案資料（10/14）</td><td>☐ 済</td></tr>
+    <tr><td><b>繁田</b></td><td>HP のデザイン方向性（10/9）→ デザイン提案（10/13）→ 提案資料（10/14）</td><td>☐ 済</td></tr>
+    <tr><td><b>繁田</b></td><td>HP 素材の依頼（10/9）／外部に確認が必要なもののリストと依頼（10/9）</td><td>☐ 済</td></tr>
+    <tr><td><b>繁田</b></td><td>HP ワイヤー・メディアワイヤーの更新（10/14）</td><td>☐ 済</td></tr>
+    <tr><td><b>小野田</b></td><td>要件定義の確認（10/12）／Stripe の調査・環境構築・DB の fix（10/14）</td><td>☐ 済</td></tr>
+  </table>
+  <p class="say">遅れているものは、ここでは理由と新しい提出日だけ聞き、中身は各議題で扱う。</p>
+</section>
+
+<section class="item">
+  <h2><span class="time">0:05–0:25</span>2. デザイン提案（HP・メディア）</h2>
+  <p class="goal">HP・メディア共通のデザインの方向性を1案に決める</p>
+  <h3 class="sub">進め方</h3>
+  <ol>
+    <li>メディアの3案をパミが説明（1案2〜3分）：配色・書体・写真の使い方・参考サイト・主要画面のイメージ</li>
+    <li>HP の提案を繁田が説明（3分）：メディアとトーンをそろえる点、HP だけ変える点</li>
+    <li>全員で質問・意見（5分）</li>
+    <li>1案に決める。決まらなければ、2案に絞って「決める人」と「決める日」を決める</li>
+  </ol>
+  <h3 class="sub">判断の観点</h3>
+  <ul>
+    <li>学生にも大人にも違和感がないか（参加枠に大人が加わったため）</li>
+    <li>イベント写真・団体ロゴが入っても見やすいか</li>
+    <li>スマホで読みやすいか（文字の大きさ・コントラスト）</li>
+    <li>HP とメディアを行き来しても同じサービスに見えるか</li>
+  </ul>
+  <p class="say">決まった方向性で、メディアの主要画面（10/29 承認）と HP（11/5 承認）のデザインを進める。</p>
+  <div class="memo">
+    <div><b>決定：</b>採用する方向性 </div>
+    <div><b>決定：</b>修正したい点 </div>
+  </div>
+</section>
+
+<section class="item">
+  <h2><span class="time">0:25–0:35</span>3. メディアの更新版ワイヤーの確認</h2>
+  <p class="goal">10/8 の決定が反映されているか確認し、ワイヤーを fix する</p>
+  <p><b>進め方</b>：<a href="https://liofval.github.io/nmj/project.html#wireframe">ワイヤーフレーム v0.4</a> を画面共有。「0 構成・注記」の「10/8 定例で変えた点」の表を上から見て、主な画面だけ開く。</p>
+  <table class="steps">
+    <tr><th style="width:180px">見る画面</th><th>確認すること</th></tr>
+    <tr><td>2 Events 一覧</td><td>絞り込みがジャンル・地域・参加枠になっている</td></tr>
+    <tr><td>4 イベント詳細 / 4b 状態違い</td><td>枠に種類（学生・大人・懇親会）と全体の上限。満員は申し込めない（補欠なし）。保存・リンクのコピー</td></tr>
+    <tr><td>10 申込 〜 11 決済</td><td>共通の質問。支払い待ちがなく、決済完了で参加予定になる</td></tr>
+    <tr><td>12 マイページ / 12b QR チケット</td><td>お知らせ欄。QR チケットの表示</td></tr>
+    <tr><td>18 参加者リスト / 18b QR で受付</td><td>受付の状態（未受付・受付済・欠席）を戻せる。QR を読むと受付済</td></tr>
+    <tr><td>15 団体作成 / 16 団体設定</td><td>申請なし・似た名前の団体の案内。owner は複数人</td></tr>
+    <tr><td>22 通報の確認</td><td>NMJ 運営が通報を確認できる</td></tr>
+  </table>
+  <div class="memo">
+    <div><b>指摘：</b></div>
+    <div><b>指摘：</b></div>
+    <div><b>決定：</b>fix ／ 修正後に fix（修正期限：　　） </div>
+  </div>
+</section>
+
+<section class="item">
+  <h2><span class="time">0:35–0:45</span>4. メディアの開発準備</h2>
+  <p class="goal">開発を始められる状態かを全員で把握する（報告：小野田）</p>
+  <table>
+    <tr><th style="width:150px">項目</th><th>報告してほしいこと</th></tr>
+    <tr><td>要件定義の確認</td><td>ワイヤーと照らした抜け・矛盾。追加で決めることがあれば議題6へ</td></tr>
+    <tr><td>Stripe の調査</td><td>学生団体の代表者が登録できるか（年齢・本人確認）・手数料・審査で見られる項目・実装方法。申請（10/22 期限）に必要なもの</td></tr>
+    <tr><td>環境構築</td><td>リポジトリ・ローカル環境・動作確認用の環境の URL と手順</td></tr>
+    <tr><td>DB の fix</td><td><a href="https://liofval.github.io/nmj/project.html#er">ER 図 v0.2</a> から変えたところ</td></tr>
+  </table>
+  <p class="say">Stripe に登録できない団体がある場合は、有料イベントを出せる団体の条件をここで確認する。</p>
+  <div class="memo">
+    <div><b>決定：</b>Stripe の申請者と申請日 </div>
+    <div><b>メモ：</b></div>
+  </div>
+</section>
+
+<section class="item">
+  <h2><span class="time">0:45–0:50</span>5. HP の進み具合</h2>
+  <p class="goal">HP の素材締切（10/22）と外部への確認に抜けがないかを確認する（報告：繁田）</p>
+  <ul>
+    <li><a href="./hp-wireframe.html" target="_blank">HP ワイヤー</a>の更新点</li>
+    <li>素材の集まり具合（原稿・写真・活動実績の数字・メンバー紹介・SNS アカウント）と、10/22 に間に合わないもの</li>
+    <li>外部に確認が必要なもののリストと返事の状況（ドメイン・DNS の権限、お問い合わせの送信先、Stripe の申請情報など）</li>
+  </ul>
+  <div class="memo">
+    <div><b>決定：</b>間に合わない素材の扱い </div>
+  </div>
+</section>
+
+<section class="item">
+  <h2><span class="time">0:50–0:55</span>6. 未決事項の決め方</h2>
+  <p class="goal">ここでは中身を議論せず、「誰が・いつまでに決めるか」だけ決める</p>
+  <table>
+    <tr><th>未決事項</th><th style="width:110px">決める人</th><th style="width:110px">期限</th></tr>
+    <tr><td>団体を削除したとき・代表が抜けたときの扱い（イベント・フォロワー・申込、引き継ぎ）</td><td></td><td></td></tr>
+    <tr><td>個人情報をどこまで扱うか（共通の質問の中身・保持期間・CSV 出力）</td><td></td><td></td></tr>
+    <tr><td>通報の項目</td><td></td><td></td></tr>
+    <tr><td>QR チケットの Wallet（Apple / Google）追加</td><td></td><td></td></tr>
+    <tr><td>個人主催のイベントを残すか（フォローは団体だけになったため）</td><td></td><td></td></tr>
+    <tr><td>イベントの「対象の大学」を残すか</td><td></td><td></td></tr>
+    <tr><td>運営手数料率・利用規約などの文面（11/26 までに確定）</td><td></td><td></td></tr>
+  </table>
+</section>
+
+<section class="item">
+  <h2><span class="time">0:55–1:00</span>7. ネクストアクション</h2>
+  <p class="goal">次回 10/22（木）までに、誰が何をいつまでに出すかを確認する</p>
+  <p class="say">10/22 は HP 素材の締切と Stripe 申請の期限。10/29 にメディアの主要画面（ホーム・イベント一覧/詳細・申込）のデザインを承認する。</p>
+  <table>
+    <tr><th style="width:90px">担当</th><th>やること</th><th style="width:110px">提出日</th><th style="width:200px">提出物</th></tr>
+    <tr><td><b>パミ</b></td><td>決まった方向性でメディアの主要画面（ホーム・イベント一覧・詳細・申込）のデザインを作る</td><td>10/28（水）</td><td>デザイン（10/29 定例で承認）</td></tr>
+    <tr><td><b>繁田</b></td><td>決まった方向性で HP のデザインを作る</td><td>10/21（水）途中共有</td><td>デザイン（11/5 定例で承認）</td></tr>
+    <tr><td><b>繁田</b></td><td>HP の素材を回収し、足りないものを催促する</td><td>10/22（木）</td><td>素材一式</td></tr>
+    <tr><td><b>繁田</b></td><td>今日の指摘をメディアのワイヤーに反映（指摘があった場合）</td><td>10/21（水）</td><td>修正版ワイヤーの URL</td></tr>
+    <tr><td><b>小野田</b></td><td>Stripe の申請（今日決めた申請者と一緒に）</td><td>10/22（木）</td><td>申請完了の報告</td></tr>
+    <tr><td><b>小野田</b></td><td>画面に依存しない部分（DB・API・申込と決済の処理）の実装を始める</td><td>10/21（水）</td><td>進み具合の報告</td></tr>
+  </table>
+  <div class="memo">
+    <div><b>追加・変更：</b></div>
+    <div><b>追加・変更：</b></div>
+  </div>
+</section>
+
+<section class="item">
+  <h2>本日の決定事項</h2>
+  <ul class="check">
+    <li>デザインの方向性（1案）</li>
+    <li>メディアのワイヤーを fix するか</li>
+    <li>Stripe の申請者と申請日</li>
+    <li>未決事項ごとの決める人と期限</li>
+    <li>担当者ごとのネクストアクションと提出日</li>
+  </ul>
+</section>
+
+</main>
+<aside class="memo-panel" id="memoPanel">
+  <h2>メモ <small id="memoStatus">自動保存</small></h2>
+  <div id="memoFields"></div>
+  <div class="btns">
+    <button type="button" class="primary" id="memoEmbed">メモを埋め込む</button>
+    <button type="button" id="memoExport">メモ入りHTMLを保存</button>
+    <button type="button" id="memoClear">メモを消去</button>
+  </div>
+  <p class="note">入力はこのブラウザに自動保存されます。「メモを埋め込む」を押すと、各議題の下にメモが表示されます。他の人に渡すときは「メモ入りHTMLを保存」で出したファイルを共有してください（開くとメモが埋め込まれた状態で表示されます）。</p>
+</aside>
+</div>
+<script type="application/json" id="memoEmbedded">{}</script>
+<script>
+(function(){
+  var KEY='nmj-agenda-20261015-memo';
+  var fields=document.getElementById('memoFields'), status=document.getElementById('memoStatus');
+  var embEl=document.getElementById('memoEmbedded'), emb={};
+  try{emb=JSON.parse(embEl.textContent||'{}')||{}}catch(e){emb={}}
+  var key=KEY+(emb.savedAt?'@'+emb.savedAt:'');
+  var local={}; try{local=JSON.parse(localStorage.getItem(key)||'{}')||{}}catch(e){local={}}
+  var data=Object.assign({},emb.memo||{},local);
+  var items=[{id:'all',label:'全体',sec:document.querySelector('main > table')}];
+  document.querySelectorAll('section.item').forEach(function(sec,i){
+    var t=sec.querySelector('h2').cloneNode(true); var tm=t.querySelector('.time'); if(tm) tm.remove();
+    items.push({id:'s'+(i+1),label:t.textContent.trim(),sec:sec});
+  });
+  var tas={}, dirty={}, timer;
+  items.forEach(function(it){
+    var l=document.createElement('label'); l.textContent=it.label; l.htmlFor='memo-'+it.id;
+    var ta=document.createElement('textarea'); ta.id='memo-'+it.id; ta.value=data[it.id]||'';
+    ta.addEventListener('input',function(){dirty[it.id]=true; clearTimeout(timer); timer=setTimeout(flush,400);});
+    // 編集中に別タブで保存された内容は、未編集のままフォーカスを外したときに反映する
+    ta.addEventListener('blur',function(){ if(dirty[it.id]) return; var cur=readStored(); if(it.id in cur) ta.value=cur[it.id]; });
+    fields.appendChild(l); fields.appendChild(ta); tas[it.id]=ta;
+  });
+  function readStored(){try{return JSON.parse(localStorage.getItem(key)||'{}')||{}}catch(e){return {}}}
+  function collect(){var o={}; Object.keys(tas).forEach(function(k){if(tas[k].value)o[k]=tas[k].value}); return o;}
+  // 入力したメモを各議題の下に表示する（textContent で入れるので HTML は解釈しない）
+  function embed(memo){
+    document.querySelectorAll('.memo-note').forEach(function(n){n.remove()});
+    items.forEach(function(it){
+      var v=memo[it.id]; if(!v||!it.sec) return;
+      var n=document.createElement('div'); n.className='memo-note';
+      var b=document.createElement('b'); b.textContent='メモ';
+      n.appendChild(b); n.appendChild(document.createTextNode(v));
+      if(it.id==='all') it.sec.after(n); else it.sec.appendChild(n);
+    });
+  }
+  // 変更した欄だけを最新の保存内容に重ねて書く（別タブの保存を消さない）。空欄も "" として保存し、埋め込み値の復活を防ぐ
+  function flush(){
+    clearTimeout(timer);
+    var ids=Object.keys(dirty); if(!ids.length) return;
+    var cur=readStored(); ids.forEach(function(k){cur[k]=tas[k].value});
+    try{localStorage.setItem(key,JSON.stringify(cur)); dirty={}; status.textContent='保存しました '+new Date().toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'});}
+    catch(e){status.textContent='自動保存できません（HTMLで保存してください）';}
+  }
+  window.addEventListener('pagehide',flush);
+  document.addEventListener('visibilitychange',function(){if(document.visibilityState==='hidden')flush();});
+  // 別タブで保存された内容を、編集中でない欄に反映する
+  window.addEventListener('storage',function(e){
+    if(e.key!==key) return;
+    var cur=readStored();
+    Object.keys(tas).forEach(function(k){ if(!dirty[k] && document.activeElement!==tas[k] && k in cur) tas[k].value=cur[k]; });
+  });
+  // 埋め込んだ内容はこのブラウザに残し、再読み込み後も表示する
+  var EKEY=key+':embedded', shown=null;
+  try{shown=JSON.parse(localStorage.getItem(EKEY)||'null')}catch(e){shown=null}
+  embed(shown||emb.memo||{});
+  document.getElementById('memoEmbed').addEventListener('click',function(){
+    flush(); var memo=collect(); embed(memo);
+    var ok=!Object.keys(dirty).length;
+    try{localStorage.setItem(EKEY,JSON.stringify(memo))}catch(e){ok=false}
+    status.textContent=ok?'埋め込みました '+new Date().toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'}):'埋め込みを保存できません（HTMLで保存してください）';
+  });
+  document.getElementById('memoExport').addEventListener('click',function(){
+    var memo=collect();
+    embed(memo);
+    var doc=document.documentElement.cloneNode(true);
+    doc.querySelectorAll('#memoFields').forEach(function(f){f.innerHTML='';});
+    doc.querySelectorAll('.memo-note').forEach(function(n){n.remove();});
+    var e=doc.querySelector('#memoEmbedded');
+    e.textContent=JSON.stringify({savedAt:new Date().toISOString(),memo:memo}).replace(/</g,'\\u003c');
+    var html='<!doctype html>\n'+doc.outerHTML;
+    var a=document.createElement('a');
+    var d=new Date(), pad=function(n){return ('0'+n).slice(-2)};
+    a.download='NMJ定例_20261015_メモ入り_'+pad(d.getHours())+pad(d.getMinutes())+'.html';
+    a.href=URL.createObjectURL(new Blob([html],{type:'text/html'}));
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function(){URL.revokeObjectURL(a.href)},1000);
+  });
+  document.getElementById('memoClear').addEventListener('click',function(){
+    if(!confirm('このブラウザに保存したメモを消去します。よろしいですか？'))return;
+    Object.keys(tas).forEach(function(k){tas[k].value=''; dirty[k]=true});
+    flush(); embed({}); try{localStorage.setItem(EKEY,'{}')}catch(e){}
+    status.textContent='消去しました';
+  });
+})();
+</script>
+<script src="./meetings.js"></script>
+</body>
+</html>
