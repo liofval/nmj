@@ -498,7 +498,8 @@ model AnswerExportLog {
 // 決済画面に進んだ時点で作る。PENDING の間（holdExpiresAt まで）は選んだ枠の席を確保し、
 // PAID の Webhook で Registration（CONFIRMED）と Ticket を作る。FAILED / EXPIRED なら何も作らず席を解放する
 // 期限切れの解放は、先に決済事業者側のセッションを失効させてから行う（Stripe なら checkout.sessions.expire）。
-//   失効できなかった＝支払い済みなら PAID として確定する。解放後に支払い済みの通知が届き定員を超える場合は自動返金して本人に知らせる
+//   失効がエラーになったときは、セッションを取得して支払い状況を確認する。支払い済み（payment_status=paid）のときだけ PAID として確定し、
+//   既に失効済み・未払いなら EXPIRED にする。解放後に支払い済みの通知が届き定員を超える場合は自動返金して本人に知らせる
 // 同じ人・同じイベントで PENDING は1件だけ（末尾 SQL の部分一意インデックス）。決済をやり直すときは前の Payment を失効させてから作る
 model Payment {
   id            String          @id @default(cuid())

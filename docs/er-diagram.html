@@ -391,7 +391,7 @@ erDiagram
   }
   </pre></div>
   <div class="notes">
-    <div><h4>ルール</h4><ul><li>providerRef は一意（Webhook が二重に届いても状態を二重に進めない）</li><li>Registration と Ticket は同じ userId・eventId であることをアプリで検証する</li><li>PENDING の Payment は定員に数える。同じ人・同じイベントで PENDING は1件だけ（部分一意インデックス）</li><li>期限切れの解放は、先に決済事業者側のセッションを失効させてから行う。失効できなければ支払い済みとして確定。解放後に支払い通知が届いて定員を超える場合は自動返金して知らせる</li><li>answersDraft は失敗時は再試行へ引き継ぎ、EXPIRED で消す</li><li>支払い済みの Payment があるイベントは移管できない</li><li>返金は MVP では持たない（運営が決済事業者の管理画面で対応）</li></ul></div>
+    <div><h4>ルール</h4><ul><li>providerRef は一意（Webhook が二重に届いても状態を二重に進めない）</li><li>Registration と Ticket は同じ userId・eventId であることをアプリで検証する</li><li>PENDING の Payment は定員に数える。同じ人・同じイベントで PENDING は1件だけ（部分一意インデックス）</li><li>期限切れの解放は、先に決済事業者側のセッションを失効させてから行う。失効がエラーになったら支払い状況を確認し、支払い済みのときだけ確定（既に失効・未払いなら EXPIRED）。解放後に支払い通知が届いて定員を超える場合は自動返金して知らせる</li><li>answersDraft は失敗時は再試行へ引き継ぎ、EXPIRED で消す</li><li>支払い済みの Payment があるイベントは移管できない</li><li>返金は MVP では持たない（運営が決済事業者の管理画面で対応）</li></ul></div>
     <div><h4>画面との対応</h4><ul><li>モック決済・確認中・参加予定（決済完了）・失敗</li><li>参加者リストの支払い状況</li></ul></div>
   </div>
 </section>
