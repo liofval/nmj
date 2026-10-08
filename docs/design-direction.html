@@ -1,0 +1,299 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NEXT MOVE JAPAN デザインの方向性（訴求軸）v0.1</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700;900&family=Noto+Serif+JP:wght@700;900&family=Barlow+Condensed:wght@700;800&display=swap" rel="stylesheet">
+<style>
+:root{--black:#111;--g600:#7C7C7C;--g200:#E5E5E5;--g100:#F5F5F5;--orange:#FF6002;--orange-w:#FFF1E8}
+*{box-sizing:border-box}
+body{margin:0;font:14.5px/1.75 "Noto Sans JP",sans-serif;color:var(--black);background:#fff}
+header{background:var(--black);color:#fff;padding:32px 48px 26px}
+header .eyebrow{font:700 13px/1 "Barlow Condensed";letter-spacing:.12em;color:var(--orange)}
+header h1{font:900 26px/1.35 "Noto Sans JP";margin:8px 0 6px}
+header p{margin:0;color:#ccc;font-size:13.5px}
+main{max-width:1280px;margin:0 auto;padding:8px 48px 64px}
+@media (max-width:720px){main{padding:8px 16px 48px}header{padding:24px 16px 20px}}
+h2{font:900 20px/1.4 "Noto Sans JP";border-top:3px solid var(--black);margin:36px 0 8px;padding-top:12px}
+h2 small{font:700 13px/1 "Barlow Condensed";color:var(--orange);letter-spacing:.1em;margin-left:10px}
+h3.sub{font-size:15px;margin:20px 0 6px;padding-left:8px;border-left:4px solid var(--orange)}
+p.lead{margin:4px 0 12px}
+.say{color:var(--g600);font-size:13px}
+a{color:var(--orange);font-weight:700}
+table{border-collapse:collapse;width:100%;font-size:13.5px;margin-top:10px}
+th,td{border:1px solid var(--g200);padding:6px 10px;text-align:left;vertical-align:top}
+th{background:var(--black);color:#fff;font-size:12px}
+td.c{text-align:center;font-weight:700}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin-top:12px}
+.axis{border:2px solid var(--black);display:flex;flex-direction:column}
+.axis.rec{border-color:var(--orange);box-shadow:0 0 0 2px var(--orange)}
+.axis .mood{height:150px;position:relative;overflow:hidden;padding:14px 16px;display:flex;flex-direction:column;justify-content:flex-end}
+.axis .mood .copy{position:relative;z-index:1}
+.axis .body{padding:12px 16px 14px;font-size:13.5px;flex:1}
+.axis .id{font:800 13px/1 "Barlow Condensed";letter-spacing:.1em;color:var(--orange)}
+.axis h4{margin:2px 0 6px;font:900 17px/1.4 "Noto Sans JP"}
+.axis dl{margin:0;display:grid;grid-template-columns:4.6em 1fr;gap:3px 8px}
+.axis dt{font-weight:700;color:var(--g600);font-size:12px;padding-top:2px}
+.axis dd{margin:0}
+.chips{display:flex;gap:4px;margin-top:2px}
+.chips i{width:18px;height:18px;border:1px solid #0002;display:inline-block}
+.tag{display:inline-block;font:700 11px/1 "Noto Sans JP";padding:4px 7px;margin-right:4px}
+.tag.rec{background:var(--orange);color:#fff}
+.tag.alt{background:var(--g100);color:var(--g600)}
+.box{background:var(--orange-w);border-left:4px solid var(--orange);padding:10px 16px;margin-top:12px}
+.src{font-size:12.5px;color:var(--g600)}
+.src li{margin:2px 0}
+/* ムード見本（雰囲気を伝えるための簡易表現。デザイン案そのものではない） */
+.m1{background:linear-gradient(135deg,#FF6002 0 55%,#FFD23F 55%)}
+.m1 .copy{font:900 26px/1.15 "Noto Sans JP";color:#fff;text-shadow:0 2px 0 #0003}
+.m1::before{content:"";position:absolute;right:12px;top:12px;width:92px;height:70px;border-radius:14px;background:#fff;box-shadow:-18px 14px 0 #111,-36px 28px 0 #fff}
+.m2{background:var(--orange-w)}
+.m2 .copy{font:900 19px/1.35 "Noto Sans JP";color:#111}
+.m2::before{content:"";position:absolute;left:16px;top:16px;width:44px;height:44px;border-radius:50%;background:#FF6002;box-shadow:52px 0 0 #111,104px 0 0 #FFB27F,156px 0 0 #7C7C7C}
+.m3{background:#fff;border-bottom:1px solid var(--g200)}
+.m3 .copy{font:700 17px/1.4 "Noto Sans JP";color:#111}
+.m3::before{content:"申し込む";position:absolute;right:16px;top:18px;font:700 13px/1 "Noto Sans JP";color:#fff;background:#FF6002;padding:10px 16px;border-radius:6px}
+.m3::after{content:"";position:absolute;left:16px;top:16px;width:48px;height:48px;background:repeating-linear-gradient(90deg,#111 0 4px,#fff 4px 7px),#111;border:4px solid #111}
+.m4{background:linear-gradient(115deg,#111 0 48%,#FF6002 48%)}
+.m4 .copy{font:900 22px/1.25 "Noto Sans JP";color:#fff}
+.m4::before{content:"→";position:absolute;right:18px;top:4px;font:800 84px/1 "Barlow Condensed";color:#111}
+.c1{background:#111}
+.c1 .copy{font:900 30px/1.1 "Noto Sans JP";color:#fff}
+.c1 .copy b{color:#FF6002}
+.c1::before{content:"MOVE";position:absolute;right:-8px;top:-10px;font:800 96px/1 "Barlow Condensed";color:#FF6002;opacity:.35;transform:skewX(-10deg)}
+.c2{background:#fff;border-bottom:1px solid var(--g200)}
+.c2 .copy{font:700 15px/1.4 "Noto Sans JP";color:#111}
+.c2::before{content:"00   000   00";position:absolute;left:16px;top:14px;font:800 44px/1 "Barlow Condensed";color:#FF6002;letter-spacing:.04em}
+.c3{background:linear-gradient(90deg,#7C7C7C 0 42%,#F5F5F5 42%)}
+.c3 .copy{font:900 18px/1.4 "Noto Serif JP";color:#111;margin-left:44%}
+.c3::before{content:"PHOTO";position:absolute;left:16px;top:14px;font:800 14px/1 "Barlow Condensed";color:#fff;letter-spacing:.2em}
+.c4{background:#F7F3EC}
+.c4 .copy{font:900 17px/1.7 "Noto Serif JP";color:#111;writing-mode:vertical-rl;position:absolute;right:20px;top:12px;height:126px}
+.c4::before{content:"";position:absolute;left:18px;bottom:18px;width:60px;height:4px;background:#FF6002}
+</style>
+</head>
+<body>
+<header>
+  <div class="eyebrow">DESIGN DIRECTION v0.1</div>
+  <h1>デザインの方向性（訴求軸）— メディア・コーポレート HP</h1>
+  <p>方向性を今週中に決め、来週火曜（10/13）にデザイン案を出すための下敷き。各案の見本は雰囲気を伝えるための簡易表現で、デザイン案そのものではありません。</p>
+</header>
+<main>
+
+<h2>この資料の使い方<small>HOW TO USE</small></h2>
+<table>
+  <tr><th style="width:120px">日程</th><th>やること</th><th style="width:150px">担当</th></tr>
+  <tr><td>今週（〜10/11）</td><td>この資料から、メディアは3案・HP は1〜2案に絞る</td><td>繁田・パミ</td></tr>
+  <tr><td>10/13（火）</td><td>絞った案ごとにデザイン案（主要画面 or ファーストビュー）を作る</td><td>メディア：パミ／HP：繁田</td></tr>
+  <tr><td>10/14（水）</td><td>チーム内でブラッシュアップ・提案資料を作る</td><td>繁田・パミ・小野田</td></tr>
+  <tr><td>10/15（木）</td><td>定例で全体に提案し、1案に決める（<a href="./agenda-20261015.html">アジェンダ 議題2</a>）</td><td>全員</td></tr>
+</table>
+
+<h2>調べて分かったこと<small>RESEARCH</small></h2>
+<table>
+  <tr><th style="width:34%">分かったこと</th><th>デザインへの示唆</th><th style="width:110px">出典の確かさ</th></tr>
+  <tr><td>Z世代はイベントを友人の紹介で知ることが多く（約6割が友人の推薦を頼りにする）、メッセージアプリ経由で知る割合も高い</td><td>「リンクをコピーしてシェア」で開かれたページが、そのまま魅力的に見えることが大事。イベント詳細の最初の画面に力を入れる</td><td>二次情報（海外のイベント業界ブログ）</td></tr>
+  <tr><td>長い入力フォームは途中でやめられやすく、スマホで完結することが前提</td><td>申込は短く・スマホ優先。M3「安心・かんたん」の根拠</td><td>二次情報</td></tr>
+  <tr><td>一律の一覧より「自分向けに選ばれた」発見体験が求められている</td><td>ジャンル・地域・参加枠の絞り込みと、フォローした団体の新着を目立たせる。M1・M2 の根拠</td><td>二次情報</td></tr>
+  <tr><td>国内の既存サービスは、Peatix＝コミュニティ型、こくちーず＝告知一覧型、ReDesigner for Student＝「つくる・まなぶ・あつまる」と学生向けに言葉を寄せた特集型、ガクセイ協賛＝学生団体×企業の協賛マッチング</td><td>「学生特化」「団体をフォロー」の組み合わせは既存サービスに無い位置。差別化はここで言い切る</td><td>一次情報（各サービスの公式ページ）</td></tr>
+  <tr><td>10/8 定例で参加枠に「大人」が加わった</td><td>学生だけに寄せすぎた見た目（子どもっぽいポップさ）は避ける。大人も違和感なく申し込めるトーンにする</td><td>社内決定</td></tr>
+</table>
+<ul class="src">
+  <li>Leap Event Technology「The Best Way to Market to Gen Z for Your Event in 2026」 <a href="https://leapevent.tech/blog/market-to-gen-z-for-your-event/">leapevent.tech</a></li>
+  <li>AnyRoad「Best Gen Z Event Software for Brand Activations」 <a href="https://blog.anyroad.com/post/gen-z-event-software">blog.anyroad.com</a></li>
+  <li>Softjourn「Top 9 Ticketing Industry Trends 2026」 <a href="https://softjourn.com/insights/top-event-ticketing-industry-trends">softjourn.com</a></li>
+  <li>Peatix <a href="https://services.peatix.com/ja">services.peatix.com</a> ／ ReDesigner for Student <a href="https://student.redesigner.jp/events">student.redesigner.jp</a> ／ ガクセイ協賛 <a href="https://www.gakuseikyosan.com/">gakuseikyosan.com</a> ／ こくちーずプロ <a href="https://www.kokuchpro.com/">kokuchpro.com</a></li>
+  <li>X（旧 Twitter）でも国内の Z世代向けイベントサイトのデザイン傾向を検索したが、該当する投稿は見つからなかった（2025-10 以降）</li>
+</ul>
+
+<h2>メディア（イベント告知・申込）の訴求軸<small>MEDIA</small></h2>
+<p class="lead">見る人：イベントを探す<b>学生（＋大人の参加者）</b>と、イベントを出す<b>団体の owner</b>。<span class="say">使いやすさが最優先。ブランドらしさは色・見出し・写真の扱いで出す。</span></p>
+<div class="grid">
+
+<div class="axis rec">
+  <div class="mood m1"><div class="copy">今週、<br>どこ行く？</div></div>
+  <div class="body">
+    <div class="id">M1</div><h4>発見・ワクワク</h4>
+    <span class="tag rec">パミへ渡す3案</span>
+    <dl>
+      <dt>伝えること</dt><dd>面白いイベントがすぐ見つかる</dd>
+      <dt>効く相手</dt><dd>何となく探している学生・友だちからリンクが届いた人</dd>
+      <dt>配色</dt><dd>オレンジ＋黒＋差し色の黄<div class="chips"><i style="background:#FF6002"></i><i style="background:#111"></i><i style="background:#FFD23F"></i><i style="background:#fff"></i></div></dd>
+      <dt>書体</dt><dd>太いゴシック（Noto Sans JP 900）＋数字・英字は Barlow Condensed</dd>
+      <dt>写真</dt><dd>カバー画像を大きく。カードは角丸を大きめにし、写真が主役</dd>
+      <dt>UI</dt><dd>トップはジャンル別の横スクロール列、保存ボタンをカード上に</dd>
+      <dt>強み</dt><dd>シェアで来た人が一目で楽しそうと感じる</dd>
+      <dt>懸念</dt><dd>団体の写真の質に見た目が左右される → 写真が無いとき用の背景パターンを用意</dd>
+    </dl>
+  </div>
+</div>
+
+<div class="axis rec">
+  <div class="mood m2"><div class="copy">推し団体の次のイベントを、<br>見逃さない</div></div>
+  <div class="body">
+    <div class="id">M2</div><h4>団体が主役（コミュニティ）</h4>
+    <span class="tag rec">パミへ渡す3案</span>
+    <dl>
+      <dt>伝えること</dt><dd>気になる団体を追いかけられる</dd>
+      <dt>効く相手</dt><dd>特定の団体のファン・リピーター、団体の owner</dd>
+      <dt>配色</dt><dd>オレンジ＋温かい薄オレンジ＋グレー<div class="chips"><i style="background:#FF6002"></i><i style="background:#FFF1E8"></i><i style="background:#FFB27F"></i><i style="background:#7C7C7C"></i></div></dd>
+      <dt>書体</dt><dd>Noto Sans JP（太さ 700 中心でやわらかく）</dd>
+      <dt>写真</dt><dd>団体のロゴ（丸型）とカバー画像を前に出す</dd>
+      <dt>UI</dt><dd>「フォロー中の団体の新着」をトップの最上段に。団体ページを作り込む</dd>
+      <dt>強み</dt><dd>10/8 決定の「団体だけフォロー」と最もつながる。owner の掲載動機にもなる</dd>
+      <dt>懸念</dt><dd>公開直後は団体数が少なくさびしい → 公開時は NMJ 主催イベントで埋める</dd>
+    </dl>
+  </div>
+</div>
+
+<div class="axis rec">
+  <div class="mood m3"><div class="copy">申し込みから当日受付まで、<br>スマホひとつで</div></div>
+  <div class="body">
+    <div class="id">M3</div><h4>安心・かんたん</h4>
+    <span class="tag rec">パミへ渡す3案</span>
+    <dl>
+      <dt>伝えること</dt><dd>申込・支払い・受付がスマホで完結し、安心して使える</dd>
+      <dt>効く相手</dt><dd>初めて有料イベントに申し込む学生・大人の参加者・保護者目線</dd>
+      <dt>配色</dt><dd>白地＋黒文字。オレンジはボタンなど押せる所だけ<div class="chips"><i style="background:#fff"></i><i style="background:#111"></i><i style="background:#F5F5F5"></i><i style="background:#FF6002"></i></div></dd>
+      <dt>書体</dt><dd>Noto Sans JP（400/700）。数字・金額を読みやすく</dd>
+      <dt>写真</dt><dd>控えめ。情報の整理と余白で見せる</dd>
+      <dt>UI</dt><dd>チケット（QR）画面・申込の手順表示・通報や運営者情報を分かりやすく</dd>
+      <dt>強み</dt><dd>大人の参加者にも違和感がない。決済・QR 受付の信頼感が出る</dd>
+      <dt>懸念</dt><dd>地味で他サービスとの違いが出にくい → 見出しと空状態のイラストで個性を足す</dd>
+    </dl>
+  </div>
+</div>
+
+<div class="axis">
+  <div class="mood m4"><div class="copy">次の一歩が<br>見つかる</div></div>
+  <div class="body">
+    <div class="id">M4</div><h4>次の一歩（成長）</h4>
+    <span class="tag alt">言葉選びに混ぜる</span>
+    <dl>
+      <dt>伝えること</dt><dd>参加が自分の成長・次の行動につながる</dd>
+      <dt>効く相手</dt><dd>意識の高い学生・キャリア系イベント</dd>
+      <dt>配色</dt><dd>オレンジを強く。黒との斜め分割<div class="chips"><i style="background:#FF6002"></i><i style="background:#111"></i><i style="background:#fff"></i></div></dd>
+      <dt>書体</dt><dd>Barlow Condensed の大きな英字見出し＋太ゴシック</dd>
+      <dt>写真</dt><dd>動きのある人物写真</dd>
+      <dt>UI</dt><dd>斜め・矢印のモチーフを区切りに使う</dd>
+      <dt>強み</dt><dd>団体名「NEXT MOVE」と直結し、HP と自然につながる</dd>
+      <dt>懸念</dt><dd>就活サイトのように堅く見え、遊び・交流系のイベントが浮く</dd>
+    </dl>
+  </div>
+</div>
+</div>
+
+<h2>コーポレート HP の訴求軸<small>CORPORATE</small></h2>
+<p class="lead">見る人：<b>協賛・連携先の企業</b>、取材、学生、メンバー希望者。<span class="say">協賛・連携の相談につなげることが一番の目的。</span></p>
+<div class="grid">
+
+<div class="axis rec">
+  <div class="mood c1"><div class="copy">学生の<br>「<b>次の一歩</b>」<br>をつくる</div></div>
+  <div class="body">
+    <div class="id">C1</div><h4>ムーブメント</h4>
+    <span class="tag rec">土台にする</span>
+    <dl>
+      <dt>伝えること</dt><dd>学生が動き出す勢い。団体名の「MOVE」をそのまま体現</dd>
+      <dt>効く相手</dt><dd>学生・メンバー希望者・初めて知る企業</dd>
+      <dt>配色</dt><dd>黒地＋オレンジ<div class="chips"><i style="background:#111"></i><i style="background:#FF6002"></i><i style="background:#fff"></i></div></dd>
+      <dt>書体</dt><dd>特大の太ゴシック＋斜体の英字「MOVE」</dd>
+      <dt>写真</dt><dd>イベント写真を全面に。動きのあるスナップ</dd>
+      <dt>構成</dt><dd>ファーストビューで勢いを出し、スクロールで実績・人を見せる</dd>
+      <dt>強み</dt><dd>3秒で「学生が動いている団体」と伝わる。メディアの M1・M4 と相性が良い</dd>
+      <dt>懸念</dt><dd>よくある学生団体の見た目になりやすい → C2 の数字で信頼を補う</dd>
+    </dl>
+  </div>
+</div>
+
+<div class="axis rec">
+  <div class="mood c2"><div class="copy">〇大学・〇〇〇人の学生が動いた</div></div>
+  <div class="body">
+    <div class="id">C2</div><h4>実績・信頼</h4>
+    <span class="tag rec">C1 に組み込む</span>
+    <dl>
+      <dt>伝えること</dt><dd>規模と実績で信用してもらう</dd>
+      <dt>効く相手</dt><dd>協賛・連携先の担当者、取材する人</dd>
+      <dt>配色</dt><dd>白基調＋黒＋数字だけオレンジ<div class="chips"><i style="background:#fff"></i><i style="background:#111"></i><i style="background:#FF6002"></i></div></dd>
+      <dt>書体</dt><dd>数字は Barlow Condensed で大きく</dd>
+      <dt>写真</dt><dd>連携先ロゴの一覧・イベントの記録写真</dd>
+      <dt>構成</dt><dd>活動実績の数字4つ・事例3件・連携先ロゴ</dd>
+      <dt>強み</dt><dd>協賛の説明資料としてそのまま使える</dd>
+      <dt>懸念</dt><dd>数字の素材がそろわないと成り立たない（10/22 の素材締切が鍵）</dd>
+    </dl>
+  </div>
+</div>
+
+<div class="axis">
+  <div class="mood c3"><div class="copy">ここから動き出した、<br>〇〇人の物語</div></div>
+  <div class="body">
+    <div class="id">C3</div><h4>人・ストーリー</h4>
+    <span class="tag alt">素材次第で一部採用</span>
+    <dl>
+      <dt>伝えること</dt><dd>運営・参加者の顔と、その人の変化</dd>
+      <dt>効く相手</dt><dd>メンバー希望者・学生・取材する人</dd>
+      <dt>配色</dt><dd>写真の色を生かす。グレー＋白＋差し色オレンジ<div class="chips"><i style="background:#7C7C7C"></i><i style="background:#F5F5F5"></i><i style="background:#FF6002"></i></div></dd>
+      <dt>書体</dt><dd>引用は明朝（Noto Serif JP）、本文はゴシック</dd>
+      <dt>写真</dt><dd>人物を大きく。雑誌・ドキュメンタリー風</dd>
+      <dt>構成</dt><dd>メンバー・代表メッセージを厚く</dd>
+      <dt>強み</dt><dd>親しみと信頼。メンバー募集に効く</dd>
+      <dt>懸念</dt><dd>写真素材と掲載許可が必要 → 代表メッセージ部分だけ取り入れるのが現実的</dd>
+    </dl>
+  </div>
+</div>
+
+<div class="axis">
+  <div class="mood c4"><div class="copy">日本の次を<br>つくるのは、<br>学生だ。</div></div>
+  <div class="body">
+    <div class="id">C4</div><h4>日本の未来（ビジョン）</h4>
+    <span class="tag alt">ミッション文に活用</span>
+    <dl>
+      <dt>伝えること</dt><dd>学生が日本の次をつくる、という大きな使命</dd>
+      <dt>効く相手</dt><dd>行政・大企業・メディア</dd>
+      <dt>配色</dt><dd>生成り＋黒＋細いオレンジ<div class="chips"><i style="background:#F7F3EC"></i><i style="background:#111"></i><i style="background:#FF6002"></i></div></dd>
+      <dt>書体</dt><dd>明朝の縦書き見出し</dd>
+      <dt>写真</dt><dd>少なめ。余白と文字組みで見せる</dd>
+      <dt>構成</dt><dd>ミッション・ビジョンを最初に大きく</dd>
+      <dt>強み</dt><dd>格がある。「JAPAN」の名前に見合う</dd>
+      <dt>懸念</dt><dd>抽象的で何をしている団体か伝わりにくい。メディアと見た目が離れる</dd>
+    </dl>
+  </div>
+</div>
+</div>
+
+<h2>判断の観点ごとの比較<small>COMPARE</small></h2>
+<p class="say">◎ とても合う ／ ○ 合う ／ △ 工夫が要る。10/15 アジェンダの判断の観点＋目的に沿って評価（案の段階の見立て）。</p>
+<table>
+  <tr><th>観点</th><th>M1</th><th>M2</th><th>M3</th><th>M4</th><th>C1</th><th>C2</th><th>C3</th><th>C4</th></tr>
+  <tr><td>学生にも大人にも違和感がない</td><td class="c">○</td><td class="c">○</td><td class="c">◎</td><td class="c">△</td><td class="c">○</td><td class="c">◎</td><td class="c">○</td><td class="c">◎</td></tr>
+  <tr><td>イベント写真・団体ロゴが入っても見やすい</td><td class="c">△</td><td class="c">◎</td><td class="c">◎</td><td class="c">○</td><td class="c">○</td><td class="c">◎</td><td class="c">△</td><td class="c">○</td></tr>
+  <tr><td>スマホで読みやすい</td><td class="c">○</td><td class="c">○</td><td class="c">◎</td><td class="c">○</td><td class="c">○</td><td class="c">◎</td><td class="c">○</td><td class="c">△</td></tr>
+  <tr><td>HP とメディアが同じサービスに見える</td><td class="c">◎</td><td class="c">○</td><td class="c">○</td><td class="c">◎</td><td class="c">◎</td><td class="c">○</td><td class="c">○</td><td class="c">△</td></tr>
+  <tr><td>目的への効き（メディア＝申込・団体の掲載／HP＝協賛・連携の相談）</td><td class="c">◎</td><td class="c">◎</td><td class="c">○</td><td class="c">○</td><td class="c">○</td><td class="c">◎</td><td class="c">○</td><td class="c">△</td></tr>
+  <tr><td>素材が少なくても成り立つ</td><td class="c">△</td><td class="c">○</td><td class="c">◎</td><td class="c">○</td><td class="c">○</td><td class="c">△</td><td class="c">△</td><td class="c">◎</td></tr>
+</table>
+
+<h2>おすすめ<small>RECOMMENDATION</small></h2>
+<div class="box">
+  <p style="margin:0"><b>メディア：M1・M2・M3 の3案をパミのデザイン提案にする。</b>M4 の「次の一歩」は見た目の案ではなく、見出しや空状態の言葉選びに混ぜる。</p>
+  <p style="margin:6px 0 0"><b>HP：C1（ムーブメント）を土台に、「活動実績」セクションで C2（数字・連携先ロゴ）を見せる。</b>C3 は代表メッセージ、C4 はミッション文として部分的に取り入れる。</p>
+  <p style="margin:6px 0 0"><b>共通：</b>オレンジ #FF6002・黒 #111・Noto Sans JP＋Barlow Condensed はどの案でも固定し、HP とメディアが同じサービスに見えるようにする。</p>
+</div>
+<h3 class="sub">採らなかった組み合わせと理由</h3>
+<ul>
+  <li><b>M4 を単独の案にする</b>：参加枠に大人・懇親会が加わり、交流系イベントも載るため、成長一色だと合わないイベントが出る</li>
+  <li><b>HP を C2 だけにする</b>：協賛先には効くが、学生・メンバー希望者には硬すぎ、メディアとの一体感も出にくい</li>
+  <li><b>HP を C4 にする</b>：何をしている団体か3秒で伝わらない（ワイヤーのファーストビューの目的に反する）</li>
+</ul>
+
+<h3 class="sub">10/13 のデザイン案で作るもの</h3>
+<table>
+  <tr><th style="width:110px">担当</th><th>作るもの</th></tr>
+  <tr><td>パミ（メディア）</td><td>M1・M2・M3 それぞれで、<b>トップ（SP）</b>と<b>イベント詳細（SP）</b>の2画面＋配色・書体の見本。ワイヤー v0.4 の構成をベースにする</td></tr>
+  <tr><td>繁田（HP）</td><td>C1＋C2 で<b>ファーストビュー</b>と<b>活動実績</b>セクション（PC・SP）。HP ワイヤー v0.1 の構成をベースにする</td></tr>
+</table>
+<p class="say">関連資料：<a href="./wireframes.html">メディア ワイヤー v0.4</a> ／ <a href="./hp-wireframe.html">HP ワイヤー v0.1</a> ／ <a href="./prototype.html">プロトタイプ</a> ／ <a href="./agenda-20261015.html">10/15 アジェンダ</a></p>
+
+</main>
+</body>
+</html>
