@@ -1,0 +1,2639 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ヨコワカ（横浜エクスポ若者実行委員会）Webサイト ワイヤーフレーム v0.2</title>
+<style>
+/* ============================================================
+   ヨコワカ Webサイト ワイヤーフレーム
+   - グレースケール（配色・装飾は意図的に持たない）
+   - 1ファイル完結／上部タブでページ切替／PC・SP併記
+   ============================================================ */
+:root{
+  --ink:#1f1f1f;
+  --mid:#6b6b6b;
+  --sub:#8f8f8f;
+  --line:#c7c7c7;
+  --line2:#dedede;
+  --fill:#f4f4f4;
+  --fill2:#e8e8e8;
+  --fill3:#dcdcdc;
+  --bg:#f7f7f7;
+  --white:#fff;
+  --font: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Noto Sans JP", "Yu Gothic", sans-serif;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  font-family:var(--font);
+  background:var(--bg);
+  color:var(--ink);
+  font-size:13px;
+  line-height:1.7;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ---------- ツールバー ---------- */
+.toolbar{
+  position:sticky;top:0;z-index:100;
+  background:var(--white);
+  border-bottom:2px solid var(--ink);
+  padding:8px 16px;
+  display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center;
+}
+.tb-title{font-weight:700;font-size:14px;white-space:nowrap;}
+.tb-title span{font-weight:400;color:var(--sub);font-size:11px;margin-left:6px;}
+.tabs{display:flex;flex-wrap:wrap;gap:4px;flex:1;}
+.tabs button{
+  font-family:var(--font);font-size:12px;
+  padding:5px 11px;border:1px solid var(--line);background:var(--white);
+  color:var(--mid);cursor:pointer;border-radius:2px;white-space:nowrap;
+}
+.tabs button:hover{background:var(--fill);}
+.tabs button.on{background:var(--ink);color:var(--white);border-color:var(--ink);font-weight:700;}
+.tb-right{display:flex;gap:14px;align-items:center;margin-left:auto;}
+.seg{display:flex;border:1px solid var(--line);border-radius:2px;overflow:hidden;}
+.seg button{
+  font-family:var(--font);font-size:11px;padding:5px 10px;border:0;
+  background:var(--white);color:var(--mid);cursor:pointer;border-left:1px solid var(--line);
+}
+.seg button:first-child{border-left:0;}
+.seg button.on{background:var(--fill3);color:var(--ink);font-weight:700;}
+.chk{font-size:11px;color:var(--mid);cursor:pointer;user-select:none;white-space:nowrap;}
+
+/* ---------- ページ／ステージ ---------- */
+.page{display:none;padding:20px 16px 80px;}
+.page.on{display:block;}
+.page-head{max-width:1600px;margin:0 auto 16px;border-left:4px solid var(--ink);padding-left:10px;}
+.page-head h1{font-size:17px;margin:0;}
+.page-head p{margin:2px 0 0;color:var(--mid);font-size:12px;}
+.stage{display:flex;gap:24px;align-items:flex-start;max-width:1600px;margin:0 auto;}
+.col-pc{flex:1 1 auto;min-width:0;}
+.col-sp{flex:0 0 375px;}
+body.view-pc .col-sp{display:none;}
+body.view-sp .col-pc{display:none;}
+body.view-sp .col-sp{flex:0 0 375px;margin:0 auto;}
+/* 説明列を出しているときは中央寄せを解除して、WF と説明を隣接させる（引き出し線を届かせる） */
+body.view-sp:not(.hide-exp) .col-sp{margin-left:0;margin-right:0;}
+.dev-cap{
+  font-size:11px;font-weight:700;color:var(--mid);
+  border-bottom:1px solid var(--line);padding-bottom:4px;margin-bottom:8px;
+  display:flex;justify-content:space-between;
+}
+.frame{background:var(--white);border:1px solid var(--ink);}
+.frame.sp{border-width:1px;}
+
+/* ---------- WFブロック ---------- */
+.blk{border-bottom:1px dashed var(--line);padding:14px 16px 18px;position:relative;}
+.blk:last-child{border-bottom:0;}
+.tag{
+  display:inline-block;font-size:10px;font-weight:700;letter-spacing:.04em;
+  background:var(--ink);color:var(--white);padding:1px 7px;border-radius:2px;margin-bottom:10px;
+}
+.tag.g{background:var(--fill3);color:var(--ink);}
+.sp .blk{padding:10px 12px 14px;}
+.sp .tag{font-size:9px;padding:1px 5px;margin-bottom:7px;}
+
+/* 見出し・本文の擬似表現 */
+.eyebrow{font-size:10px;letter-spacing:.18em;color:var(--mid);font-weight:700;}
+.h-lg{font-size:22px;font-weight:700;line-height:1.35;margin:4px 0 8px;}
+.h-md{font-size:16px;font-weight:700;line-height:1.4;margin:3px 0 6px;}
+.h-sm{font-size:13px;font-weight:700;margin:0 0 4px;}
+.sp .h-lg{font-size:17px;}
+.sp .h-md{font-size:14px;}
+.body{font-size:12px;color:#333;margin:0 0 8px;}
+.sub{font-size:11px;color:var(--mid);margin:0 0 6px;}
+.cen{text-align:center;}
+
+/* ダミーテキスト行（CMS投入部） */
+.bar{height:8px;background:var(--fill2);border-radius:1px;margin:5px 0;}
+.bar.w90{width:90%}.bar.w75{width:75%}.bar.w60{width:60%}.bar.w40{width:40%}.bar.w25{width:25%}
+.bar.t{height:12px;background:var(--fill3);}
+
+/* 画像プレースホルダ */
+.ph{
+  position:relative;background:var(--fill);border:1px solid var(--line);
+  display:flex;align-items:center;justify-content:center;
+  color:var(--mid);font-size:11px;overflow:hidden;
+}
+.ph::before,.ph::after{
+  content:"";position:absolute;inset:0;
+  background:linear-gradient(to top right,transparent calc(50% - .5px),var(--line2) calc(50% - .5px),var(--line2) calc(50% + .5px),transparent calc(50% + .5px));
+}
+.ph::after{background:linear-gradient(to bottom right,transparent calc(50% - .5px),var(--line2) calc(50% - .5px),var(--line2) calc(50% + .5px),transparent calc(50% + .5px));}
+.ph > span{position:relative;background:var(--fill);padding:2px 8px;border:1px solid var(--line2);}
+.ph.kv{height:300px;}
+.sp .ph.kv{height:380px;}
+.ph.h160{height:160px}.ph.h120{height:120px}.ph.h90{height:90px}.ph.h64{height:64px}.ph.h48{height:48px}
+.ph.sq{aspect-ratio:1/1;}
+.ph.r16{aspect-ratio:16/9;}
+
+/* パーツ */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  border:1px solid var(--ink);padding:7px 18px;font-size:11px;font-weight:700;
+  background:var(--white);border-radius:2px;
+}
+.btn.fill{background:var(--fill3);}
+.btn.wide{width:100%;padding:12px;}
+.btn.sm{padding:4px 10px;font-size:10px;font-weight:400;border-color:var(--line);color:var(--mid);}
+.chips{display:flex;flex-wrap:wrap;gap:6px;}
+.chip{border:1px solid var(--line);padding:3px 10px;font-size:11px;color:var(--mid);border-radius:999px;background:var(--white);}
+.chip.on{border-color:var(--ink);color:var(--ink);font-weight:700;background:var(--fill);}
+.badge{
+  display:inline-block;font-size:9px;font-weight:700;letter-spacing:.06em;
+  border:1px solid var(--mid);color:var(--mid);padding:0 5px;border-radius:2px;
+  vertical-align:2px;margin-left:6px;
+}
+.todo{
+  display:inline-block;font-size:9px;font-weight:700;
+  border:1px dashed var(--ink);color:var(--ink);background:var(--fill2);
+  padding:0 5px;border-radius:2px;vertical-align:2px;margin-left:4px;
+}
+.grid{display:grid;gap:14px;}
+.g2{grid-template-columns:repeat(2,1fr);}
+.g3{grid-template-columns:repeat(3,1fr);}
+.g4{grid-template-columns:repeat(4,1fr);}
+.g5{grid-template-columns:repeat(5,1fr);}
+.g6{grid-template-columns:repeat(6,1fr);}
+.sp .g3,.sp .g4{grid-template-columns:repeat(2,1fr);}
+.sp .g5,.sp .g6{grid-template-columns:repeat(3,1fr);}
+.sp .g2{grid-template-columns:1fr;}
+.card{border:1px solid var(--line);background:var(--white);padding:10px;}
+.card .ph{margin-bottom:8px;}
+.hr{border:0;border-top:1px solid var(--line2);margin:14px 0;}
+.meta{font-size:10px;color:var(--sub);display:flex;gap:8px;align-items:center;margin-bottom:4px;}
+.center-cta{text-align:center;padding:6px 0;}
+.scroll-hint{font-size:10px;color:var(--sub);text-align:center;letter-spacing:.1em;}
+
+/* ヘッダー／フッターの擬似 */
+.wf-header{display:flex;align-items:center;gap:16px;flex-wrap:wrap;}
+.wf-logo{border:1px solid var(--line);background:var(--fill);padding:8px 14px;font-size:11px;font-weight:700;color:var(--mid);white-space:nowrap;}
+.wf-nav{display:flex;gap:14px;font-size:11px;color:var(--mid);flex-wrap:wrap;}
+.wf-nav span{border-bottom:1px solid var(--line2);padding-bottom:2px;}
+.burger{margin-left:auto;border:1px solid var(--line);padding:6px 9px;font-size:11px;color:var(--mid);background:var(--fill);}
+.ext-link{display:inline-flex;align-items:center;gap:3px;font-size:10px;color:var(--mid);border-bottom:1px dotted var(--line2);padding-bottom:1px;}
+.head-right{margin-left:auto;display:flex;align-items:center;justify-content:flex-end;gap:8px 12px;flex-wrap:wrap;min-width:0;}
+.wf-footer{background:var(--fill);}
+
+/* フォーム */
+.field{margin-bottom:10px;}
+.field label{display:block;font-size:11px;font-weight:700;margin-bottom:3px;}
+.field .req{color:var(--ink);font-size:9px;border:1px solid var(--ink);padding:0 4px;margin-left:5px;vertical-align:1px;}
+.input{border:1px solid var(--line);background:var(--white);height:30px;}
+.input.ta{height:88px;}
+.input.sel{position:relative;}
+.input.sel::after{content:"▾";position:absolute;right:8px;top:5px;color:var(--mid);font-size:11px;}
+
+/* 注記 */
+.note{
+  border:1px dashed var(--mid);background:#fbfbfb;
+  padding:8px 10px;margin:10px 0 0;font-size:11px;color:#444;
+}
+.note b{font-size:10px;letter-spacing:.06em;}
+.note ul{margin:4px 0 0;padding-left:16px;}
+.note li{margin:1px 0;}
+body.hide-notes .note{display:none;}
+
+/* ---------- 構成ページ ---------- */
+.doc{max-width:1100px;margin:0 auto;background:var(--white);border:1px solid var(--line);padding:24px 26px;}
+.doc h2{font-size:14px;margin:26px 0 10px;padding-bottom:5px;border-bottom:1px solid var(--ink);}
+.doc h2:first-child{margin-top:0;}
+.doc table{width:100%;border-collapse:collapse;font-size:12px;}
+.doc th,.doc td{border:1px solid var(--line);padding:6px 9px;text-align:left;vertical-align:top;}
+.doc th{background:var(--fill);font-size:11px;white-space:nowrap;}
+.doc code{background:var(--fill);padding:1px 4px;font-size:11px;}
+.tree{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;line-height:2;white-space:pre;overflow-x:auto;}
+.legend{display:flex;flex-wrap:wrap;gap:18px;font-size:11px;color:var(--mid);align-items:center;}
+.legend .sw{display:inline-block;width:22px;height:12px;border:1px solid var(--line);vertical-align:-2px;margin-right:5px;}
+
+/* ============================================================
+   ビュー切替のタブ化 ＋ メモ機能
+   ============================================================ */
+/* PC+SP / PC / SP をページタブと同じ見た目に */
+#viewSeg{border:0;overflow:visible;display:flex;gap:4px;}
+#viewSeg button.tabish{
+  font-family:var(--font);font-size:12px;padding:5px 11px;
+  border:1px solid var(--line);border-left:1px solid var(--line);
+  background:var(--white);color:var(--mid);cursor:pointer;border-radius:2px;white-space:nowrap;
+}
+#viewSeg button.tabish:hover{background:var(--fill);}
+#viewSeg button.tabish.on{background:var(--ink);color:var(--white);border-color:var(--ink);font-weight:700;}
+
+/* ツールバーのボタン */
+.tb-btn{
+  font-family:var(--font);font-size:11px;padding:5px 10px;cursor:pointer;
+  border:1px solid var(--line);background:var(--white);color:var(--mid);border-radius:2px;white-space:nowrap;
+}
+.tb-btn:hover{background:var(--fill);}
+.tb-btn.armed{border-color:var(--ink);color:var(--ink);font-weight:700;background:var(--fill2);}
+
+/* ページタブのメモ件数バッジ */
+#tabs button .memo-count{
+  display:inline-block;min-width:14px;margin-left:5px;padding:0 4px;
+  font-size:9px;font-weight:700;line-height:14px;text-align:center;
+  background:var(--mid);color:var(--white);border-radius:7px;vertical-align:1px;
+}
+#tabs button.on .memo-count{background:var(--white);color:var(--ink);}
+
+/* メモ列 */
+/* 構成ページ用の本文カラム（PC/SP 切替では消えない） */
+.col-doc{flex:1 1 auto;min-width:0;}
+
+/* ============================================================
+   提案説明（MTG で話すための狙い・動線）
+   WF の中には入れず、右側の独立した列に出す。
+   各項目は対応するブロックと縦位置を揃える（JSが top を計算）。
+   PC 単独 / SP 単独 タブのときだけ表示する。
+   ============================================================ */
+.col-exp{
+  display:none;
+  flex:0 0 300px;
+  position:relative;   /* .exp-item の絶対配置の基準 */
+}
+body.view-pc .col-exp.for-pc{display:block;}
+body.view-sp .col-exp.for-sp{display:block;}
+body.hide-exp .col-exp{display:none !important;}
+
+.exp-head{
+  font-size:11px;font-weight:700;color:var(--mid);
+  border-bottom:1px solid var(--line);padding-bottom:4px;margin-bottom:8px;
+  display:flex;justify-content:space-between;
+}
+.exp-item{
+  position:absolute;left:0;right:0;
+  border:1px solid var(--ink);background:var(--white);
+  padding:7px 9px;
+}
+.exp-label{
+  display:block;font-size:10px;font-weight:700;color:var(--ink);
+  margin:0 0 5px;padding-bottom:4px;border-bottom:1px dashed var(--line);
+}
+/* ブロックとの対応が目で追えるよう、左に引き出し線を出す */
+.exp-item::before{
+  content:"";position:absolute;left:-14px;top:12px;width:13px;
+  border-top:1px solid var(--line);
+}
+/* 説明列の中に移した注記 */
+.exp-item .note{margin:7px 0 0;padding:6px 8px;font-size:10px;line-height:1.6;}
+.exp-item .note ul{padding-left:14px;}
+
+.wf-exp-line{margin:0 0 3px;font-size:11px;line-height:1.65;color:#222;}
+.wf-exp-line:last-child{margin-bottom:0;}
+.wf-exp-line b{
+  display:inline-block;min-width:30px;margin-right:7px;
+  font-size:9px;font-weight:700;letter-spacing:.06em;text-align:center;
+  border:1px solid var(--ink);border-radius:2px;padding:0 5px;vertical-align:1px;
+}
+
+/* メモ列は WF をスクロールしても追従させる（--tbh はツールバー実測高さ・JSが設定） */
+.col-memo{
+  flex:0 0 320px;
+  position:sticky;
+  top:calc(var(--tbh, 56px) + 10px);
+  align-self:flex-start;
+  max-height:calc(100vh - var(--tbh, 56px) - 28px);
+  overflow-y:auto;
+}
+body.hide-memo .col-memo{display:none;}
+.memo-head{
+  font-size:11px;font-weight:700;color:var(--mid);
+  border-bottom:1px solid var(--line);padding-bottom:4px;margin-bottom:8px;
+  display:flex;justify-content:space-between;align-items:center;
+}
+.memo-body{border:1px solid var(--line);background:var(--white);padding:10px;}
+.memo-item{margin-bottom:12px;}
+.memo-item:last-child{margin-bottom:0;}
+.memo-label{
+  display:block;font-size:10px;font-weight:700;color:var(--ink);
+  margin-bottom:3px;cursor:pointer;
+}
+.memo-label:hover{text-decoration:underline;}
+.memo-item.overall .memo-label{background:var(--fill2);padding:2px 6px;border-radius:2px;}
+.memo-item textarea{
+  width:100%;box-sizing:border-box;font-family:var(--font);font-size:11px;line-height:1.6;
+  border:1px solid var(--line2);background:var(--white);color:var(--ink);
+  padding:5px 6px;resize:vertical;min-height:34px;border-radius:2px;
+}
+.memo-item.overall textarea{min-height:60px;}
+.memo-item textarea:focus{outline:2px solid var(--fill3);border-color:var(--mid);}
+.memo-item:not(.empty) textarea{border-color:var(--mid);background:#fcfcfc;}
+.memo-print{display:none;}
+
+/* メモがあるブロックの目印 */
+.blk .memo-flag{
+  display:none;font-size:10px;font-weight:700;margin-left:6px;
+  border:1px solid var(--ink);border-radius:2px;padding:0 4px;vertical-align:2px;
+}
+.blk.has-memo .memo-flag{display:inline-block;}
+.blk.memo-target{outline:2px solid var(--mid);outline-offset:2px;}
+
+/* 埋め込みメモの読み込み確認バナー */
+.memo-banner{
+  position:sticky;top:0;z-index:90;
+  border:1px solid var(--ink);background:var(--fill);
+  padding:8px 12px;margin:0 auto 14px;max-width:1600px;
+  font-size:12px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;
+}
+
+/* ============================================================
+   印刷 / PDF 書き出し用
+   - 全8ページを順番に出力（1ページ＝1枚以上）
+   - PC と SP を縦積みにして用紙幅に収める
+   - 注記は出力しない（先方共有用）
+   ============================================================ */
+/* 横向き＝印刷可能幅 約1060px。PC WF の設計幅 1100px にほぼ一致するので
+   縮小せずに比率どおり出力できる（縦向きだと 733px でPC想定が崩れる） */
+@page{ size:A4 landscape; margin:11mm 8mm; }
+
+@media print{
+  html,body{background:#fff;}
+  /* 背景グラフィックのチェック有無に関わらずグレー塗り・✕印を出す */
+  body,body *{ -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+
+  .toolbar{display:none !important;}
+
+  /* 全ページを出力し、ページごとに改ページ */
+  .page{display:block !important;padding:0 0 6mm;}
+  .page + .page{break-before:page;page-break-before:always;}
+
+  .page-head{margin:0 0 6mm;max-width:none;}
+  .page-head h1{font-size:14pt;}
+  .page-head p{font-size:8pt;}
+
+  /* PC と SP を縦積みに */
+  .stage{display:block !important;max-width:none;}
+  .col-pc,.col-sp,.col-doc{display:block !important;width:100% !important;flex:none !important;margin:0;}
+  .col-sp{margin-top:8mm;break-before:page;page-break-before:always;}
+  .col-sp .frame{width:375px;margin:0 auto;}
+  .dev-cap{font-size:8pt;}
+
+  /* 注記は先方共有用に出さない（画面専用の説明も同時に落とす） */
+  .note,.screen-only,.memo-banner{display:none !important;}
+
+  /* 提案説明は PC 紙・SP 紙の両方に載せる（MTG 用に紙で配れるように）。
+     絶対配置は紙面で崩れるので、通常フローのリストへ戻して別紙にまとめる。 */
+  body:not(.hide-exp) .col-exp{
+    display:block !important;width:100% !important;flex:none !important;
+    position:static !important;margin:8mm 0 0;
+    break-before:page;page-break-before:always;
+  }
+  .exp-item{
+    position:static !important;left:auto !important;right:auto !important;top:auto !important;
+    margin:0 0 4mm;break-inside:avoid;page-break-inside:avoid;
+  }
+  .exp-item::before{display:none !important;}
+
+  /* メモは別紙にまとめ、書かれているものだけ出す */
+  .col-memo{display:block !important;width:100% !important;flex:none !important;
+            margin:8mm 0 0;break-before:page;page-break-before:always;}
+  .col-memo{position:static !important;max-height:none !important;overflow:visible !important;}
+  .col-memo.all-empty{display:none !important;}
+  .memo-item.empty{display:none !important;}
+  .memo-item textarea{display:none !important;}
+  .memo-print{
+    display:block !important;border:1px solid var(--line);background:#fff;
+    padding:5px 7px;font-size:9pt;line-height:1.6;white-space:pre-wrap;
+  }
+  .memo-body{border:0;padding:0;}
+  .memo-item{break-inside:avoid;page-break-inside:avoid;}
+
+  /* ブロックの途中で改ページさせない */
+  .blk,.card,.doc table tr,.field{break-inside:avoid;page-break-inside:avoid;}
+  .doc{border:0;padding:0;max-width:none;}
+  .doc h2{break-after:avoid;page-break-after:avoid;}
+
+  /* 画面用の枠線を印刷でも維持 */
+  .frame{border:1px solid #333;}
+  a{text-decoration:none;color:inherit;}
+}
+</style>
+</head>
+<body class="view-both">
+
+<header class="toolbar">
+  <div class="tb-title">ヨコワカ サイト WF<span>v0.2 / 2026-08-25</span></div>
+  <nav class="tabs" id="tabs">
+    <button data-p="p-structure" class="on">0. 構成・注記</button>
+    <button data-p="p-top">1. TOP</button>
+    <button data-p="p-about">2. about</button>
+    <button data-p="p-contents">3. contents</button>
+    <button data-p="p-news">4. NEWS一覧</button>
+    <button data-p="p-news-detail">5. ニュース詳細</button>
+    <button data-p="p-partners">6. 参加団体一覧</button>
+    <button data-p="p-contact">7. お問い合わせ・参加応募フォーム</button>
+  </nav>
+  <div class="tb-right">
+    <div class="seg" id="viewSeg">
+      <button data-v="both" class="tabish on">PC+SP</button>
+      <button data-v="pc" class="tabish">PC</button>
+      <button data-v="sp" class="tabish">SP</button>
+    </div>
+    <label class="chk" title="PC 単独 / SP 単独 タブのときだけ表示されます"><input type="checkbox" id="expToggle" checked> 提案説明</label>
+    <label class="chk"><input type="checkbox" id="memoToggle" checked> メモ欄</label>
+    <label class="chk" title="実装メモ。提案説明の各項目の下に表示されます（PC / SP タブ）"><input type="checkbox" id="noteToggle" checked> 注記</label>
+    <button class="tb-btn" id="memoExport" title="いま入力されているメモを埋め込んだHTMLを別ファイルとして保存します">✉ メモ入りHTMLを書き出す</button>
+    <button class="tb-btn" id="memoClear" title="このブラウザに保存されたメモを全部消します">メモを全消去</button>
+  </div>
+</header>
+
+<main>
+
+<!-- ============================================================
+     0. 構成・注記
+     ============================================================ -->
+<section class="page on" id="p-structure">
+  <div class="page-head">
+    <h1>0. サイト構成・凡例・要確認事項</h1>
+    <p>構成図（サイト構成スライド）＋ テキスト原稿（Google ドキュメント）を元にした WF v0.2（いただいたお戻しを反映）</p>
+  </div>
+
+  <div class="doc">
+    <h2>v0.2 での変更点（お戻し反映）</h2>
+    <table>
+      <tr><th>#</th><th>いただいたご指摘</th><th>反映内容</th></tr>
+      <tr><td>1</td><td>「ヨコワカ」から「未来会議HP」へ遷移するボタンの追加</td><td>3 箇所に設置しました。①<b>共通ヘッダー右上</b>のテキストリンク（全 7 ページ・SP はメニュー内に格納）②<b>フッター「運営体制」</b>内のボタン ③<b>about「ヨコワカとは？」</b>内のボタン。いずれも別タブで開きます</td></tr>
+      <tr><td>2</td><td>参加ボタンの遷移先はすべてお問い合わせフォームか／名称が硬い</td><td>ご認識のとおり、参加系ボタンの遷移先は<b>すべて <code>/contact</code> の 1 ページ</b>です。ページ名を「<b>お問い合わせ・参加応募フォーム</b>」に変更し、ボタン表記も「<b>参加応募フォーム</b>」に統一しました（コンテンツ個別の応募ボタンのみ「このプロジェクトに応募する」「楽曲を応募する」等、対象が分かる表記を残しています）</td></tr>
+      <tr><td>3</td><td>参加団体は横 6 団体のみ？ できるだけ多く見せたい</td><td>掲載件数の上限はありません（CMS で登録した全件が並びます）。より多く見えるよう <b>TOP は 6 列 × N 段（WF は 12 件で作図）</b>、<b>一覧ページは 4 列 → 5 列</b>、<b>SP は 2 列 → 3 列</b>に変更しました</td></tr>
+      <tr><td>4</td><td>ヨコワカの SNS はどの媒体を利用する想定か</td><td>WF では <b>Instagram・X</b> を主軸に想定し、フッターと contact に枠を 3 つ（3 枠目は予備）確保しています</td></tr>
+    </table>
+
+    <h2>サイト階層</h2>
+    <div class="tree">ヨコハマ未来創造会議（親サイト・別サイト）  ← ヘッダー／フッター／about からリンク（別タブ）
+└─ EXPO部
+   └─ <b>ヨコワカ（横浜エクスポ若者実行委員会）＝ 本サイト</b>
+      ├─ TOP                     … ヘッダー / KV / about概要 / コンテンツ概要 / ニュース(CMS) / 参加団体(CMS) / 参加方法 / お問い合わせ / フッター
+      ├─ about                   … 概要 / CONCEPT / 主な活動・参加方法 / 実行委員長・副実行委員長
+      ├─ contents                … リボンアース / アップサイクル祝花 / オリジナルソング&MV
+      ├─ NEWS一覧  (CMS)
+      │   └─ ニュース詳細 (CMS)
+      ├─ 参加団体一覧 (CMS)
+      └─ contact                 … お問い合わせ・参加応募フォーム（1本化）</div>
+
+    <h2>ページ一覧と収録ブロック</h2>
+    <table>
+      <tr><th>#</th><th>ページ</th><th>URL（案）</th><th>収録ブロック</th><th>CMS</th></tr>
+      <tr><td>1</td><td>TOP</td><td><code>/</code></td><td>① ヘッダー ② KV ③ about概要 ④ コンテンツ概要 ⑤ ニュース ⑥ 参加団体 ⑦ 参加方法 ⑧ お問い合わせ ⑨ フッター</td><td>⑤⑥</td></tr>
+      <tr><td>2</td><td>about</td><td><code>/about</code></td><td>ヨコワカとは / CONCEPT / 主な活動・参加方法（企画する・創る・発信する）/ 委員長・副委員長</td><td>－</td></tr>
+      <tr><td>3</td><td>contents</td><td><code>/contents</code></td><td>リード / 3プロジェクト詳細 / 参加CTA</td><td>－</td></tr>
+      <tr><td>4</td><td>NEWS一覧</td><td><code>/news</code></td><td>カテゴリ絞り込み（4種）/ 記事一覧 / ページネーション</td><td>○</td></tr>
+      <tr><td>5</td><td>ニュース詳細</td><td><code>/news/[slug]</code></td><td>記事ヘッダ / 本文 / シェア / 前後記事</td><td>○</td></tr>
+      <tr><td>6</td><td>参加団体一覧</td><td><code>/partners</code></td><td>リード / 団体カード一覧 / 募集CTA</td><td>○</td></tr>
+      <tr><td>7</td><td>お問い合わせ・参加応募フォーム</td><td><code>/contact</code></td><td>フォーム（種別セレクトで参加応募・一般問い合わせを1本化）/ 他窓口</td><td>－</td></tr>
+    </table>
+
+    <h2>凡例</h2>
+    <div class="legend">
+      <span><span class="sw" style="background:var(--fill)"></span>✕印のボックス＝画像・動画エリア</span>
+      <span><span class="sw" style="background:var(--fill2)"></span>グレーの横棒＝CMS で流し込むテキスト（原稿未確定）</span>
+      <span><span class="badge">CMS</span>管理画面から更新する領域</span>
+      <span><span class="todo">要文言</span>原稿が未確定の箱</span>
+      <span class="screen-only" style="border:1px dashed var(--mid);padding:1px 8px;">破線枠＝注記（「注記」チェックで表示切替）</span>
+    </div>
+
+    <h2>要確認事項（11件）</h2>
+    <table>
+      <tr><th>#</th><th>項目</th><th>現状の WF での扱い</th></tr>
+      <tr><td>1</td><td>KV のキャッチコピー</td><td>原稿に記載がないため、about の CONCEPT「Be Excited for GREEN」を仮置き。差し替え前提</td></tr>
+      <tr><td>2</td><td>実行委員長・副実行委員長のプロフィール本文</td><td>原稿が「〜〜〜〜〜〜」のため <span class="todo">要文言</span> のダミー行で確保（2〜3行想定）</td></tr>
+      <tr><td>3</td><td>contact ページの文言一式</td><td>リード文・問い合わせ種別・送信完了文が原稿に無い。一般的な構成で仮置き</td></tr>
+      <tr><td>4</td><td>参加応募フォーム（原稿「（フォーム作成必要）」）</td><td>自社実装か外部フォーム（Google フォーム等）かで実装量が変わる。WF では自社実装として <code>/contact</code> に集約。<b>サイト内の参加ボタンはすべてこの 1 ページへ遷移</b>し、ページ名は「お問い合わせ・参加応募フォーム」に統一（v0.2 で反映）</td></tr>
+      <tr><td>5</td><td>参加団体一覧のカテゴリ</td><td>カテゴリ分類は設けず、絞り込み UI を置かない構成で確定</td></tr>
+      <tr><td>6</td><td>ニュースのカテゴリ 4 種</td><td>「すべて／お知らせ／開催前イベント／活動レポート」を CMS の分類として確定扱い</td></tr>
+      <tr><td>7</td><td>親サイト（ヨコハマ未来創造会議）への導線</td><td><b>v0.2 で 3 箇所に追加</b>：①共通ヘッダー右上のテキストリンク（SP はメニュー内）②フッター「運営体制」内のボタン ③about ②「ヨコワカとは？」内のボタン。いずれも別タブで開く。<b>遷移先 URL と、about に入れる関係性の説明文（1〜2 行）が未確定</b></td></tr>
+      <tr><td>8</td><td>ロゴデータ・KV 素材の有無</td><td>すべてプレースホルダ。支給時期がスケジュールに影響</td></tr>
+      <tr><td>9</td><td>3 プロジェクトの個別ページ</td><td>構成図では contents 1 枚に 3 つ内包。個別ページ化するかは未確定（WF は 1 枚に内包）</td></tr>
+      <tr><td>10</td><td>多言語対応</td><td>多言語は無しとして作成</td></tr>
+      <tr><td>11</td><td>SNS 公式アカウントの媒体</td><td>WF では <b>Instagram・X</b> を主軸に想定し、フッター／contact に枠を 3 つ確保（3 枠目は予備）。<b>実際に運用する媒体（Instagram／X／TikTok／YouTube／LINE 等）と各アカウント URL をご教示ください</b>。媒体数に合わせて枠数を調整します</td></tr>
+    </table>
+  </div>
+</section>
+
+
+<!-- ============================================================
+     1. TOP
+     ============================================================ -->
+<section class="page" id="p-top">
+  <div class="page-head">
+    <h1>1. TOP <code>/</code></h1>
+    <p>①ヘッダー ②KV ③about概要 ④コンテンツ概要 ⑤ニュース(CMS) ⑥参加団体(CMS) ⑦参加方法 ⑧お問い合わせ ⑨フッター</p>
+  </div>
+  <div class="stage">
+
+    <!-- ===== PC ===== -->
+    <div class="col-pc">
+      <div class="dev-cap"><span>PC（1280px 想定 / コンテンツ幅 1100px）</span><span>TOP</span></div>
+      <div class="frame">
+
+        <div class="blk">
+          <span class="tag">① ヘッダー</span>
+          <div class="wf-header">
+            <div class="wf-logo">ロゴ<br>ヨコワカ</div>
+            <div class="wf-nav">
+              <span>ABOUT</span><span>CONTENTS</span><span>NEWS</span><span>PARTNERS</span><span>CONTACT</span>
+            </div>
+            <div class="head-right"><span class="ext-link">ヨコハマ未来創造会議 ↗</span><span class="btn fill">参加応募フォーム</span></div>
+          </div>
+          <div class="note"><b>NOTE</b> 上部固定（スクロール追従）。ページ内リンクではなく各独立ページへ遷移。ロゴクリックで TOP へ。<b>親サイト「ヨコハマ未来創造会議」へのリンクを右上に追加（別タブで開く）</b>。URL 支給待ち <span class="todo">要確認</span>。</div>
+        </div>
+
+        <div class="blk">
+          <span class="tag">② KV（メインビジュアル）</span>
+          <div class="ph kv">
+            <span>KV 画像 or 動画（1280×600 想定）</span>
+          </div>
+          <div style="margin-top:12px;text-align:center;">
+            <div class="h-lg">Be Excited for GREEN <span class="todo">KVコピー要確認</span></div>
+            <p class="body">横浜グリーンエクスポ を全国の若者が創る EXPO へ</p>
+            <span class="btn">ヨコワカを知る</span>
+            <span class="btn fill">参加応募フォーム</span>
+          </div>
+          <p class="scroll-hint" style="margin-top:14px;">SCROLL ↓</p>
+          <div class="note"><b>NOTE</b> KV のコピーは未確定。いまは about の CONCEPT を仮置きしている。ファーストビューで「若者が創り手」であることが伝わる一文に差し替える。</div>
+        </div>
+
+        <div class="blk">
+          <span class="tag">③ about概要</span>
+          <div class="grid g2" style="align-items:center;">
+            <div>
+              <p class="eyebrow">ABOUT</p>
+              <div class="h-md">ヨコワカとは？</div>
+              <p class="sub">横浜エクスポ若者実行委員会</p>
+              <p class="body">全国の若者と共に、横浜グリーンエクスポを盛り上げるプロジェクトです。<br>
+              ただ単に参加するだけではなく、若者が創り手の一員となり、それぞれの想いや感性を横浜に届けていきます。多くの若者と連携することで社会的ムーブメントを創ります。</p>
+              <span class="btn">詳細はこちら</span>
+            </div>
+            <div class="ph h160"><span>活動写真</span></div>
+          </div>
+          <div class="note"><b>NOTE</b> 「詳細はこちら」→ <code>/about</code>。本文は about ページと同じ2文を使う。</div>
+        </div>
+
+        <div class="blk">
+          <span class="tag">④ コンテンツ概要</span>
+          <div class="cen">
+            <p class="eyebrow">CONTENTS</p>
+            <div class="h-md">主な活動・実施コンテンツ</div>
+          </div>
+          <div class="grid g3" style="margin-top:14px;">
+            <div class="card">
+              <div class="ph r16"><span>画像</span></div>
+              <p class="h-sm">リボンアースプロジェクト</p>
+              <p class="sub">〜リボンで全国の想いをツナグ〜</p>
+              <p class="body" style="font-size:11px;">若者一人ひとりの想いをリボンに綴り、横浜グリーンエクスポ会場内に1つのモニュメントを制作するプロジェクト。</p>
+              <span class="btn sm">詳しく見る</span>
+            </div>
+            <div class="card">
+              <div class="ph r16"><span>画像</span></div>
+              <p class="h-sm">アップサイクル祝花プロジェクト</p>
+              <p class="sub">〜廃材でオリジナル祝花を〜</p>
+              <p class="body" style="font-size:11px;">全国の若者・学生団体が、それぞれの地域に眠る廃材や未利用資源を活用し、横浜グリーンエクスポの開催を祝う「アップサイクル祝花」を制作する共創プロジェクト。</p>
+              <span class="btn sm">詳しく見る</span>
+            </div>
+            <div class="card">
+              <div class="ph r16"><span>画像</span></div>
+              <p class="h-sm">オリジナルソング&amp;MV制作チャレンジ</p>
+              <p class="sub">〜GREENをテーマに歌う踊る〜</p>
+              <p class="body" style="font-size:11px;">全国のシンガーから「GREEN」をテーマにオリジナルソングを公募。参画団体の若者と共にミュージックビデオ（MV）を制作します。</p>
+              <span class="btn sm">詳しく見る</span>
+            </div>
+          </div>
+          <div class="center-cta" style="margin-top:14px;"><span class="btn">コンテンツ一覧へ</span></div>
+          <div class="note"><b>NOTE</b> 「詳しく見る」は <code>/contents</code> の各セクションへのアンカー（個別ページ化するかは要確認 #9）。</div>
+        </div>
+
+        <div class="blk">
+          <span class="tag">⑤ ニュース <span class="badge" style="border-color:#fff;color:#fff">CMS</span></span>
+          <div style="display:flex;align-items:flex-end;justify-content:space-between;">
+            <div>
+              <p class="eyebrow">NEWS</p>
+              <div class="h-md">お知らせ・活動レポート</div>
+            </div>
+            <span class="btn sm">一覧を見る</span>
+          </div>
+          <div class="grid g3" style="margin-top:12px;">
+            <div class="card">
+              <div class="ph r16"><span>サムネ</span></div>
+              <div class="meta"><span>2026.00.00</span><span class="chip" style="font-size:9px;padding:0 7px;">カテゴリ</span></div>
+              <div class="bar t w90"></div><div class="bar w60"></div>
+            </div>
+            <div class="card">
+              <div class="ph r16"><span>サムネ</span></div>
+              <div class="meta"><span>2026.00.00</span><span class="chip" style="font-size:9px;padding:0 7px;">カテゴリ</span></div>
+              <div class="bar t w90"></div><div class="bar w75"></div>
+            </div>
+            <div class="card">
+              <div class="ph r16"><span>サムネ</span></div>
+              <div class="meta"><span>2026.00.00</span><span class="chip" style="font-size:9px;padding:0 7px;">カテゴリ</span></div>
+              <div class="bar t w75"></div><div class="bar w40"></div>
+            </div>
+          </div>
+          <div class="note"><b>NOTE</b> 最新 3 件を自動表示。0 件時は本ブロックを非表示にするか「準備中」を出すか要決定。</div>
+        </div>
+
+        <div class="blk">
+          <span class="tag">⑥ 参加団体 <span class="badge" style="border-color:#fff;color:#fff">CMS</span></span>
+          <div class="cen">
+            <p class="eyebrow">PARTNERS</p>
+            <div class="h-md">参加団体</div>
+            <p class="body">参加表明をいただいている学生団体/若者団体です。<br>関東だけではなく全国からの参加を募集しています。</p>
+          </div>
+          <div class="grid g6" style="margin-top:12px;gap:10px;">
+            <div class="ph h64"><span>ロゴ</span></div>
+            <div class="ph h64"><span>ロゴ</span></div>
+            <div class="ph h64"><span>ロゴ</span></div>
+            <div class="ph h64"><span>ロゴ</span></div>
+            <div class="ph h64"><span>ロゴ</span></div>
+            <div class="ph h64"><span>ロゴ</span></div>
+            <div class="ph h64"><span>ロゴ</span></div>
+            <div class="ph h64"><span>ロゴ</span></div>
+            <div class="ph h64"><span>ロゴ</span></div>
+            <div class="ph h64"><span>ロゴ</span></div>
+            <div class="ph h64"><span>ロゴ</span></div>
+            <div class="ph h64"><span>ロゴ</span></div>
+          </div>
+          <div class="center-cta" style="margin-top:14px;"><span class="btn">参加団体一覧へ</span></div>
+          <div class="note"><b>NOTE</b> TOP はロゴのみのダイジェスト表示。<b>掲載件数の上限は設けず、6 列 × N 段で流し込む</b>（WF は 12 件＝2 段で作図）。団体が増えるほど段が伸び、参加の広がりがそのまま見た目に出る構成。全件は <code>/partners</code>。ロゴ未支給の団体は団体名テキストで表示するフォールバックが必要。</div>
+        </div>
+
+        <div class="blk">
+          <span class="tag">⑦ 参加方法</span>
+          <div class="cen">
+            <p class="eyebrow">JOIN</p>
+            <div class="h-md">主な活動・参加方法</div>
+          </div>
+          <div class="grid g3" style="margin-top:14px;">
+            <div class="card cen">
+              <div class="ph h90"><span>アイコン/写真</span></div>
+              <p class="h-sm" style="margin-top:8px;">企画する</p>
+              <p class="sub">〜実行委員として参加する〜</p>
+              <p class="body" style="font-size:11px;">アイデアを出し合い、参加者を募り、共にムーブメントを創ります。</p>
+            </div>
+            <div class="card cen">
+              <div class="ph h90"><span>アイコン/写真</span></div>
+              <p class="h-sm" style="margin-top:8px;">創る</p>
+              <p class="sub">〜3つのコンテンツに参加する〜</p>
+              <p class="body" style="font-size:11px;">リボンアース・祝い花・オリジナルソングMVそれぞれに参加し、自身の想いを会場へ届けます。</p>
+            </div>
+            <div class="card cen">
+              <div class="ph h90"><span>アイコン/写真</span></div>
+              <p class="h-sm" style="margin-top:8px;">発信する</p>
+              <p class="sub">〜自身の活動とEXPOを広める〜</p>
+              <p class="body" style="font-size:11px;">自分なりの言葉で企画やイベントの魅力を発信しましょう。</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="blk">
+          <span class="tag">⑧ お問い合わせ（CTA帯）</span>
+          <div class="ph" style="height:150px;flex-direction:column;gap:10px;">
+            <span style="border:0;background:transparent;">背景画像</span>
+            <div style="position:relative;text-align:center;">
+              <div class="h-md" style="margin:0 0 8px;">あなたも参加しませんか？</div>
+              <span class="btn fill">参加応募フォーム <span class="todo">フォーム作成要</span></span>
+              <span class="btn">お問い合わせ</span>
+            </div>
+          </div>
+          <div class="note"><b>NOTE</b> 参加応募フォームは未着手。自社実装／外部フォーム（Google フォーム等）のどちらにするか決定が必要（要確認 #4）。</div>
+        </div>
+
+        <div class="blk">
+          <span class="tag">⑨ フッター</span>
+          <div class="wf-footer" style="padding:16px;">
+            <div class="grid g4">
+              <div>
+                <div class="wf-logo" style="display:inline-block;">ロゴ</div>
+                <p class="sub" style="margin-top:8px;">横浜エクスポ若者実行委員会</p>
+              </div>
+              <div>
+                <p class="h-sm">運営体制</p>
+                <p class="sub" style="font-size:10px;line-height:1.9;">ヨコハマ未来創造会議<br>└ EXPO部<br>　└ 横浜エクスポ若者実行委員会</p>
+                <span class="btn sm" style="margin-top:6px;">未来会議HPを見る ↗</span>
+              </div>
+              <div>
+                <p class="h-sm">サイトマップ</p>
+                <p class="sub" style="font-size:10px;line-height:1.9;">ABOUT／CONTENTS<br>NEWS／PARTNERS<br>CONTACT</p>
+              </div>
+              <div>
+                <p class="h-sm">参加誘導</p>
+                <span class="btn sm">参加応募フォーム</span>
+                <div class="chips" style="margin-top:8px;">
+                  <span class="chip" style="font-size:10px;">Instagram</span>
+                  <span class="chip" style="font-size:10px;">X</span>
+                  <span class="chip" style="font-size:10px;">予備枠 <span class="todo">要確認</span></span>
+                </div>
+              </div>
+            </div>
+            <hr class="hr">
+            <p class="sub cen" style="font-size:10px;margin:0;">© 横浜エクスポ若者実行委員会</p>
+          </div>
+          <div class="note"><b>NOTE</b> 構成図のフッター要件「運営体制」「参加誘導」を 2 カラムとして明示。親組織へのリンクはここに集約（要確認 #7）。</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ===== SP ===== -->
+    <div class="col-sp">
+      <div class="dev-cap"><span>SP（375px）</span><span>TOP</span></div>
+      <div class="frame sp">
+
+        <div class="blk">
+          <span class="tag">①</span>
+          <div class="wf-header">
+            <div class="wf-logo" style="padding:6px 10px;">ロゴ</div>
+            <div class="burger">≡ MENU</div>
+          </div>
+          <div class="note">タップでオーバーレイメニュー（5項目＋参加応募フォームボタン＋「ヨコハマ未来創造会議 ↗」リンク）。SP はヘッダー幅が足りないため、親サイトリンクはメニュー内に格納する。</div>
+        </div>
+
+        <div class="blk">
+          <span class="tag">②</span>
+          <div class="ph kv"><span>KV（縦長トリミング）</span></div>
+          <div class="cen" style="margin-top:10px;">
+            <div class="h-lg">Be Excited<br>for GREEN</div>
+            <p class="body" style="font-size:11px;">横浜グリーンエクスポ を全国の若者が創る EXPO へ</p>
+            <span class="btn wide">ヨコワカを知る</span>
+            <div style="height:6px"></div>
+            <span class="btn wide fill">参加応募フォーム</span>
+          </div>
+        </div>
+
+        <div class="blk">
+          <span class="tag">③</span>
+          <p class="eyebrow">ABOUT</p>
+          <div class="h-md">ヨコワカとは？</div>
+          <p class="sub">横浜エクスポ若者実行委員会</p>
+          <div class="ph h120" style="margin-bottom:8px;"><span>活動写真</span></div>
+          <p class="body" style="font-size:11px;">全国の若者と共に、横浜グリーンエクスポを盛り上げるプロジェクトです。ただ単に参加するだけではなく、若者が創り手の一員となり、それぞれの想いや感性を横浜に届けていきます。多くの若者と連携することで社会的ムーブメントを創ります。</p>
+          <span class="btn wide">詳細はこちら</span>
+        </div>
+
+        <div class="blk">
+          <span class="tag">④</span>
+          <p class="eyebrow">CONTENTS</p>
+          <div class="h-md">主な活動・実施コンテンツ</div>
+          <div style="display:flex;flex-direction:column;gap:10px;margin-top:8px;">
+            <div class="card">
+              <div class="ph r16"><span>画像</span></div>
+              <p class="h-sm" style="margin-top:6px;">リボンアースプロジェクト</p>
+              <p class="sub" style="font-size:10px;">〜リボンで全国の想いをツナグ〜</p>
+              <p class="body" style="font-size:11px;">若者一人ひとりの想いをリボンに綴り、横浜グリーンエクスポ会場内に1つのモニュメントを制作するプロジェクト。</p>
+            </div>
+            <div class="card">
+              <div class="ph r16"><span>画像</span></div>
+              <p class="h-sm" style="margin-top:6px;">アップサイクル祝花プロジェクト</p>
+              <p class="sub" style="font-size:10px;">〜廃材でオリジナル祝花を〜</p>
+              <p class="body" style="font-size:11px;">全国の若者・学生団体が、それぞれの地域に眠る廃材や未利用資源を活用し…</p>
+            </div>
+            <div class="card">
+              <div class="ph r16"><span>画像</span></div>
+              <p class="h-sm" style="margin-top:6px;">オリジナルソング&amp;MV制作チャレンジ</p>
+              <p class="sub" style="font-size:10px;">〜GREENをテーマに歌う踊る〜</p>
+              <p class="body" style="font-size:11px;">全国のシンガーから「GREEN」をテーマにオリジナルソングを公募…</p>
+            </div>
+          </div>
+          <div style="margin-top:10px;"><span class="btn wide">コンテンツ一覧へ</span></div>
+          <div class="note">SP は横スワイプカルーセルでなく縦積み（一覧性優先）</div>
+        </div>
+
+        <div class="blk">
+          <span class="tag">⑤ CMS</span>
+          <p class="eyebrow">NEWS</p>
+          <div class="h-md">お知らせ・活動レポート</div>
+          <div style="display:flex;flex-direction:column;gap:8px;margin-top:8px;">
+            <div class="card" style="display:flex;gap:8px;">
+              <div class="ph" style="width:88px;height:60px;flex:0 0 88px;"><span>&nbsp;</span></div>
+              <div style="flex:1"><div class="meta" style="font-size:9px;">2026.00.00 ・ カテゴリ</div><div class="bar t w90"></div><div class="bar w60"></div></div>
+            </div>
+            <div class="card" style="display:flex;gap:8px;">
+              <div class="ph" style="width:88px;height:60px;flex:0 0 88px;"><span>&nbsp;</span></div>
+              <div style="flex:1"><div class="meta" style="font-size:9px;">2026.00.00 ・ カテゴリ</div><div class="bar t w75"></div><div class="bar w40"></div></div>
+            </div>
+            <div class="card" style="display:flex;gap:8px;">
+              <div class="ph" style="width:88px;height:60px;flex:0 0 88px;"><span>&nbsp;</span></div>
+              <div style="flex:1"><div class="meta" style="font-size:9px;">2026.00.00 ・ カテゴリ</div><div class="bar t w90"></div><div class="bar w40"></div></div>
+            </div>
+          </div>
+          <div style="margin-top:10px;"><span class="btn wide">一覧を見る</span></div>
+          <div class="note">SP は横並びカードではなく横型リスト（サムネ左・テキスト右）</div>
+        </div>
+
+        <div class="blk">
+          <span class="tag">⑥ CMS</span>
+          <p class="eyebrow">PARTNERS</p>
+          <div class="h-md">参加団体</div>
+          <p class="body" style="font-size:11px;">参加表明をいただいている学生団体/若者団体です。関東だけではなく全国からの参加を募集しています。</p>
+          <div class="grid g6" style="gap:8px;">
+            <div class="ph h64"><span>ロゴ</span></div>
+            <div class="ph h64"><span>ロゴ</span></div>
+            <div class="ph h64"><span>ロゴ</span></div>
+            <div class="ph h64"><span>ロゴ</span></div>
+            <div class="ph h64"><span>ロゴ</span></div>
+            <div class="ph h64"><span>ロゴ</span></div>
+            <div class="ph h64"><span>ロゴ</span></div>
+            <div class="ph h64"><span>ロゴ</span></div>
+            <div class="ph h64"><span>ロゴ</span></div>
+            <div class="ph h64"><span>ロゴ</span></div>
+            <div class="ph h64"><span>ロゴ</span></div>
+            <div class="ph h64"><span>ロゴ</span></div>
+          </div>
+          <div class="note">SP は 3 列 × N 段。ロゴが潰れる場合のみ 2 列に落とす</div>
+          <div style="margin-top:10px;"><span class="btn wide">参加団体一覧へ</span></div>
+        </div>
+
+        <div class="blk">
+          <span class="tag">⑦</span>
+          <p class="eyebrow">JOIN</p>
+          <div class="h-md">主な活動・参加方法</div>
+          <div style="display:flex;flex-direction:column;gap:10px;margin-top:8px;">
+            <div class="card">
+              <p class="h-sm">企画する</p><p class="sub" style="font-size:10px;">〜実行委員として参加する〜</p>
+              <p class="body" style="font-size:11px;">アイデアを出し合い、参加者を募り、共にムーブメントを創ります。</p>
+            </div>
+            <div class="card">
+              <p class="h-sm">創る</p><p class="sub" style="font-size:10px;">〜3つのコンテンツに参加する〜</p>
+              <p class="body" style="font-size:11px;">リボンアース・祝い花・オリジナルソングMVそれぞれに参加し、自身の想いを会場へ届けます。</p>
+            </div>
+            <div class="card">
+              <p class="h-sm">発信する</p><p class="sub" style="font-size:10px;">〜自身の活動とEXPOを広める〜</p>
+              <p class="body" style="font-size:11px;">自分なりの言葉で企画やイベントの魅力を発信しましょう。</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="blk">
+          <span class="tag">⑧</span>
+          <div class="ph" style="height:150px;">
+            <div style="position:relative;text-align:center;">
+              <div class="h-md" style="margin:0 0 8px;">あなたも参加しませんか？</div>
+              <span class="btn fill">参加応募フォーム</span>
+            </div>
+          </div>
+          <div style="margin-top:8px;"><span class="btn wide">お問い合わせ</span></div>
+        </div>
+
+        <div class="blk">
+          <span class="tag">⑨</span>
+          <div class="wf-footer" style="padding:12px;">
+            <div class="wf-logo" style="display:inline-block;padding:6px 10px;">ロゴ</div>
+            <hr class="hr">
+            <p class="h-sm">運営体制</p>
+            <p class="sub" style="font-size:10px;">ヨコハマ未来創造会議 / EXPO部 / 横浜エクスポ若者実行委員会</p>
+            <span class="btn sm" style="margin-top:6px;">未来会議HPを見る ↗</span>
+            <hr class="hr">
+            <p class="h-sm">サイトマップ</p>
+            <p class="sub" style="font-size:10px;">ABOUT / CONTENTS / NEWS / PARTNERS / CONTACT</p>
+            <hr class="hr">
+            <span class="btn wide">参加応募フォーム</span>
+            <div class="chips cen" style="margin-top:10px;justify-content:center;">
+              <span class="chip" style="font-size:10px;">Instagram</span><span class="chip" style="font-size:10px;">X</span><span class="chip" style="font-size:10px;">予備枠</span>
+            </div>
+            <p class="sub cen" style="font-size:9px;margin-top:10px;">© 横浜エクスポ若者実行委員会</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ============================================================
+     2. about
+     ============================================================ -->
+<section class="page" id="p-about">
+  <div class="page-head">
+    <h1>2. about <code>/about</code></h1>
+    <p>ヨコワカとは（概要）／CONCEPT（目的）／主な活動・参加方法／実行委員長・副実行委員長の紹介</p>
+  </div>
+  <div class="stage">
+
+    <div class="col-pc">
+      <div class="dev-cap"><span>PC</span><span>about</span></div>
+      <div class="frame">
+
+        <div class="blk">
+          <span class="tag g">共通ヘッダー（TOP ① と同一）</span>
+          <div class="wf-header">
+            <div class="wf-logo" style="padding:6px 12px;">ロゴ</div>
+            <div class="wf-nav"><span style="font-weight:700;color:var(--ink)">ABOUT</span><span>CONTENTS</span><span>NEWS</span><span>PARTNERS</span><span>CONTACT</span></div>
+            <div class="head-right"><span class="ext-link">ヨコハマ未来創造会議 ↗</span><span class="btn fill">参加応募フォーム</span></div>
+          </div>
+          <div class="note">現在ページをナビ上で強調（カレント表示）</div>
+        </div>
+
+        <div class="blk">
+          <span class="tag">① ページヘッダー</span>
+          <div class="ph" style="height:170px;">
+            <div style="position:relative;text-align:center;">
+              <p class="eyebrow">ABOUT</p>
+              <div class="h-lg" style="margin:2px 0 0;">ヨコワカ〜横浜エクスポ若者実行委員会〜</div>
+            </div>
+          </div>
+          <p class="sub" style="margin-top:8px;font-size:10px;">HOME ＞ ABOUT　←パンくず</p>
+        </div>
+
+        <div class="blk">
+          <span class="tag">② ヨコワカとは？</span>
+          <div class="grid g2" style="align-items:center;">
+            <div>
+              <div class="h-md">ヨコワカとは？</div>
+              <p class="sub">横浜エクスポ若者実行委員会</p>
+              <p class="body">全国の若者と共に、横浜グリーンエクスポを盛り上げるプロジェクトです。<br>
+              ただ単に参加するだけではなく、若者が創り手の一員となり、それぞれの想いや感性を横浜に届けていきます。多くの若者と連携することで社会的ムーブメントを創ります。</p>
+              <p class="sub" style="margin-top:12px;font-size:11px;line-height:1.8;">ヨコワカは「ヨコハマ未来創造会議 EXPO部」の若者実行委員会です。 <span class="todo">要文言</span></p>
+              <span class="btn sm" style="margin-top:4px;">ヨコハマ未来創造会議HPへ ↗</span>
+            </div>
+            <div class="ph h160"><span>活動写真</span></div>
+          </div>
+          <div class="note"><b>NOTE</b> 親組織（ヨコハマ未来創造会議）への導線をここにも設置。1〜2 行の関係性の説明文が必要（原稿に記載なし・<span class="todo">要文言</span>）。リンクは別タブで開く。</div>
+        </div>
+
+        <div class="blk">
+          <span class="tag">③ CONCEPT</span>
+          <div class="ph" style="height:210px;">
+            <div style="position:relative;text-align:center;">
+              <p class="eyebrow">CONCEPT</p>
+              <div class="h-lg" style="margin:4px 0 6px;">Be Excited for GREEN</div>
+              <p class="body" style="margin:0;">横浜グリーンエクスポを全国の若者が創るEXPOへ</p>
+            </div>
+          </div>
+          <div class="note"><b>NOTE</b> サイト全体で最も強く見せるコピー。KV と重複するため、KV 側の文言を差し替える場合はここを主役に。</div>
+        </div>
+
+        <div class="blk">
+          <span class="tag">④ 主な活動・参加方法</span>
+          <div class="cen"><div class="h-md">主な活動・参加方法</div></div>
+          <div class="grid g3" style="margin-top:14px;">
+            <div class="card">
+              <div class="ph h120"><span>写真</span></div>
+              <p class="h-sm" style="margin-top:8px;">企画する</p>
+              <p class="sub">〜実行委員として参加する〜</p>
+              <p class="body" style="font-size:11px;">アイデアを出し合い、参加者を募り、共にムーブメントを創ります。</p>
+              <span class="btn sm">実行委員に応募</span>
+            </div>
+            <div class="card">
+              <div class="ph h120"><span>写真</span></div>
+              <p class="h-sm" style="margin-top:8px;">創る</p>
+              <p class="sub">〜3つのコンテンツに参加する〜</p>
+              <p class="body" style="font-size:11px;">リボンアース・祝い花・オリジナルソングMVそれぞれに参加し、自身の想いを会場へ届けます。</p>
+              <span class="btn sm">CONTENTS を見る</span>
+            </div>
+            <div class="card">
+              <div class="ph h120"><span>写真</span></div>
+              <p class="h-sm" style="margin-top:8px;">発信する</p>
+              <p class="sub">〜自身の活動とEXPOを広める〜</p>
+              <p class="body" style="font-size:11px;">自分なりの言葉で企画やイベントの魅力を発信しましょう。</p>
+              <span class="btn sm">SNS を見る</span>
+            </div>
+          </div>
+          <div class="note"><b>NOTE</b> 3 つのうち「創る」だけが contents ページへの導線。ボタン文言は要確認。</div>
+        </div>
+
+        <div class="blk">
+          <span class="tag">⑤ メンバー紹介</span>
+          <div class="cen"><div class="h-md">運営メンバー</div></div>
+          <div class="grid g2" style="margin-top:14px;">
+            <div class="card" style="display:flex;gap:14px;">
+              <div class="ph sq" style="flex:0 0 120px;"><span>顔写真</span></div>
+              <div style="flex:1">
+                <p class="eyebrow">実行委員長</p>
+                <p class="h-sm" style="font-size:15px;margin:2px 0;">圡田一樹</p>
+                <p class="sub">横浜出身 / 東北大学院1年</p>
+                <p class="sub" style="margin:6px 0 4px;">コメント <span class="todo">要文言</span></p>
+                <div class="bar w90"></div><div class="bar w90"></div><div class="bar w60"></div>
+              </div>
+            </div>
+            <div class="card" style="display:flex;gap:14px;">
+              <div class="ph sq" style="flex:0 0 120px;"><span>顔写真</span></div>
+              <div style="flex:1">
+                <p class="eyebrow">副実行委員長</p>
+                <p class="h-sm" style="font-size:15px;margin:2px 0;">初沢咲織</p>
+                <p class="sub">大阪在住 / 立命館大学3年</p>
+                <p class="sub" style="margin:6px 0 4px;">コメント <span class="todo">要文言</span></p>
+                <div class="bar w90"></div><div class="bar w75"></div><div class="bar w40"></div>
+              </div>
+            </div>
+          </div>
+          <div class="note"><b>NOTE</b> コメント文が未確定のため 2〜3 行分の枠を確保している。他メンバー（各部門長など）を追加する場合はグリッド 3〜4 列に拡張。</div>
+        </div>
+
+        <div class="blk">
+          <span class="tag g">共通 CTA ＋ フッター（TOP ⑧⑨ と同一）</span>
+          <div class="ph" style="height:110px;">
+            <div style="position:relative;text-align:center;">
+              <div class="h-md" style="margin:0 0 6px;">あなたも参加しませんか？</div>
+              <span class="btn fill">参加応募フォーム</span>
+            </div>
+          </div>
+          <div class="wf-footer" style="padding:14px;margin-top:12px;text-align:center;">
+            <p class="sub" style="margin:0;font-size:10px;">運営体制（未来会議HP ↗）／ サイトマップ ／ 参加誘導 ／ SNS ／ © 横浜エクスポ若者実行委員会</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="col-sp">
+      <div class="dev-cap"><span>SP</span><span>about</span></div>
+      <div class="frame sp">
+        <div class="blk"><span class="tag g">共通ヘッダー</span>
+          <div class="wf-header"><div class="wf-logo" style="padding:6px 10px;">ロゴ</div><div class="burger">≡ MENU</div></div>
+        </div>
+        <div class="blk">
+          <span class="tag">①</span>
+          <div class="ph" style="height:120px;"><div style="position:relative;text-align:center;"><p class="eyebrow">ABOUT</p><div class="h-md" style="margin:0;">ヨコワカ<br>〜横浜エクスポ若者実行委員会〜</div></div></div>
+          <p class="sub" style="font-size:9px;margin-top:6px;">HOME ＞ ABOUT</p>
+        </div>
+        <div class="blk">
+          <span class="tag">②</span>
+          <div class="h-md">ヨコワカとは？</div>
+          <p class="sub">横浜エクスポ若者実行委員会</p>
+          <div class="ph h120" style="margin-bottom:8px;"><span>活動写真</span></div>
+          <p class="body" style="font-size:11px;">全国の若者と共に、横浜グリーンエクスポを盛り上げるプロジェクトです。ただ単に参加するだけではなく、若者が創り手の一員となり、それぞれの想いや感性を横浜に届けていきます。多くの若者と連携することで社会的ムーブメントを創ります。</p>
+          <p class="sub" style="margin-top:10px;font-size:10px;line-height:1.8;">ヨコワカは「ヨコハマ未来創造会議 EXPO部」の若者実行委員会です。 <span class="todo">要文言</span></p>
+          <span class="btn wide" style="margin-top:6px;">ヨコハマ未来創造会議HPへ ↗</span>
+        </div>
+        <div class="blk">
+          <span class="tag">③</span>
+          <div class="ph" style="height:160px;"><div style="position:relative;text-align:center;"><p class="eyebrow">CONCEPT</p><div class="h-lg" style="margin:4px 0;">Be Excited<br>for GREEN</div><p class="body" style="font-size:11px;margin:0;">横浜グリーンエクスポを<br>全国の若者が創るEXPOへ</p></div></div>
+        </div>
+        <div class="blk">
+          <span class="tag">④</span>
+          <div class="h-md">主な活動・参加方法</div>
+          <div style="display:flex;flex-direction:column;gap:10px;margin-top:8px;">
+            <div class="card"><div class="ph h90"><span>写真</span></div><p class="h-sm" style="margin-top:6px;">企画する</p><p class="sub" style="font-size:10px;">〜実行委員として参加する〜</p><p class="body" style="font-size:11px;">アイデアを出し合い、参加者を募り、共にムーブメントを創ります。</p></div>
+            <div class="card"><div class="ph h90"><span>写真</span></div><p class="h-sm" style="margin-top:6px;">創る</p><p class="sub" style="font-size:10px;">〜3つのコンテンツに参加する〜</p><p class="body" style="font-size:11px;">リボンアース・祝い花・オリジナルソングMVそれぞれに参加し、自身の想いを会場へ届けます。</p></div>
+            <div class="card"><div class="ph h90"><span>写真</span></div><p class="h-sm" style="margin-top:6px;">発信する</p><p class="sub" style="font-size:10px;">〜自身の活動とEXPOを広める〜</p><p class="body" style="font-size:11px;">自分なりの言葉で企画やイベントの魅力を発信しましょう。</p></div>
+          </div>
+        </div>
+        <div class="blk">
+          <span class="tag">⑤</span>
+          <div class="h-md">運営メンバー</div>
+          <div style="display:flex;flex-direction:column;gap:10px;margin-top:8px;">
+            <div class="card cen"><div class="ph sq" style="width:110px;margin:0 auto;"><span>顔写真</span></div><p class="eyebrow" style="margin-top:6px;">実行委員長</p><p class="h-sm" style="font-size:14px;">圡田一樹</p><p class="sub" style="font-size:10px;">横浜出身 / 東北大学院1年</p><div class="bar w90"></div><div class="bar w75"></div></div>
+            <div class="card cen"><div class="ph sq" style="width:110px;margin:0 auto;"><span>顔写真</span></div><p class="eyebrow" style="margin-top:6px;">副実行委員長</p><p class="h-sm" style="font-size:14px;">初沢咲織</p><p class="sub" style="font-size:10px;">大阪在住 / 立命館大学3年</p><div class="bar w90"></div><div class="bar w60"></div></div>
+          </div>
+        </div>
+        <div class="blk"><span class="tag g">共通 CTA ＋ フッター</span>
+          <div class="ph" style="height:100px;"><div style="position:relative;text-align:center;"><div class="h-md" style="margin:0 0 6px;">あなたも参加しませんか？</div><span class="btn fill">参加応募フォーム</span></div></div>
+          <div class="wf-footer cen" style="padding:12px;margin-top:10px;"><p class="sub" style="margin:0;font-size:9px;">運営体制（未来会議HP ↗）/ サイトマップ / 参加誘導 / SNS</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ============================================================
+     3. contents
+     ============================================================ -->
+<section class="page" id="p-contents">
+  <div class="page-head">
+    <h1>3. contents <code>/contents</code></h1>
+    <p>リボンアース／アップサイクル祝花／オリジナルソング&amp;MV の 3 プロジェクトを 1 ページに内包</p>
+  </div>
+  <div class="stage">
+
+    <div class="col-pc">
+      <div class="dev-cap"><span>PC</span><span>contents</span></div>
+      <div class="frame">
+
+        <div class="blk"><span class="tag g">共通ヘッダー</span>
+          <div class="wf-header">
+            <div class="wf-logo" style="padding:6px 12px;">ロゴ</div>
+            <div class="wf-nav"><span>ABOUT</span><span style="font-weight:700;color:var(--ink)">CONTENTS</span><span>NEWS</span><span>PARTNERS</span><span>CONTACT</span></div>
+            <div class="head-right"><span class="ext-link">ヨコハマ未来創造会議 ↗</span><span class="btn fill">参加応募フォーム</span></div>
+          </div>
+        </div>
+
+        <div class="blk">
+          <span class="tag">① ページヘッダー ＋ リード</span>
+          <div class="ph" style="height:150px;">
+            <div style="position:relative;text-align:center;">
+              <p class="eyebrow">CONTENTS</p>
+              <div class="h-lg" style="margin:2px 0 0;">ヨコワカの活動</div>
+            </div>
+          </div>
+          <p class="body cen" style="margin-top:12px;">横浜エクスポ若者実行委員会は、下記の3つプロジェクトを軸に<br>全国の若者と共に横浜グリーンエクスポを盛り上げていきます。</p>
+        </div>
+
+        <div class="blk">
+          <span class="tag">② 目次（ページ内アンカー）</span>
+          <div class="grid g3">
+            <div class="card cen"><div class="ph h64"><span>サムネ</span></div><p class="h-sm" style="margin-top:6px;">01 リボンアース</p></div>
+            <div class="card cen"><div class="ph h64"><span>サムネ</span></div><p class="h-sm" style="margin-top:6px;">02 アップサイクル祝花</p></div>
+            <div class="card cen"><div class="ph h64"><span>サムネ</span></div><p class="h-sm" style="margin-top:6px;">03 オリジナルソング&amp;MV</p></div>
+          </div>
+          <div class="note"><b>NOTE</b> 3 プロジェクトを個別ページに分ける場合、このブロックはカード型の一覧に置き換わる（要確認 #9）。</div>
+        </div>
+
+        <div class="blk">
+          <span class="tag">③-1 リボンアースプロジェクト</span>
+          <div class="grid g2" style="align-items:start;">
+            <div class="ph h160"><span>メイン画像</span></div>
+            <div>
+              <p class="eyebrow">PROJECT 01</p>
+              <div class="h-md">リボンアースプロジェクト</div>
+              <p class="sub">〜リボンで全国の想いをツナグ〜</p>
+              <p class="body">若者一人ひとりの想いをリボンに綴り、横浜グリーンエクスポ会場内に1つのモニュメントを制作するプロジェクト。</p>
+              <p class="body">横浜から始まったリボンアースの活動を全国へ広げ、1つのモニュメントを制作するプロジェクトです。参加者一人ひとりが「あなたの創りたい明日の風景」をテーマにリボンへ記入。全国から集まった想いを一つの作品として、横浜グリーンエクスポ会場内に展示します。</p>
+              <span class="btn">このプロジェクトに応募する</span>
+            </div>
+          </div>
+          <div class="grid g4" style="margin-top:14px;">
+            <div class="ph r16"><span>活動写真</span></div><div class="ph r16"><span>活動写真</span></div>
+            <div class="ph r16"><span>活動写真</span></div><div class="ph r16"><span>活動写真</span></div>
+          </div>
+          <div class="note"><b>NOTE</b> 3企画のうち詳細説明まで用意できているのはこの企画のみ。参加手順（何をどう送るか）は未確定で <span class="todo">要文言</span>。</div>
+        </div>
+
+        <div class="blk">
+          <span class="tag">③-2 アップサイクル祝花プロジェクト</span>
+          <div class="grid g2" style="align-items:start;">
+            <div>
+              <p class="eyebrow">PROJECT 02</p>
+              <div class="h-md">アップサイクル祝花プロジェクト</div>
+              <p class="sub">〜廃材でオリジナル祝花を〜</p>
+              <p class="body">全国の若者・学生団体が、それぞれの地域に眠る廃材や未利用資源を活用し、横浜グリーンエクスポの開催を祝う「アップサイクル祝花」を制作する共創プロジェクト。</p>
+              <p class="sub">詳細説明 <span class="todo">要文言</span></p>
+              <div class="bar w90"></div><div class="bar w90"></div><div class="bar w75"></div>
+              <div style="margin-top:10px;"><span class="btn">このプロジェクトに応募する</span></div>
+            </div>
+            <div class="ph h160"><span>メイン画像</span></div>
+          </div>
+          <div class="grid g4" style="margin-top:14px;">
+            <div class="ph r16"><span>活動写真</span></div><div class="ph r16"><span>活動写真</span></div>
+            <div class="ph r16"><span>活動写真</span></div><div class="ph r16"><span>活動写真</span></div>
+          </div>
+          <div class="note"><b>NOTE</b> 画像とテキストの左右を 01 と反転させ、リズムをつける（実装時の指定）。</div>
+        </div>
+
+        <div class="blk">
+          <span class="tag">③-3 オリジナルソング&amp;MV制作チャレンジ</span>
+          <div class="grid g2" style="align-items:start;">
+            <div class="ph h160"><span>MV サムネ（動画埋め込み枠）</span></div>
+            <div>
+              <p class="eyebrow">PROJECT 03</p>
+              <div class="h-md">オリジナルソング&amp;MV制作チャレンジ</div>
+              <p class="sub">〜GREENをテーマに歌う踊る〜</p>
+              <p class="body">全国のシンガーから「GREEN」をテーマにオリジナルソングを公募。参画団体の若者と共にミュージックビデオ（MV）を制作します。</p>
+              <p class="sub">応募要項・締切 <span class="todo">要文言</span></p>
+              <div class="bar w90"></div><div class="bar w60"></div>
+              <div style="margin-top:10px;"><span class="btn">楽曲を応募する</span><span class="btn">MV制作に応募する</span></div>
+            </div>
+          </div>
+          <div class="note"><b>NOTE</b> シンガー（楽曲応募）と若者団体（MV制作）で応募者が異なるため、CTA を 2 系統に分けている。統合するか要確認。</div>
+        </div>
+
+        <div class="blk">
+          <span class="tag">④ 参加 CTA</span>
+          <div class="ph" style="height:140px;">
+            <div style="position:relative;text-align:center;">
+              <div class="h-md" style="margin:0 0 8px;">あなたも参加しませんか？</div>
+              <p class="sub" style="margin:0 0 10px;">（フォーム作成必要）<span class="todo">要確認</span></p>
+              <span class="btn fill">参加応募フォーム</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="blk"><span class="tag g">共通フッター</span>
+          <div class="wf-footer cen" style="padding:14px;"><p class="sub" style="margin:0;font-size:10px;">運営体制（未来会議HP ↗）／ サイトマップ ／ 参加誘導 ／ SNS ／ © 横浜エクスポ若者実行委員会</p></div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="col-sp">
+      <div class="dev-cap"><span>SP</span><span>contents</span></div>
+      <div class="frame sp">
+        <div class="blk"><span class="tag g">共通ヘッダー</span>
+          <div class="wf-header"><div class="wf-logo" style="padding:6px 10px;">ロゴ</div><div class="burger">≡ MENU</div></div>
+        </div>
+        <div class="blk">
+          <span class="tag">①</span>
+          <div class="ph" style="height:110px;"><div style="position:relative;text-align:center;"><p class="eyebrow">CONTENTS</p><div class="h-md" style="margin:0;">ヨコワカの活動</div></div></div>
+          <p class="body cen" style="font-size:11px;margin-top:10px;">横浜エクスポ若者実行委員会は、下記の3つプロジェクトを軸に全国の若者と共に横浜グリーンエクスポを盛り上げていきます。</p>
+        </div>
+        <div class="blk">
+          <span class="tag">②</span>
+          <div style="display:flex;flex-direction:column;gap:6px;">
+            <div class="card" style="display:flex;gap:8px;align-items:center;"><div class="ph" style="width:56px;height:40px;flex:0 0 56px;"><span>&nbsp;</span></div><p class="h-sm" style="margin:0;">01 リボンアース</p></div>
+            <div class="card" style="display:flex;gap:8px;align-items:center;"><div class="ph" style="width:56px;height:40px;flex:0 0 56px;"><span>&nbsp;</span></div><p class="h-sm" style="margin:0;">02 アップサイクル祝花</p></div>
+            <div class="card" style="display:flex;gap:8px;align-items:center;"><div class="ph" style="width:56px;height:40px;flex:0 0 56px;"><span>&nbsp;</span></div><p class="h-sm" style="margin:0;">03 オリジナルソング&amp;MV</p></div>
+          </div>
+        </div>
+        <div class="blk">
+          <span class="tag">③-1</span>
+          <div class="ph h120" style="margin-bottom:8px;"><span>メイン画像</span></div>
+          <p class="eyebrow">PROJECT 01</p>
+          <div class="h-md">リボンアースプロジェクト</div>
+          <p class="sub" style="font-size:10px;">〜リボンで全国の想いをツナグ〜</p>
+          <p class="body" style="font-size:11px;">若者一人ひとりの想いをリボンに綴り、横浜グリーンエクスポ会場内に1つのモニュメントを制作するプロジェクト。</p>
+          <p class="body" style="font-size:11px;">横浜から始まったリボンアースの活動を全国へ広げ、1つのモニュメントを制作するプロジェクトです。参加者一人ひとりが「あなたの創りたい明日の風景」をテーマにリボンへ記入。全国から集まった想いを一つの作品として、横浜グリーンエクスポ会場内に展示します。</p>
+          <div class="grid g2" style="margin:10px 0;"><div class="ph r16"><span>写真</span></div><div class="ph r16"><span>写真</span></div></div>
+          <span class="btn wide">このプロジェクトに応募する</span>
+        </div>
+        <div class="blk">
+          <span class="tag">③-2</span>
+          <div class="ph h120" style="margin-bottom:8px;"><span>メイン画像</span></div>
+          <p class="eyebrow">PROJECT 02</p>
+          <div class="h-md">アップサイクル祝花プロジェクト</div>
+          <p class="sub" style="font-size:10px;">〜廃材でオリジナル祝花を〜</p>
+          <p class="body" style="font-size:11px;">全国の若者・学生団体が、それぞれの地域に眠る廃材や未利用資源を活用し、横浜グリーンエクスポの開催を祝う「アップサイクル祝花」を制作する共創プロジェクト。</p>
+          <p class="sub" style="font-size:10px;">詳細説明 <span class="todo">要文言</span></p>
+          <div class="bar w90"></div><div class="bar w75"></div>
+          <div class="grid g2" style="margin:10px 0;"><div class="ph r16"><span>写真</span></div><div class="ph r16"><span>写真</span></div></div>
+          <span class="btn wide">このプロジェクトに応募する</span>
+        </div>
+        <div class="blk">
+          <span class="tag">③-3</span>
+          <div class="ph r16" style="margin-bottom:8px;"><span>MV 埋め込み枠</span></div>
+          <p class="eyebrow">PROJECT 03</p>
+          <div class="h-md">オリジナルソング&amp;MV制作チャレンジ</div>
+          <p class="sub" style="font-size:10px;">〜GREENをテーマに歌う踊る〜</p>
+          <p class="body" style="font-size:11px;">全国のシンガーから「GREEN」をテーマにオリジナルソングを公募。参画団体の若者と共にミュージックビデオ（MV）を制作します。</p>
+          <p class="sub" style="font-size:10px;">応募要項・締切 <span class="todo">要文言</span></p>
+          <div class="bar w90"></div><div class="bar w60"></div>
+          <div style="margin-top:10px;"><span class="btn wide">楽曲を応募する</span><div style="height:6px"></div><span class="btn wide">MV制作に応募する</span></div>
+        </div>
+        <div class="blk">
+          <span class="tag">④</span>
+          <div class="ph" style="height:120px;"><div style="position:relative;text-align:center;"><div class="h-md" style="margin:0 0 6px;">あなたも参加しませんか？</div><span class="btn fill">参加応募フォーム</span></div></div>
+        </div>
+        <div class="blk"><span class="tag g">共通フッター</span>
+          <div class="wf-footer cen" style="padding:12px;"><p class="sub" style="margin:0;font-size:9px;">運営体制（未来会議HP ↗）/ サイトマップ / 参加誘導 / SNS</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ============================================================
+     4. NEWS一覧
+     ============================================================ -->
+<section class="page" id="p-news">
+  <div class="page-head">
+    <h1>4. NEWS一覧 <code>/news</code> <span class="badge">CMS</span></h1>
+    <p>カテゴリ：すべて／お知らせ／開催前イベント／活動レポート</p>
+  </div>
+  <div class="stage">
+
+    <div class="col-pc">
+      <div class="dev-cap"><span>PC</span><span>NEWS一覧</span></div>
+      <div class="frame">
+        <div class="blk"><span class="tag g">共通ヘッダー</span>
+          <div class="wf-header">
+            <div class="wf-logo" style="padding:6px 12px;">ロゴ</div>
+            <div class="wf-nav"><span>ABOUT</span><span>CONTENTS</span><span style="font-weight:700;color:var(--ink)">NEWS</span><span>PARTNERS</span><span>CONTACT</span></div>
+            <div class="head-right"><span class="ext-link">ヨコハマ未来創造会議 ↗</span><span class="btn fill">参加応募フォーム</span></div>
+          </div>
+        </div>
+
+        <div class="blk">
+          <span class="tag">① ページヘッダー</span>
+          <div class="ph" style="height:130px;">
+            <div style="position:relative;text-align:center;">
+              <p class="eyebrow">NEWS</p>
+              <div class="h-lg" style="margin:2px 0 0;">ニュース一覧</div>
+            </div>
+          </div>
+          <p class="sub" style="margin-top:8px;font-size:10px;">HOME ＞ NEWS</p>
+        </div>
+
+        <div class="blk">
+          <span class="tag">② カテゴリ絞り込み</span>
+          <div class="chips">
+            <span class="chip on">すべて</span>
+            <span class="chip">お知らせ</span>
+            <span class="chip">開催前イベント</span>
+            <span class="chip">活動レポート</span>
+          </div>
+          <div class="note"><b>NOTE</b> カテゴリは 4 種で確定。選択時は <code>/news?category=xxx</code> 等で URL に反映する（SEO・共有のため）。</div>
+        </div>
+
+        <div class="blk">
+          <span class="tag">③ 記事一覧（3列 × N行）</span>
+          <div class="grid g3">
+            <div class="card"><div class="ph r16"><span>サムネ</span></div><div class="meta"><span>2026.00.00</span><span class="chip" style="font-size:9px;padding:0 7px;">お知らせ</span></div><div class="bar t w90"></div><div class="bar w75"></div><div class="bar w40"></div></div>
+            <div class="card"><div class="ph r16"><span>サムネ</span></div><div class="meta"><span>2026.00.00</span><span class="chip" style="font-size:9px;padding:0 7px;">活動レポート</span></div><div class="bar t w90"></div><div class="bar w60"></div></div>
+            <div class="card"><div class="ph r16"><span>サムネ</span></div><div class="meta"><span>2026.00.00</span><span class="chip" style="font-size:9px;padding:0 7px;">開催前イベント</span></div><div class="bar t w75"></div><div class="bar w60"></div><div class="bar w25"></div></div>
+            <div class="card"><div class="ph r16"><span>サムネ</span></div><div class="meta"><span>2026.00.00</span><span class="chip" style="font-size:9px;padding:0 7px;">お知らせ</span></div><div class="bar t w90"></div><div class="bar w40"></div></div>
+            <div class="card"><div class="ph r16"><span>サムネ</span></div><div class="meta"><span>2026.00.00</span><span class="chip" style="font-size:9px;padding:0 7px;">活動レポート</span></div><div class="bar t w75"></div><div class="bar w75"></div></div>
+            <div class="card"><div class="ph r16"><span>サムネ</span></div><div class="meta"><span>2026.00.00</span><span class="chip" style="font-size:9px;padding:0 7px;">お知らせ</span></div><div class="bar t w90"></div><div class="bar w60"></div></div>
+          </div>
+          <div class="note"><b>NOTE</b> カードの構成要素＝サムネ／日付／カテゴリ／タイトル（最大 2 行で省略）。サムネ未設定時の代替画像を用意。記事 0 件時は「記事がありません」を表示。</div>
+        </div>
+
+        <div class="blk">
+          <span class="tag">④ ページネーション</span>
+          <div class="cen">
+            <span class="btn sm">‹ 前へ</span>
+            <span class="btn sm" style="border-color:var(--ink);color:var(--ink);font-weight:700;">1</span>
+            <span class="btn sm">2</span><span class="btn sm">3</span>
+            <span class="btn sm">次へ ›</span>
+          </div>
+          <div class="note"><b>NOTE</b> 1 ページ 9 〜 12 件想定。件数は要決定。</div>
+        </div>
+
+        <div class="blk"><span class="tag g">共通 CTA ＋ フッター</span>
+          <div class="wf-footer cen" style="padding:14px;"><p class="sub" style="margin:0;font-size:10px;">運営体制（未来会議HP ↗）／ サイトマップ ／ 参加誘導 ／ SNS ／ © 横浜エクスポ若者実行委員会</p></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-sp">
+      <div class="dev-cap"><span>SP</span><span>NEWS一覧</span></div>
+      <div class="frame sp">
+        <div class="blk"><span class="tag g">共通ヘッダー</span>
+          <div class="wf-header"><div class="wf-logo" style="padding:6px 10px;">ロゴ</div><div class="burger">≡ MENU</div></div>
+        </div>
+        <div class="blk">
+          <span class="tag">①</span>
+          <div class="ph" style="height:100px;"><div style="position:relative;text-align:center;"><p class="eyebrow">NEWS</p><div class="h-md" style="margin:0;">ニュース一覧</div></div></div>
+        </div>
+        <div class="blk">
+          <span class="tag">②</span>
+          <div class="chips"><span class="chip on">すべて</span><span class="chip">お知らせ</span><span class="chip">開催前イベント</span><span class="chip">活動レポート</span></div>
+          <div class="note">4 つで折り返す想定。横スクロールにはしない</div>
+        </div>
+        <div class="blk">
+          <span class="tag">③</span>
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <div class="card" style="display:flex;gap:8px;"><div class="ph" style="width:96px;height:66px;flex:0 0 96px;"><span>&nbsp;</span></div><div style="flex:1"><div class="meta" style="font-size:9px;">2026.00.00 ・ お知らせ</div><div class="bar t w90"></div><div class="bar w60"></div></div></div>
+            <div class="card" style="display:flex;gap:8px;"><div class="ph" style="width:96px;height:66px;flex:0 0 96px;"><span>&nbsp;</span></div><div style="flex:1"><div class="meta" style="font-size:9px;">2026.00.00 ・ 活動レポート</div><div class="bar t w90"></div><div class="bar w75"></div></div></div>
+            <div class="card" style="display:flex;gap:8px;"><div class="ph" style="width:96px;height:66px;flex:0 0 96px;"><span>&nbsp;</span></div><div style="flex:1"><div class="meta" style="font-size:9px;">2026.00.00 ・ 開催前イベント</div><div class="bar t w75"></div><div class="bar w40"></div></div></div>
+            <div class="card" style="display:flex;gap:8px;"><div class="ph" style="width:96px;height:66px;flex:0 0 96px;"><span>&nbsp;</span></div><div style="flex:1"><div class="meta" style="font-size:9px;">2026.00.00 ・ お知らせ</div><div class="bar t w90"></div><div class="bar w40"></div></div></div>
+          </div>
+        </div>
+        <div class="blk">
+          <span class="tag">④</span>
+          <div class="cen"><span class="btn sm">‹</span><span class="btn sm" style="border-color:var(--ink);color:var(--ink);font-weight:700;">1</span><span class="btn sm">2</span><span class="btn sm">3</span><span class="btn sm">›</span></div>
+        </div>
+        <div class="blk"><span class="tag g">共通フッター</span>
+          <div class="wf-footer cen" style="padding:12px;"><p class="sub" style="margin:0;font-size:9px;">運営体制（未来会議HP ↗）/ サイトマップ / 参加誘導 / SNS</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ============================================================
+     5. ニュース詳細
+     ============================================================ -->
+<section class="page" id="p-news-detail">
+  <div class="page-head">
+    <h1>5. ニュース詳細 <code>/news/[slug]</code> <span class="badge">CMS</span></h1>
+    <p>記事ヘッダ／本文（リッチテキスト）／シェア／前後・関連記事</p>
+  </div>
+  <div class="stage">
+
+    <div class="col-pc">
+      <div class="dev-cap"><span>PC（本文幅 720px）</span><span>ニュース詳細</span></div>
+      <div class="frame">
+        <div class="blk"><span class="tag g">共通ヘッダー</span>
+          <div class="wf-header">
+            <div class="wf-logo" style="padding:6px 12px;">ロゴ</div>
+            <div class="wf-nav"><span>ABOUT</span><span>CONTENTS</span><span style="font-weight:700;color:var(--ink)">NEWS</span><span>PARTNERS</span><span>CONTACT</span></div>
+            <div class="head-right"><span class="ext-link">ヨコハマ未来創造会議 ↗</span><span class="btn fill">参加応募フォーム</span></div>
+          </div>
+        </div>
+
+        <div class="blk">
+          <span class="tag">① 記事ヘッダ</span>
+          <p class="sub" style="font-size:10px;">HOME ＞ NEWS ＞ 記事タイトル</p>
+          <div style="max-width:720px;margin:10px auto 0;">
+            <div class="meta"><span class="chip" style="font-size:9px;padding:0 7px;">カテゴリ</span><span>2026.00.00</span></div>
+            <div class="bar t w90" style="height:20px;"></div>
+            <div class="bar t w60" style="height:20px;"></div>
+            <p class="sub" style="margin-top:6px;font-size:10px;">↑ 記事タイトル（CMS）</p>
+            <div class="ph r16" style="margin-top:12px;"><span>アイキャッチ画像</span></div>
+          </div>
+        </div>
+
+        <div class="blk">
+          <span class="tag">② 本文（リッチテキスト）</span>
+          <div style="max-width:720px;margin:0 auto;">
+            <div class="bar w90"></div><div class="bar w90"></div><div class="bar w75"></div>
+            <div class="bar t w40" style="margin-top:18px;"></div>
+            <p class="sub" style="font-size:10px;">↑ 見出し h2</p>
+            <div class="bar w90"></div><div class="bar w90"></div><div class="bar w60"></div>
+            <div class="ph r16" style="margin:14px 0;"><span>本文中画像 ＋ キャプション</span></div>
+            <div class="bar w90"></div><div class="bar w75"></div>
+            <div style="border-left:3px solid var(--line);padding-left:12px;margin:14px 0;">
+              <div class="bar w75"></div><div class="bar w60"></div>
+              <p class="sub" style="font-size:10px;margin:0;">↑ 引用</p>
+            </div>
+            <div class="bar w90"></div><div class="bar w40"></div>
+          </div>
+          <div class="note"><b>NOTE</b> CMS のリッチテキストで使う要素を確定しておく（h2／h3／段落／太字／リンク／箇条書き／画像＋キャプション／引用／埋め込み動画）。想定外の要素はスタイル崩れの原因になる。</div>
+        </div>
+
+        <div class="blk">
+          <span class="tag">③ シェア ＋ 一覧へ戻る</span>
+          <div style="max-width:720px;margin:0 auto;" class="cen">
+            <p class="sub">この記事をシェア</p>
+            <div class="chips" style="justify-content:center;">
+              <span class="chip">X</span><span class="chip">Facebook</span><span class="chip">LINE</span><span class="chip">URLコピー</span>
+            </div>
+            <div style="margin-top:14px;"><span class="btn">ニュース一覧へ戻る</span></div>
+          </div>
+        </div>
+
+        <div class="blk">
+          <span class="tag">④ 前後記事 ／ 関連記事</span>
+          <div style="max-width:720px;margin:0 auto;display:flex;gap:12px;">
+            <div class="card" style="flex:1"><p class="sub" style="font-size:10px;">‹ 前の記事</p><div class="bar t w90"></div></div>
+            <div class="card" style="flex:1;text-align:right;"><p class="sub" style="font-size:10px;">次の記事 ›</p><div class="bar t w90" style="margin-left:auto;"></div></div>
+          </div>
+          <div style="max-width:720px;margin:18px auto 0;">
+            <p class="h-sm">関連記事</p>
+            <div class="grid g3">
+              <div class="card"><div class="ph r16"><span>サムネ</span></div><div class="bar t w90"></div><div class="bar w40"></div></div>
+              <div class="card"><div class="ph r16"><span>サムネ</span></div><div class="bar t w75"></div><div class="bar w60"></div></div>
+              <div class="card"><div class="ph r16"><span>サムネ</span></div><div class="bar t w90"></div><div class="bar w40"></div></div>
+            </div>
+          </div>
+          <div class="note"><b>NOTE</b> 関連記事の抽出ロジック（同カテゴリの新着 3 件 等）を要決定。記事が少ない初期はブロックを出さない判定が必要。</div>
+        </div>
+
+        <div class="blk"><span class="tag g">共通 CTA ＋ フッター</span>
+          <div class="ph" style="height:110px;"><div style="position:relative;text-align:center;"><div class="h-md" style="margin:0 0 6px;">あなたも参加しませんか？</div><span class="btn fill">参加応募フォーム</span></div></div>
+          <div class="wf-footer cen" style="padding:14px;margin-top:12px;"><p class="sub" style="margin:0;font-size:10px;">運営体制（未来会議HP ↗）／ サイトマップ ／ 参加誘導 ／ SNS ／ © 横浜エクスポ若者実行委員会</p></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-sp">
+      <div class="dev-cap"><span>SP</span><span>ニュース詳細</span></div>
+      <div class="frame sp">
+        <div class="blk"><span class="tag g">共通ヘッダー</span>
+          <div class="wf-header"><div class="wf-logo" style="padding:6px 10px;">ロゴ</div><div class="burger">≡ MENU</div></div>
+        </div>
+        <div class="blk">
+          <span class="tag">①</span>
+          <p class="sub" style="font-size:9px;">HOME ＞ NEWS ＞ …</p>
+          <div class="meta" style="font-size:9px;"><span class="chip" style="font-size:9px;padding:0 6px;">カテゴリ</span><span>2026.00.00</span></div>
+          <div class="bar t w90" style="height:16px;"></div><div class="bar t w75" style="height:16px;"></div>
+          <div class="ph r16" style="margin-top:10px;"><span>アイキャッチ</span></div>
+        </div>
+        <div class="blk">
+          <span class="tag">②</span>
+          <div class="bar w90"></div><div class="bar w90"></div><div class="bar w60"></div>
+          <div class="bar t w40" style="margin-top:14px;"></div>
+          <div class="bar w90"></div><div class="bar w75"></div>
+          <div class="ph r16" style="margin:12px 0;"><span>本文中画像</span></div>
+          <div class="bar w90"></div><div class="bar w40"></div>
+        </div>
+        <div class="blk">
+          <span class="tag">③</span>
+          <p class="sub cen">この記事をシェア</p>
+          <div class="chips" style="justify-content:center;"><span class="chip">X</span><span class="chip">FB</span><span class="chip">LINE</span><span class="chip">コピー</span></div>
+          <div style="margin-top:12px;"><span class="btn wide">ニュース一覧へ戻る</span></div>
+        </div>
+        <div class="blk">
+          <span class="tag">④</span>
+          <div class="card" style="margin-bottom:6px;"><p class="sub" style="font-size:10px;">‹ 前の記事</p><div class="bar t w90"></div></div>
+          <div class="card"><p class="sub" style="font-size:10px;">次の記事 ›</p><div class="bar t w90"></div></div>
+          <p class="h-sm" style="margin-top:14px;">関連記事</p>
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <div class="card" style="display:flex;gap:8px;"><div class="ph" style="width:88px;height:60px;flex:0 0 88px;"><span>&nbsp;</span></div><div style="flex:1"><div class="bar t w90"></div><div class="bar w40"></div></div></div>
+            <div class="card" style="display:flex;gap:8px;"><div class="ph" style="width:88px;height:60px;flex:0 0 88px;"><span>&nbsp;</span></div><div style="flex:1"><div class="bar t w75"></div><div class="bar w60"></div></div></div>
+          </div>
+        </div>
+        <div class="blk"><span class="tag g">共通フッター</span>
+          <div class="wf-footer cen" style="padding:12px;"><p class="sub" style="margin:0;font-size:9px;">運営体制（未来会議HP ↗）/ サイトマップ / 参加誘導 / SNS</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ============================================================
+     6. 参加団体一覧
+     ============================================================ -->
+<section class="page" id="p-partners">
+  <div class="page-head">
+    <h1>6. 参加団体一覧 <code>/partners</code> <span class="badge">CMS</span></h1>
+    <p>カテゴリ分類は設けず、絞り込み UI は置かない構成</p>
+  </div>
+  <div class="stage">
+
+    <div class="col-pc">
+      <div class="dev-cap"><span>PC</span><span>参加団体一覧</span></div>
+      <div class="frame">
+        <div class="blk"><span class="tag g">共通ヘッダー</span>
+          <div class="wf-header">
+            <div class="wf-logo" style="padding:6px 12px;">ロゴ</div>
+            <div class="wf-nav"><span>ABOUT</span><span>CONTENTS</span><span>NEWS</span><span style="font-weight:700;color:var(--ink)">PARTNERS</span><span>CONTACT</span></div>
+            <div class="head-right"><span class="ext-link">ヨコハマ未来創造会議 ↗</span><span class="btn fill">参加応募フォーム</span></div>
+          </div>
+        </div>
+
+        <div class="blk">
+          <span class="tag">① ページヘッダー ＋ リード</span>
+          <div class="ph" style="height:130px;">
+            <div style="position:relative;text-align:center;">
+              <p class="eyebrow">PARTNERS</p>
+              <div class="h-lg" style="margin:2px 0 0;">参加団体一覧</div>
+            </div>
+          </div>
+          <p class="body cen" style="margin-top:12px;">参加表明をいただいている学生団体/若者団体です。<br>関東だけではなく全国からの参加を募集しています。</p>
+          <div class="note"><b>NOTE</b> 地域別・種別などの絞り込みタブは<b>置かない</b>方針で確定。並び順（登録順／五十音）のみ実装側で決定。</div>
+        </div>
+
+        <div class="blk">
+          <span class="tag">② 団体カード一覧（5列 × N行）</span>
+          <div class="grid g5" style="gap:10px;">
+            <div class="card cen"><div class="ph h64"><span>ロゴ</span></div><div class="bar t w90" style="margin:7px auto 4px;"></div><div class="bar w60" style="margin:0 auto;"></div><div class="chips" style="justify-content:center;margin-top:7px;"><span class="chip" style="font-size:9px;">SNS</span><span class="chip" style="font-size:9px;">WEB</span></div></div>
+            <div class="card cen"><div class="ph h64"><span>ロゴ</span></div><div class="bar t w75" style="margin:7px auto 4px;"></div><div class="bar w40" style="margin:0 auto;"></div><div class="chips" style="justify-content:center;margin-top:7px;"><span class="chip" style="font-size:9px;">SNS</span></div></div>
+            <div class="card cen"><div class="ph h64"><span>ロゴ</span></div><div class="bar t w90" style="margin:7px auto 4px;"></div><div class="bar w60" style="margin:0 auto;"></div><div class="chips" style="justify-content:center;margin-top:7px;"><span class="chip" style="font-size:9px;">SNS</span></div></div>
+            <div class="card cen"><div class="ph h64"><span>ロゴ</span></div><div class="bar t w75" style="margin:7px auto 4px;"></div><div class="bar w60" style="margin:0 auto;"></div><div class="chips" style="justify-content:center;margin-top:7px;"><span class="chip" style="font-size:9px;">SNS</span><span class="chip" style="font-size:9px;">WEB</span></div></div>
+            <div class="card cen"><div class="ph h64"><span>ロゴ</span></div><div class="bar t w90" style="margin:7px auto 4px;"></div><div class="bar w40" style="margin:0 auto;"></div><div class="chips" style="justify-content:center;margin-top:7px;"><span class="chip" style="font-size:9px;">SNS</span></div></div>
+            <div class="card cen"><div class="ph h64"><span>ロゴ</span></div><div class="bar t w90" style="margin:7px auto 4px;"></div><div class="bar w60" style="margin:0 auto;"></div><div class="chips" style="justify-content:center;margin-top:7px;"><span class="chip" style="font-size:9px;">SNS</span><span class="chip" style="font-size:9px;">WEB</span></div></div>
+            <div class="card cen"><div class="ph h64"><span>ロゴ</span></div><div class="bar t w75" style="margin:7px auto 4px;"></div><div class="bar w40" style="margin:0 auto;"></div><div class="chips" style="justify-content:center;margin-top:7px;"><span class="chip" style="font-size:9px;">SNS</span></div></div>
+            <div class="card cen"><div class="ph h64"><span>ロゴ</span></div><div class="bar t w90" style="margin:7px auto 4px;"></div><div class="bar w60" style="margin:0 auto;"></div><div class="chips" style="justify-content:center;margin-top:7px;"><span class="chip" style="font-size:9px;">SNS</span></div></div>
+            <div class="card cen"><div class="ph h64"><span>ロゴ</span></div><div class="bar t w75" style="margin:7px auto 4px;"></div><div class="bar w60" style="margin:0 auto;"></div><div class="chips" style="justify-content:center;margin-top:7px;"><span class="chip" style="font-size:9px;">SNS</span><span class="chip" style="font-size:9px;">WEB</span></div></div>
+            <div class="card cen"><div class="ph h64"><span>ロゴ</span></div><div class="bar t w90" style="margin:7px auto 4px;"></div><div class="bar w40" style="margin:0 auto;"></div><div class="chips" style="justify-content:center;margin-top:7px;"><span class="chip" style="font-size:9px;">SNS</span></div></div>
+            <div class="card cen"><div class="ph h64"><span>ロゴ</span></div><div class="bar t w90" style="margin:7px auto 4px;"></div><div class="bar w60" style="margin:0 auto;"></div><div class="chips" style="justify-content:center;margin-top:7px;"><span class="chip" style="font-size:9px;">SNS</span><span class="chip" style="font-size:9px;">WEB</span></div></div>
+            <div class="card cen"><div class="ph h64"><span>ロゴ</span></div><div class="bar t w75" style="margin:7px auto 4px;"></div><div class="bar w40" style="margin:0 auto;"></div><div class="chips" style="justify-content:center;margin-top:7px;"><span class="chip" style="font-size:9px;">SNS</span></div></div>
+            <div class="card cen"><div class="ph h64"><span>ロゴ</span></div><div class="bar t w90" style="margin:7px auto 4px;"></div><div class="bar w60" style="margin:0 auto;"></div><div class="chips" style="justify-content:center;margin-top:7px;"><span class="chip" style="font-size:9px;">SNS</span></div></div>
+            <div class="card cen"><div class="ph h64"><span>ロゴ</span></div><div class="bar t w75" style="margin:7px auto 4px;"></div><div class="bar w60" style="margin:0 auto;"></div><div class="chips" style="justify-content:center;margin-top:7px;"><span class="chip" style="font-size:9px;">SNS</span><span class="chip" style="font-size:9px;">WEB</span></div></div>
+            <div class="card cen"><div class="ph h64"><span>ロゴ</span></div><div class="bar t w90" style="margin:7px auto 4px;"></div><div class="bar w40" style="margin:0 auto;"></div><div class="chips" style="justify-content:center;margin-top:7px;"><span class="chip" style="font-size:9px;">SNS</span></div></div>
+            <div class="card cen"><div class="ph h64"><span>ロゴ</span></div><div class="bar t w90" style="margin:7px auto 4px;"></div><div class="bar w60" style="margin:0 auto;"></div><div class="chips" style="justify-content:center;margin-top:7px;"><span class="chip" style="font-size:9px;">SNS</span><span class="chip" style="font-size:9px;">WEB</span></div></div>
+            <div class="card cen"><div class="ph h64"><span>ロゴ</span></div><div class="bar t w75" style="margin:7px auto 4px;"></div><div class="bar w40" style="margin:0 auto;"></div><div class="chips" style="justify-content:center;margin-top:7px;"><span class="chip" style="font-size:9px;">SNS</span></div></div>
+            <div class="card cen"><div class="ph h64"><span>ロゴ</span></div><div class="bar t w90" style="margin:7px auto 4px;"></div><div class="bar w60" style="margin:0 auto;"></div><div class="chips" style="justify-content:center;margin-top:7px;"><span class="chip" style="font-size:9px;">SNS</span></div></div>
+            <div class="card cen"><div class="ph h64"><span>ロゴ</span></div><div class="bar t w75" style="margin:7px auto 4px;"></div><div class="bar w60" style="margin:0 auto;"></div><div class="chips" style="justify-content:center;margin-top:7px;"><span class="chip" style="font-size:9px;">SNS</span><span class="chip" style="font-size:9px;">WEB</span></div></div>
+            <div class="card cen"><div class="ph h64"><span>ロゴ</span></div><div class="bar t w90" style="margin:7px auto 4px;"></div><div class="bar w40" style="margin:0 auto;"></div><div class="chips" style="justify-content:center;margin-top:7px;"><span class="chip" style="font-size:9px;">SNS</span></div></div>
+          </div>
+          <p class="sub" style="margin-top:10px;font-size:10px;">カード構成：ロゴ ／ 団体名 ／ 所在地（都道府県）／ SNS・WEB リンク</p>
+          <div class="note"><b>NOTE</b> 「参加団体が多い」印象を優先し、<b>4 列 → 5 列</b>に変更（1 段あたり 5 団体・ページ内の掲載件数に上限は設けない）。ロゴ未支給の団体は団体名テキストのみで成立するレイアウトにする（欠けが目立たないよう枠は維持）。団体詳細ページは作らずカード内リンクで外部へ出す想定。</div>
+        </div>
+
+        <div class="blk">
+          <span class="tag">③ 募集 CTA</span>
+          <div class="ph" style="height:150px;">
+            <div style="position:relative;text-align:center;">
+              <div class="h-md" style="margin:0 0 6px;">参加団体を募集しています</div>
+              <p class="sub" style="margin:0 0 10px;">関東だけではなく全国からの参加を募集しています。</p>
+              <span class="btn fill">参加団体として応募する</span>
+              <span class="btn">お問い合わせ</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="blk"><span class="tag g">共通フッター</span>
+          <div class="wf-footer cen" style="padding:14px;"><p class="sub" style="margin:0;font-size:10px;">運営体制（未来会議HP ↗）／ サイトマップ ／ 参加誘導 ／ SNS ／ © 横浜エクスポ若者実行委員会</p></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-sp">
+      <div class="dev-cap"><span>SP</span><span>参加団体一覧</span></div>
+      <div class="frame sp">
+        <div class="blk"><span class="tag g">共通ヘッダー</span>
+          <div class="wf-header"><div class="wf-logo" style="padding:6px 10px;">ロゴ</div><div class="burger">≡ MENU</div></div>
+        </div>
+        <div class="blk">
+          <span class="tag">①</span>
+          <div class="ph" style="height:100px;"><div style="position:relative;text-align:center;"><p class="eyebrow">PARTNERS</p><div class="h-md" style="margin:0;">参加団体一覧</div></div></div>
+          <p class="body cen" style="font-size:11px;margin-top:10px;">参加表明をいただいている学生団体/若者団体です。関東だけではなく全国からの参加を募集しています。</p>
+        </div>
+        <div class="blk">
+          <span class="tag">②</span>
+          <div class="grid g6" style="gap:8px;">
+            <div class="card cen" style="padding:8px;"><div class="ph h48"><span>ロゴ</span></div><div class="bar t w90" style="margin:6px auto 3px;"></div><div class="bar w60" style="margin:0 auto;"></div></div>
+            <div class="card cen" style="padding:8px;"><div class="ph h48"><span>ロゴ</span></div><div class="bar t w75" style="margin:6px auto 3px;"></div><div class="bar w40" style="margin:0 auto;"></div></div>
+            <div class="card cen" style="padding:8px;"><div class="ph h48"><span>ロゴ</span></div><div class="bar t w90" style="margin:6px auto 3px;"></div><div class="bar w60" style="margin:0 auto;"></div></div>
+            <div class="card cen" style="padding:8px;"><div class="ph h48"><span>ロゴ</span></div><div class="bar t w75" style="margin:6px auto 3px;"></div><div class="bar w40" style="margin:0 auto;"></div></div>
+            <div class="card cen" style="padding:8px;"><div class="ph h48"><span>ロゴ</span></div><div class="bar t w90" style="margin:6px auto 3px;"></div><div class="bar w60" style="margin:0 auto;"></div></div>
+            <div class="card cen" style="padding:8px;"><div class="ph h48"><span>ロゴ</span></div><div class="bar t w75" style="margin:6px auto 3px;"></div><div class="bar w40" style="margin:0 auto;"></div></div>
+            <div class="card cen" style="padding:8px;"><div class="ph h48"><span>ロゴ</span></div><div class="bar t w90" style="margin:6px auto 3px;"></div><div class="bar w60" style="margin:0 auto;"></div></div>
+            <div class="card cen" style="padding:8px;"><div class="ph h48"><span>ロゴ</span></div><div class="bar t w75" style="margin:6px auto 3px;"></div><div class="bar w40" style="margin:0 auto;"></div></div>
+            <div class="card cen" style="padding:8px;"><div class="ph h48"><span>ロゴ</span></div><div class="bar t w90" style="margin:6px auto 3px;"></div><div class="bar w60" style="margin:0 auto;"></div></div>
+            <div class="card cen" style="padding:8px;"><div class="ph h48"><span>ロゴ</span></div><div class="bar t w75" style="margin:6px auto 3px;"></div><div class="bar w40" style="margin:0 auto;"></div></div>
+            <div class="card cen" style="padding:8px;"><div class="ph h48"><span>ロゴ</span></div><div class="bar t w90" style="margin:6px auto 3px;"></div><div class="bar w60" style="margin:0 auto;"></div></div>
+            <div class="card cen" style="padding:8px;"><div class="ph h48"><span>ロゴ</span></div><div class="bar t w75" style="margin:6px auto 3px;"></div><div class="bar w40" style="margin:0 auto;"></div></div>
+          </div>
+          <div class="note">SP は 3 列 × N 段。団体名は 2 行まで表示し、はみ出す場合は省略。ロゴが潰れる場合のみ 2 列に落とす</div>
+        </div>
+        <div class="blk">
+          <span class="tag">③</span>
+          <div class="ph" style="height:130px;"><div style="position:relative;text-align:center;"><div class="h-md" style="margin:0 0 6px;">参加団体を<br>募集しています</div><span class="btn fill">参加団体として応募する</span></div></div>
+        </div>
+        <div class="blk"><span class="tag g">共通フッター</span>
+          <div class="wf-footer cen" style="padding:12px;"><p class="sub" style="margin:0;font-size:9px;">運営体制（未来会議HP ↗）/ サイトマップ / 参加誘導 / SNS</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ============================================================
+     7. contact
+     ============================================================ -->
+<section class="page" id="p-contact">
+  <div class="page-head">
+    <h1>7. お問い合わせ・参加応募フォーム <code>/contact</code></h1>
+    <p>原稿に文言が無いため、一般的な構成で仮組み（要確認 #3・#4）</p>
+  </div>
+  <div class="stage">
+
+    <div class="col-pc">
+      <div class="dev-cap"><span>PC（フォーム幅 640px）</span><span>contact</span></div>
+      <div class="frame">
+        <div class="blk"><span class="tag g">共通ヘッダー</span>
+          <div class="wf-header">
+            <div class="wf-logo" style="padding:6px 12px;">ロゴ</div>
+            <div class="wf-nav"><span>ABOUT</span><span>CONTENTS</span><span>NEWS</span><span>PARTNERS</span><span style="font-weight:700;color:var(--ink)">CONTACT</span></div>
+            <div class="head-right"><span class="ext-link">ヨコハマ未来創造会議 ↗</span><span class="btn fill">参加応募フォーム</span></div>
+          </div>
+        </div>
+
+        <div class="blk">
+          <span class="tag">① ページヘッダー ＋ リード</span>
+          <div class="ph" style="height:130px;">
+            <div style="position:relative;text-align:center;">
+              <p class="eyebrow">CONTACT</p>
+              <div class="h-lg" style="margin:2px 0 0;">お問い合わせ・参加応募フォーム</div>
+            </div>
+          </div>
+          <div style="max-width:640px;margin:12px auto 0;">
+            <p class="sub cen">リード文 <span class="todo">要文言</span></p>
+            <div class="bar w90" style="margin:0 auto;"></div><div class="bar w60" style="margin:5px auto;"></div>
+          </div>
+          <div class="note"><b>NOTE</b> 「参加希望」と「一般の問い合わせ」を 1 フォームに統合するか分けるかで構成が変わる（要確認 #4）。WF は種別セレクトで 1 本化。</div>
+        </div>
+
+        <div class="blk">
+          <span class="tag">② お問い合わせフォーム</span>
+          <div style="max-width:640px;margin:0 auto;">
+            <div class="field"><label>お問い合わせ種別<span class="req">必須</span></label><div class="input sel"></div>
+              <p class="sub" style="font-size:10px;margin:3px 0 0;">選択肢案：参加希望（実行委員）／参加希望（団体）／コンテンツへの応募／取材・メディア／協賛・協力／その他 <span class="todo">要確認</span></p>
+            </div>
+            <div class="grid g2" style="gap:12px;">
+              <div class="field"><label>お名前<span class="req">必須</span></label><div class="input"></div></div>
+              <div class="field"><label>ふりがな</label><div class="input"></div></div>
+            </div>
+            <div class="grid g2" style="gap:12px;">
+              <div class="field"><label>所属団体・学校名</label><div class="input"></div></div>
+              <div class="field"><label>都道府県</label><div class="input sel"></div></div>
+            </div>
+            <div class="grid g2" style="gap:12px;">
+              <div class="field"><label>メールアドレス<span class="req">必須</span></label><div class="input"></div></div>
+              <div class="field"><label>電話番号</label><div class="input"></div></div>
+            </div>
+            <div class="field"><label>お問い合わせ内容<span class="req">必須</span></label><div class="input ta"></div></div>
+            <div class="field">
+              <label style="font-weight:400;font-size:11px;">□ プライバシーポリシーに同意する<span class="req">必須</span></label>
+              <p class="sub" style="font-size:10px;margin:3px 0 0;">プライバシーポリシーページの用意が必要 <span class="todo">要確認</span></p>
+            </div>
+            <div class="cen" style="margin-top:14px;"><span class="btn fill" style="padding:11px 44px;">確認画面へ</span></div>
+          </div>
+          <div class="note"><b>NOTE</b> 未成年の応募が想定されるため、保護者同意の要否を確認。スパム対策（reCAPTCHA 等）と自動返信メールの有無も実装前に決定。</div>
+        </div>
+
+        <div class="blk">
+          <span class="tag">③ 画面遷移メモ</span>
+          <div style="max-width:640px;margin:0 auto;">
+            <div style="display:flex;gap:8px;align-items:center;font-size:11px;color:var(--mid);">
+              <span class="card" style="padding:8px 12px;">入力</span>→
+              <span class="card" style="padding:8px 12px;">確認</span>→
+              <span class="card" style="padding:8px 12px;">完了 <span class="todo">要文言</span></span>
+            </div>
+            <p class="sub" style="font-size:10px;margin-top:8px;">確認画面を省いて 1 画面送信にする場合はこのブロックを削除。完了画面の文言・戻り先（TOP）も要決定。</p>
+          </div>
+        </div>
+
+        <div class="blk">
+          <span class="tag">④ その他の窓口</span>
+          <div style="max-width:640px;margin:0 auto;" class="cen">
+            <p class="h-sm">SNS からのご連絡も受け付けています</p>
+            <div class="chips" style="justify-content:center;"><span class="chip">Instagram</span><span class="chip">X</span><span class="chip">その他 <span class="todo">要確認</span></span></div>
+          </div>
+        </div>
+
+        <div class="blk"><span class="tag g">共通フッター</span>
+          <div class="wf-footer cen" style="padding:14px;"><p class="sub" style="margin:0;font-size:10px;">運営体制（未来会議HP ↗）／ サイトマップ ／ 参加誘導 ／ SNS ／ © 横浜エクスポ若者実行委員会</p></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-sp">
+      <div class="dev-cap"><span>SP</span><span>contact</span></div>
+      <div class="frame sp">
+        <div class="blk"><span class="tag g">共通ヘッダー</span>
+          <div class="wf-header"><div class="wf-logo" style="padding:6px 10px;">ロゴ</div><div class="burger">≡ MENU</div></div>
+        </div>
+        <div class="blk">
+          <span class="tag">①</span>
+          <div class="ph" style="height:100px;"><div style="position:relative;text-align:center;"><p class="eyebrow">CONTACT</p><div class="h-md" style="margin:0;">お問い合わせ・<br>参加応募フォーム</div></div></div>
+          <p class="sub cen" style="margin-top:10px;">リード文 <span class="todo">要文言</span></p>
+          <div class="bar w90"></div><div class="bar w60"></div>
+        </div>
+        <div class="blk">
+          <span class="tag">②</span>
+          <div class="field"><label>お問い合わせ種別<span class="req">必須</span></label><div class="input sel"></div></div>
+          <div class="field"><label>お名前<span class="req">必須</span></label><div class="input"></div></div>
+          <div class="field"><label>ふりがな</label><div class="input"></div></div>
+          <div class="field"><label>所属団体・学校名</label><div class="input"></div></div>
+          <div class="field"><label>都道府県</label><div class="input sel"></div></div>
+          <div class="field"><label>メールアドレス<span class="req">必須</span></label><div class="input"></div></div>
+          <div class="field"><label>電話番号</label><div class="input"></div></div>
+          <div class="field"><label>お問い合わせ内容<span class="req">必須</span></label><div class="input ta"></div></div>
+          <div class="field"><label style="font-weight:400;font-size:11px;">□ プライバシーポリシーに同意する<span class="req">必須</span></label></div>
+          <span class="btn wide fill">確認画面へ</span>
+          <div class="note">SP は 1 カラム固定。入力欄の高さは 44px 以上を確保（タップ領域）</div>
+        </div>
+        <div class="blk">
+          <span class="tag">③</span>
+          <p class="sub" style="font-size:10px;">入力 → 確認 → 完了 <span class="todo">要文言</span></p>
+        </div>
+        <div class="blk">
+          <span class="tag">④</span>
+          <p class="h-sm cen">SNS からのご連絡も受付</p>
+          <div class="chips" style="justify-content:center;"><span class="chip">Instagram</span><span class="chip">X</span><span class="chip">その他 <span class="todo">要確認</span></span></div>
+        </div>
+        <div class="blk"><span class="tag g">共通フッター</span>
+          <div class="wf-footer cen" style="padding:12px;"><p class="sub" style="margin:0;font-size:9px;">運営体制（未来会議HP ↗）/ サイトマップ / 参加誘導 / SNS</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<script>
+(function(){
+  var A = function(nl){ return Array.prototype.slice.call(nl); };
+
+  /* ---------- ページタブ ---------- */
+  var tabs  = A(document.querySelectorAll('#tabs button'));
+  var pages = A(document.querySelectorAll('.page'));
+  tabs.forEach(function(b){
+    b.addEventListener('click', function(){
+      tabs.forEach(function(x){ x.classList.remove('on'); });
+      b.classList.add('on');
+      pages.forEach(function(p){ p.classList.remove('on'); });
+      var t = document.getElementById(b.dataset.p);
+      if (t) t.classList.add('on');
+      window.scrollTo(0,0);
+      layoutExpSoon();
+    });
+  });
+
+  /* ---------- PC / SP 表示切替（タブ見た目） ---------- */
+  var segs = A(document.querySelectorAll('#viewSeg button'));
+  segs.forEach(function(b){
+    b.addEventListener('click', function(){
+      segs.forEach(function(x){ x.classList.remove('on'); });
+      b.classList.add('on');
+      document.body.classList.remove('view-both','view-pc','view-sp');
+      document.body.classList.add('view-' + b.dataset.v);
+      layoutExpSoon();
+    });
+  });
+
+  /* ---------- 注記 / メモ欄の表示切替 ---------- */
+  var nt = document.getElementById('noteToggle');
+  nt.addEventListener('change', function(){
+    document.body.classList.toggle('hide-notes', !nt.checked);
+    layoutExpSoon();   /* 注記の出し入れでブロック高さが変わる */
+  });
+  var mt = document.getElementById('memoToggle');
+  mt.addEventListener('change', function(){
+    document.body.classList.toggle('hide-memo', !mt.checked);
+    layoutExpSoon();   /* 列幅が変わるとブロック高さも変わる */
+  });
+
+  /* ---------- ← → キーでページ送り（メモ入力中は無効） ---------- */
+  document.addEventListener('keydown', function(e){
+    var tag = e.target.tagName;
+    if (tag === 'INPUT' || tag === 'TEXTAREA' || e.target.isContentEditable) return;
+    var i = tabs.findIndex(function(x){ return x.classList.contains('on'); });
+    if (e.key === 'ArrowRight' && i < tabs.length - 1) tabs[i+1].click();
+    if (e.key === 'ArrowLeft'  && i > 0)               tabs[i-1].click();
+  });
+
+  /* =========================================================
+     メモ機能
+     - 入力は localStorage へ自動保存（同じPC・同じブラウザで復元）
+     - 「メモ入りHTMLを書き出す」で、メモを埋め込んだ別ファイルを保存
+     ========================================================= */
+  var KEY = 'yokowaka-wf:v1:memo';
+  var data = {};   // { pageId: { overall: '', blocks: { mid: '' } } }
+  var PAGE_IDS = tabs.map(function(b){ return b.dataset.p; });
+
+  function bucket(pageId){
+    if (!data[pageId]) data[pageId] = {overall:'', blocks:{}};
+    if (!data[pageId].blocks) data[pageId].blocks = {};
+    return data[pageId];
+  }
+
+  /* 構成ページは .stage を持たないので作る（col-doc は PC/SP 切替で消さない） */
+  function ensureStage(page){
+    var stage = page.querySelector('.stage');
+    if (stage) return stage;
+    stage = document.createElement('div');
+    stage.className = 'stage';
+    var col = document.createElement('div');
+    col.className = 'col-doc';
+    var head = page.querySelector('.page-head');
+    A(page.children).forEach(function(el){ if (el !== head) col.appendChild(el); });
+    stage.appendChild(col);
+    page.appendChild(stage);
+    return stage;
+  }
+
+  function makeItem(pageId, mid, labelText, isOverall){
+    var item = document.createElement('div');
+    item.className = 'memo-item empty' + (isOverall ? ' overall' : '');
+
+    var label = document.createElement('label');
+    label.className = 'memo-label';
+    label.textContent = labelText;
+
+    var ta = document.createElement('textarea');
+    ta.className = isOverall ? 'memo-overall' : 'memo-block';
+    ta.placeholder = isOverall ? 'このページ全体への指摘・要望' : '（' + labelText + ' への指摘）';
+    ta.dataset.page = pageId;
+    if (mid) ta.dataset.mid = mid;
+
+    var pr = document.createElement('div');
+    pr.className = 'memo-print';
+
+    item.appendChild(label); item.appendChild(ta); item.appendChild(pr);
+
+    label.addEventListener('click', function(){
+      if (!mid){ ta.focus(); return; }
+      var blk = document.querySelector('[data-mid="' + mid + '"]');
+      if (!blk) return;
+      blk.scrollIntoView({block:'center'});
+      blk.classList.add('memo-target');
+      setTimeout(function(){ blk.classList.remove('memo-target'); }, 1200);
+    });
+
+    ta.addEventListener('input', function(){
+      var b = bucket(pageId);
+      if (mid) b.blocks[mid] = ta.value; else b.overall = ta.value;
+      refreshItem(item, ta);
+      refreshPage(pageId);
+      saveSoon();
+    });
+    return item;
+  }
+
+  function buildMemoColumn(page){
+    var stage = ensureStage(page);
+    var col = document.createElement('div');
+    col.className = 'col-memo';
+
+    var head = document.createElement('div');
+    head.className = 'memo-head';
+    head.innerHTML = '<span>✉ メモ</span><span class="memo-head-count">0件</span>';
+    col.appendChild(head);
+
+    var body = document.createElement('div');
+    body.className = 'memo-body';
+    col.appendChild(body);
+
+    body.appendChild(makeItem(page.id, null, 'ページ全体へのメモ', true));
+
+    A(page.querySelectorAll('.col-pc .blk')).forEach(function(blk, i){
+      var mid = page.id + '#' + i;
+      blk.dataset.mid = mid;
+      var tag = blk.querySelector('.tag');
+      var label = tag ? tag.textContent.trim() : ('ブロック ' + (i + 1));
+      if (tag && !tag.querySelector('.memo-flag')){
+        var flag = document.createElement('span');
+        flag.className = 'memo-flag';
+        flag.textContent = '✉';
+        tag.appendChild(flag);
+      }
+      body.appendChild(makeItem(page.id, mid, label, false));
+    });
+
+    stage.appendChild(col);
+  }
+
+  function refreshItem(item, ta){
+    var filled = ta.value.trim().length > 0;
+    item.classList.toggle('empty', !filled);
+    item.querySelector('.memo-print').textContent = ta.value;
+    if (ta.dataset.mid){
+      var blk = document.querySelector('[data-mid="' + ta.dataset.mid + '"]');
+      if (blk) blk.classList.toggle('has-memo', filled);
+    }
+  }
+
+  function refreshPage(pageId){
+    var page = document.getElementById(pageId);
+    if (!page) return;
+    var col = page.querySelector('.col-memo');
+    if (!col) return;
+    var n = 0;
+    A(col.querySelectorAll('textarea')).forEach(function(ta){ if (ta.value.trim()) n++; });
+    col.classList.toggle('all-empty', n === 0);
+    var hc = col.querySelector('.memo-head-count');
+    if (hc) hc.textContent = n + '件';
+    var tab = document.querySelector('#tabs button[data-p="' + pageId + '"]');
+    if (!tab) return;
+    var badge = tab.querySelector('.memo-count');
+    if (n > 0){
+      if (!badge){ badge = document.createElement('span'); badge.className = 'memo-count'; tab.appendChild(badge); }
+      badge.textContent = String(n);
+    } else if (badge){ badge.remove(); }
+  }
+
+  var saveTimer = null;
+  function saveSoon(){ if (saveTimer) clearTimeout(saveTimer); saveTimer = setTimeout(save, 250); }
+  function save(){
+    try { localStorage.setItem(KEY, JSON.stringify(data)); }
+    catch (e) { /* 保存できない環境でも入力自体は継続させる */ }
+  }
+  function readStorage(){
+    try { var raw = localStorage.getItem(KEY); if (raw) data = JSON.parse(raw) || {}; }
+    catch (e) { data = {}; }
+  }
+  function load(){
+    A(document.querySelectorAll('.col-memo textarea')).forEach(function(ta){
+      var b = bucket(ta.dataset.page);
+      ta.value = ta.dataset.mid ? (b.blocks[ta.dataset.mid] || '') : (b.overall || '');
+      refreshItem(ta.closest('.memo-item'), ta);
+    });
+    PAGE_IDS.forEach(refreshPage);
+  }
+
+  function setOverall(pageId, text){
+    bucket(pageId).overall = text;
+    var ta = document.querySelector('#' + pageId + ' textarea.memo-overall');
+    if (ta){ ta.value = text; refreshItem(ta.closest('.memo-item'), ta); }
+    refreshPage(pageId); save();
+  }
+  function setBlock(pageId, mid, text){
+    bucket(pageId).blocks[mid] = text;
+    var ta = document.querySelector('#' + pageId + ' textarea.memo-block[data-mid="' + mid + '"]');
+    if (ta){ ta.value = text; refreshItem(ta.closest('.memo-item'), ta); }
+    refreshPage(pageId); save();
+  }
+  function count(pageId){
+    var b = bucket(pageId), n = 0;
+    if ((b.overall || '').trim()) n++;
+    Object.keys(b.blocks).forEach(function(k){ if ((b.blocks[k] || '').trim()) n++; });
+    return n;
+  }
+  function total(obj){
+    var n = 0;
+    Object.keys(obj || {}).forEach(function(p){
+      var b = obj[p] || {};
+      if ((b.overall || '').trim()) n++;
+      Object.keys(b.blocks || {}).forEach(function(k){ if ((b.blocks[k] || '').trim()) n++; });
+    });
+    return n;
+  }
+
+  /* メモを埋め込んだHTML文字列を作る（textarea の値は属性に出ないので textContent へ写す） */
+  function serialize(){
+    var clone = document.documentElement.cloneNode(true);
+    A(clone.querySelectorAll('.col-memo textarea')).forEach(function(ta){
+      var b = data[ta.dataset.page] || {overall:'', blocks:{}};
+      ta.textContent = ta.dataset.mid ? ((b.blocks || {})[ta.dataset.mid] || '') : (b.overall || '');
+    });
+    A(clone.querySelectorAll('.memo-target')).forEach(function(el){ el.classList.remove('memo-target'); });
+    var banner = clone.querySelector('.memo-banner');
+    if (banner) banner.remove();
+    var old = clone.querySelector('#memo-data');
+    if (old) old.remove();
+    var s = document.createElement('script');
+    s.id = 'memo-data';
+    s.type = 'application/json';
+    // メモ本文に閉じタグ文字列が混ざっても壊れないよう "<" を < へ退避する
+    s.textContent = JSON.stringify(data).replace(/</g, '\\u003c');
+    clone.querySelector('body').appendChild(s);
+    return '<!DOCTYPE html>\n' + clone.outerHTML;
+  }
+
+  function exportHtml(){
+    var blob = new Blob([serialize()], {type:'text/html;charset=utf-8'});
+    var d = new Date();
+    var p2 = function(n){ return ('0' + n).slice(-2); };
+    var stamp = d.getFullYear() + '-' + p2(d.getMonth() + 1) + '-' + p2(d.getDate());
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'ヨコワカWF_メモ_' + stamp + '.html';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
+  }
+
+  function readEmbedded(){
+    var el = document.getElementById('memo-data');
+    if (!el) return null;
+    try { return JSON.parse(el.textContent) || null; } catch (e) { return null; }
+  }
+
+  /* ファイル側とブラウザ側の両方にメモがあるときは、上書きせず選ばせる */
+  function showBanner(embedded){
+    var main = document.querySelector('main');
+    var bar = document.createElement('div');
+    bar.className = 'memo-banner';
+    var msg = document.createElement('span');
+    msg.innerHTML = '<b>このファイルにメモ ' + total(embedded) + ' 件が埋め込まれています。</b>'
+      + ' このブラウザには別のメモ ' + total(data) + ' 件が保存されています。どちらを表示しますか？';
+    var b1 = document.createElement('button'); b1.className = 'tb-btn'; b1.textContent = 'ファイル側を読み込む';
+    var b2 = document.createElement('button'); b2.className = 'tb-btn'; b2.textContent = 'このブラウザ側を使う';
+    b1.addEventListener('click', function(){ data = embedded; load(); save(); bar.remove(); });
+    b2.addEventListener('click', function(){ bar.remove(); });
+    bar.appendChild(msg); bar.appendChild(b1); bar.appendChild(b2);
+    main.insertBefore(bar, main.firstChild);
+  }
+
+  /* =========================================================
+     提案説明（MTG で話す用）
+     各ブロックの [狙い, 動線] を PC / SP 別に持つ。配列の順番は
+     そのカラム内の .blk の並び順と 1 対 1 で対応させている。
+     ========================================================= */
+  var EXP = {
+  "p-top": {
+    "pc": [
+      [
+        "サイト全体の情報を5つの主要カテゴリーに整理し、「参加応募フォーム」を独立したアクションとして常に見える位置に配置します。情報を探す導線と、参加へ進む導線を分けることで、初めて訪れた人にも目的が伝わりやすい構成です。",
+        "興味のある情報へすぐ移動できるほか、参加したいと思ったタイミングでいつでもフォームへ進める導線にします。"
+      ],
+      [
+        "ファーストビューでは、ヨコワカの活動内容を細かく説明する前に、「横浜グリーンエクスポを若者自身がつくっていく」というサイトの核となるメッセージを印象的に伝えます。",
+        "まず活動を知りたい人は「ヨコワカを知る」へ、すでに参加意欲のある人は「参加応募フォーム」へ進める2つの入口を用意します。"
+      ],
+      [
+        "団体名だけでは活動イメージが伝わりにくいため、写真と短い紹介文を組み合わせ、ヨコワカが「誰と・何を目指している活動なのか」を直感的に理解できるセクションにします。",
+        "概要で興味を持った人はABOUTへ。より具体的な活動を見たい人は、そのまま次のCONTENTSへ自然に読み進められます。"
+      ],
+      [
+        "3つのプロジェクトを同じフォーマットで並べ、活動の幅と選択肢を一目で伝えます。「自分ならどの活動に関われそうか」を想像しやすくすることを重視します。",
+        "気になるプロジェクトから詳細へ進めるほか、まだ参加方法が決まっていない人は後半のJOINセクションで自分に合う関わり方を確認できます。"
+      ],
+      [
+        "最新のお知らせや活動レポートを掲載し、ヨコワカが継続的に活動していることや、現在の動きを伝えるセクションです。",
+        "気になるニュースは詳細へ、継続して情報を追いたい人はNEWS一覧へ進めます。"
+      ],
+      [
+        "参加団体のロゴを一覧で見せることで、すでに多様な仲間が参加していることを視覚的に伝えます。全国に広がる活動であることが伝わるほど、新しく参加する団体にも安心感を持ってもらえます。",
+        "興味を持った人は参加団体一覧へ進み、どのような団体が関わっているかを詳しく確認できます。"
+      ],
+      [
+        "「企画する・創る・発信する」という3つの関わり方を示し、実行委員だけでなく、それぞれの得意分野から参加できる活動であることを伝えます。",
+        "自分に合う参加方法をイメージした状態で、次の参加CTAへつなげます。"
+      ],
+      [
+        "サイトを読み進めて興味が高まったタイミングで、「参加」と「問い合わせ」の2つの選択肢を明確に提示します。",
+        "参加したい人はフォームへ、まず相談したい人はお問い合わせへ進めるシンプルな導線です。"
+      ],
+      [
+        "運営体制や関連組織、主要ページへのリンクをまとめ、活動の公式性とサイト全体の情報を最後に整理します。",
+        "他ページへの回遊に加え、フッターからも参加応募フォームやSNSへアクセスできるようにします。"
+      ]
+    ],
+    "sp": [
+      [
+        "スマートフォンではロゴとメニューに情報を絞り、ファーストビューの主役となるビジュアルを大きく見せます。",
+        "メニュー内に主要ページと参加導線をまとめ、どのページからでも必要な情報へすぐ移動できる構成にします。"
+      ],
+      [
+        "縦長画面を活かしてビジュアルとメッセージを大きく見せ、最初の1画面で活動の雰囲気と目的が伝わる構成にします。",
+        "「知る」「参加応募フォーム」の2つの選択肢を全幅ボタンで明確に見せます。"
+      ],
+      [
+        "写真を先に見せることで活動の雰囲気を直感的に伝え、その後に短い説明文を配置します。",
+        "興味を持った人はABOUTへ、概要だけで理解できた人はそのまま次の活動紹介へ進めます。"
+      ],
+      [
+        "3つのプロジェクトを縦に並べ、横スワイプをしなくてもすべての活動が自然に目に入る構成にします。",
+        "それぞれの内容を比較しながら、気になるプロジェクトの詳細へ進めます。"
+      ],
+      [
+        "ニュースはサムネイルとテキストを横並びにし、限られた画面幅でも複数の記事を見渡しやすくします。",
+        "記事詳細とNEWS一覧のどちらにもスムーズに移動できます。"
+      ],
+      [
+        "参加団体をコンパクトなグリッドで見せ、スマートフォンでも「多くの団体が関わっている」印象を保ちます。",
+        "一覧ページで各団体の情報をさらに確認できます。"
+      ],
+      [
+        "3つの参加方法を1つずつカードで見せ、自分に合う関わり方を順番に考えられる構成にします。",
+        "参加イメージができた状態で、そのまま下の参加CTAへ進めます。"
+      ],
+      [
+        "参加CTAは十分な面積を取り、ページを読み終えたタイミングで次のアクションを明確に提示します。",
+        "参加を主導線、問い合わせを補助導線として整理します。"
+      ],
+      [
+        "フッターでは運営体制・サイトマップ・参加導線を分けて整理し、スマートフォンでも情報の階層が分かるようにします。",
+        "最後まで読んだ人が、参加応募フォームやSNS、他ページへそのまま移動できます。"
+      ]
+    ]
+  },
+  "p-about": {
+    "pc": [
+      [
+        "ABOUTを現在地として明確に示し、サイト内での位置関係が分かる共通ナビゲーションにします。",
+        "他ページへの移動やTOPへの戻りも、同じナビゲーションから行えます。"
+      ],
+      [
+        "ページタイトルを大きく見せ、TOPの概要から一段深い「ヨコワカを知るページ」に入ったことを明確にします。",
+        "パンくずを設け、TOPとの階層関係も分かりやすくします。"
+      ],
+      [
+        "ヨコワカの基本情報を写真とともに改めて紹介し、検索やSNSなどから直接訪れた人にも活動の全体像が伝わる構成にします。",
+        "活動の概要を理解したうえで、次のCONCEPTへ読み進めてもらいます。"
+      ],
+      [
+        "「Be Excited for GREEN」をこのページの中心となるメッセージとして大きく見せ、活動の背景にある想いや価値観を伝えます。",
+        "活動への共感をつくったあと、具体的な参加方法へつなげます。"
+      ],
+      [
+        "「企画する・創る・発信する」の3つを写真とともに紹介し、ヨコワカへの関わり方が一つではないことを伝えます。",
+        "興味のある関わり方から、CONTENTS・参加応募フォーム・SNSなど次のアクションへ進めます。"
+      ],
+      [
+        "実行委員長・副実行委員長を写真とプロフィール付きで紹介し、活動を動かしている人の顔が見える構成にします。若者自身が主体となっていることも、このページの信頼感につながります。",
+        "人や活動への共感を持った状態で、最後の参加CTAへつなげます。"
+      ],
+      [
+        "ABOUTを読んで活動への理解が深まったタイミングで、参加への導線を明確に提示します。",
+        "興味を持った人が迷わず参加応募フォームへ進めるよう、アクションを一本化します。"
+      ]
+    ],
+    "sp": [
+      [
+        "ヘッダーのルールを全ページで統一し、スマートフォンでも迷わずサイト内を移動できる構成にします。",
+        "メニューから主要ページと参加導線へアクセスできます。"
+      ],
+      [
+        "ページタイトルは文字サイズを保ちながら読みやすく改行し、ABOUTページに入ったことを明確に見せます。",
+        "パンくずはコンパクトに配置し、TOPへの戻り道を残します。"
+      ],
+      [
+        "まず写真で活動の雰囲気を伝え、そのあとに紹介文を読んでもらう順番にします。",
+        "概要を理解した流れで、次のCONCEPTへ自然につなげます。"
+      ],
+      [
+        "コンセプトは1画面の中で印象的に見せ、スマートフォンでもメッセージの強さを損なわない構成にします。",
+        "共感をつくったあと、具体的な参加方法へ進めます。"
+      ],
+      [
+        "3つの関わり方を縦に並べ、一つずつ内容を確認できるようにします。",
+        "自分に合う関わり方を見つけたあと、関連コンテンツや参加導線へ進めます。"
+      ],
+      [
+        "人物紹介は写真・名前・所属・コメントを縦に整理し、顔と人柄が自然に伝わる構成にします。",
+        "活動を運営する人への安心感を持った状態で、参加CTAへ進めます。"
+      ],
+      [
+        "ページの締めとして参加導線を明確に見せ、ABOUTで得た共感をそのまま行動につなげます。",
+        "参加応募フォームへ直接進めるシンプルな導線にします。"
+      ]
+    ]
+  },
+  "p-contents": {
+    "pc": [
+      [
+        "CONTENTSを現在地として明確に示し、他ページとの行き来が分かりやすい共通ナビゲーションにします。",
+        "興味に応じてABOUT・NEWS・PARTNERSなどへ移動できます。"
+      ],
+      [
+        "冒頭で「3つのプロジェクトを軸に活動している」ことを伝え、このページで何が分かるのかを最初に整理します。",
+        "次のプロジェクト一覧で全体像を把握し、その後に気になる詳細へ進めます。"
+      ],
+      [
+        "3つのプロジェクトを最初に一覧化し、内容を比較しながら気になる活動から読める構成にします。",
+        "各サムネイル・番号から該当プロジェクトへ直接移動できます。"
+      ],
+      [
+        "リボンアースは活動イメージが伝わりやすいため、写真と説明をしっかり見せ、プロジェクト参加の具体像をつくります。",
+        "内容に共感した人は、その場から参加アクションへ進めます。"
+      ],
+      [
+        "2つ目はレイアウトに変化をつけながらも、情報の順番や参加ボタンの位置は揃え、3企画を比較しやすくします。",
+        "同じ操作感で内容確認から参加まで進めます。"
+      ],
+      [
+        "オリジナルソング&MVは動画自体が魅力になるため、映像を中心に構成します。また、シンガーと制作参加団体で参加方法が異なることを分かりやすく整理します。",
+        "それぞれの立場に合った応募・参加導線へ直接進めます。"
+      ],
+      [
+        "3つの活動を見たあとに共通の参加CTAを置き、「どの企画にするかまだ決めきれていない人」も受け止めます。",
+        "まとめて参加応募フォームへ案内します。"
+      ],
+      [
+        "ページ末尾では運営体制や他ページへのリンクを整理し、サイト全体の回遊性と公式性を補完します。",
+        "他コンテンツの閲覧や参加応募フォームへ引き続き移動できます。"
+      ]
+    ],
+    "sp": [
+      [
+        "ヘッダーは全ページ共通のルールに揃え、スマートフォンでもページごとに操作方法が変わらない構成にします。",
+        "メニューから主要ページや参加導線へ移動できます。"
+      ],
+      [
+        "冒頭の説明は短くまとめ、このページで3つのプロジェクトを紹介することをすぐ理解できるようにします。",
+        "そのままプロジェクト一覧へ進みます。"
+      ],
+      [
+        "3つのプロジェクトをコンパクトに一覧化し、長いページでも先に全体像を把握できるようにします。",
+        "気になる項目から該当セクションへ直接移動できます。"
+      ],
+      [
+        "各プロジェクトは「画像→見出し→説明→参加」の順に統一し、縦スクロールでも内容を追いやすくします。",
+        "詳細を読んだ直後に参加ボタンへ進めます。"
+      ],
+      [
+        "2つ目以降も情報の順番を揃え、レイアウトの違いより読みやすさを優先します。",
+        "どのプロジェクトでも同じ操作で参加できます。"
+      ],
+      [
+        "MVは16:9の動画を大きく見せ、スマートフォンでも内容を視覚的に理解できる構成にします。",
+        "シンガー向けと団体向けの2つの参加導線を分けて提示します。"
+      ],
+      [
+        "3つの活動を見終わったタイミングで、共通の参加CTAを大きく配置します。",
+        "プロジェクトを決めきれていない人も、そのまま参加応募フォームへ進めます。"
+      ],
+      [
+        "フッターでは運営体制・サイトマップ・参加導線を整理し、最後まで読んだ人の次の行動を受け止めます。",
+        "他ページへの回遊や参加応募フォームへ移動できます。"
+      ]
+    ]
+  },
+  "p-news": {
+    "pc": [
+      [
+        "NEWSを現在地として明確に示し、他ページとの関係が分かりやすい共通ナビゲーションにします。",
+        "ナビからサイト内の主要ページへ移動できます。"
+      ],
+      [
+        "ページタイトルで「活動の最新情報を確認する場所」であることを明確にします。",
+        "パンくずからTOPへ戻れるほか、そのまま記事一覧へ進めます。"
+      ],
+      [
+        "ニュースをカテゴリごとに整理し、「お知らせ」「開催前イベント」「活動レポート」など、目的に合わせて探しやすくします。",
+        "カテゴリを選ぶことで、見たい情報だけに絞って確認できます。"
+      ],
+      [
+        "一覧ではサムネイル・日付・カテゴリ・タイトルを統一して表示し、記事が増えても内容を比較しやすい構成にします。",
+        "気になる記事を選んで詳細へ進みます。"
+      ],
+      [
+        "記事数が増えても現在位置と全体量が把握できるよう、ページネーションを設けます。",
+        "前後のページへ移動しながら過去の活動まで追うことができます。"
+      ],
+      [
+        "NEWSを通じて活動への興味が高まった人に、最後に参加導線を提示します。",
+        "参加応募フォームへ進み、活動への関心を次のアクションにつなげます。"
+      ]
+    ],
+    "sp": [
+      [
+        "ヘッダーは全ページ共通の操作に揃え、スマートフォンでも迷わず移動できる構成にします。",
+        "メニューから主要ページや参加導線へアクセスできます。"
+      ],
+      [
+        "ページ名と導入をコンパクトにまとめ、すぐに記事を探し始められる構成にします。",
+        "そのままカテゴリ絞り込みへ進みます。"
+      ],
+      [
+        "カテゴリはすべて見える形で並べ、横スクロールをせずに選択肢を把握できるようにします。",
+        "タップしたカテゴリの記事だけを表示します。"
+      ],
+      [
+        "記事一覧は横型リストにし、限られた画面幅でも複数の記事を効率よく見渡せるようにします。",
+        "気になる記事から詳細へ進めます。"
+      ],
+      [
+        "ページ番号をコンパクトに表示しながら、現在位置が分かる構成にします。",
+        "前後・任意のページへ移動できます。"
+      ],
+      [
+        "最後まで見た人に、参加や他ページへの導線をまとめて提示します。",
+        "フッターから参加応募フォームや他のコンテンツへ移動できます。"
+      ]
+    ]
+  },
+  "p-news-detail": {
+    "pc": [
+      [
+        "NEWS内の詳細ページであることが分かるよう、ナビゲーションの現在地を維持します。",
+        "NEWS一覧へ戻る導線を常に確保します。"
+      ],
+      [
+        "カテゴリ・日付・タイトル・アイキャッチの順で情報を整理し、SNSなどから直接訪れた人にも記事内容がすぐ伝わる構成にします。",
+        "パンくずからNEWS一覧や上位ページへ戻れます。"
+      ],
+      [
+        "本文は読みやすい幅に絞り、見出し・画像・引用などのルールを統一して、活動レポートや告知が増えても読みやすさを保ちます。",
+        "記事を読み終えた流れで、シェアや次の記事へ進めます。"
+      ],
+      [
+        "読了後にSNSシェアを配置し、共感した活動をそのまま周囲へ広げてもらえる導線にします。",
+        "SNSへのシェア、またはNEWS一覧へ戻ることができます。"
+      ],
+      [
+        "前後の記事や関連記事を表示し、一つの記事だけで終わらず、ヨコワカの他の活動にも触れてもらえる構成にします。",
+        "興味のある次の記事へ自然に回遊できます。"
+      ],
+      [
+        "記事を通して活動に興味を持った人へ、最後に参加導線を提示します。",
+        "参加応募フォームへ進み、情報閲覧から実際の参加につなげます。"
+      ]
+    ],
+    "sp": [
+      [
+        "ヘッダーは共通ルールに揃え、記事詳細からでも他ページへすぐ移動できる構成にします。",
+        "メニューからNEWS一覧や参加導線へアクセスできます。"
+      ],
+      [
+        "タイトルとアイキャッチを大きく見せ、記事の内容を最初に直感的に把握できるようにします。",
+        "コンパクトなパンくずでNEWS一覧へ戻れるようにします。"
+      ],
+      [
+        "本文は1カラムで読みやすくし、長文でも視線が途切れにくい余白と行間を確保します。",
+        "読了後にそのままシェアへ進めます。"
+      ],
+      [
+        "シェア導線はコンパクトにまとめ、読み終わった直後に使いやすい位置へ配置します。",
+        "SNSで共有するか、NEWS一覧へ戻れます。"
+      ],
+      [
+        "前後記事と関連記事を縦に整理し、スマートフォンでも次に読む記事を選びやすくします。",
+        "別の記事へ移動して、活動を続けて閲覧できます。"
+      ],
+      [
+        "最後に参加導線とフッターをまとめ、記事から生まれた興味を次の行動につなげます。",
+        "参加応募フォームや他ページへ進めます。"
+      ]
+    ]
+  },
+  "p-partners": {
+    "pc": [
+      [
+        "PARTNERSを現在地として明確に示し、サイト内での位置関係が分かる共通ナビゲーションにします。",
+        "ナビから他の主要ページへ移動できます。"
+      ],
+      [
+        "冒頭で「全国から参加を募集している」ことを明確に伝え、地域を問わず自分たちも対象だと感じてもらえる導入にします。",
+        "募集対象を理解したうえで、実際の参加団体一覧へ進みます。"
+      ],
+      [
+        "団体情報はロゴ・団体名・所在地・リンクに統一し、多様な団体が全国から参加していることを一覧で伝えます。",
+        "気になる団体はSNSやWEBへ進み、それぞれの活動も確認できます。"
+      ],
+      [
+        "参加団体を見たあとに募集CTAを置き、「自分たちも参加できる」というイメージをそのまま応募につなげます。",
+        "参加希望は応募フォームへ、事前に相談したい場合はお問い合わせへ進めます。"
+      ],
+      [
+        "ページ末尾では運営体制や他ページへの導線を整理し、公式性とサイト全体の回遊性を補完します。",
+        "参加応募フォームや他ページへ引き続き移動できます。"
+      ]
+    ],
+    "sp": [
+      [
+        "ヘッダーは全ページ共通の操作に揃え、スマートフォンでも迷わず移動できる構成にします。",
+        "メニューから主要ページや参加導線へアクセスできます。"
+      ],
+      [
+        "「全国から参加できる」ことが短い導入でもしっかり伝わるよう、メッセージをコンパクトに見せます。",
+        "そのまま参加団体一覧へ進みます。"
+      ],
+      [
+        "団体ロゴを見渡しやすいグリッドで配置し、参加の広がりを視覚的に伝えます。",
+        "気になる団体からSNSやWEBへ移動できます。"
+      ],
+      [
+        "一覧を見終えたタイミングで募集CTAを大きく見せ、自分たちの参加を具体的に検討できる流れにします。",
+        "全幅ボタンから応募フォームへ進めます。"
+      ],
+      [
+        "フッターでは運営体制・サイトマップ・参加導線を整理し、ページの最後でも次の行動が分かる構成にします。",
+        "参加応募フォームや他ページへ移動できます。"
+      ]
+    ]
+  },
+  "p-contact": {
+    "pc": [
+      [
+        "CONTACTを現在地として明確に示し、サイト内での位置関係が分かる共通ナビゲーションにします。",
+        "ナビから他の主要ページへ移動できます。"
+      ],
+      [
+        "参加希望から一般的な質問まで、問い合わせ窓口を一つにまとめて分かりやすくします。問い合わせ種別で内容を整理できる設計です。",
+        "導入文で対象を確認したあと、そのままフォーム入力へ進みます。"
+      ],
+      [
+        "入力項目は必要な情報に絞り、問い合わせのハードルを下げます。所属団体や地域など、活動運営に役立つ情報は任意項目として取得します。",
+        "入力後は内容確認を経て送信完了へ進む想定です。"
+      ],
+      [
+        "送信までのステップを見える形にし、現在どの段階にいるかが分かる構成にします。",
+        "入力・確認・完了の順で安心して送信できます。"
+      ],
+      [
+        "フォーム以外にもSNSから相談できることを示し、若者が普段使い慣れている方法でも連絡できるようにします。",
+        "問い合わせ内容や好みに応じて、フォームまたはSNSのDMを選べます。"
+      ],
+      [
+        "最後に運営体制や他ページへの導線をまとめ、問い合わせ後も活動情報へ戻れる構成にします。",
+        "サイト内の他ページや参加導線へ移動できます。"
+      ]
+    ],
+    "sp": [
+      [
+        "ヘッダーは全ページ共通の操作に揃え、問い合わせページでも迷わずサイト内を移動できる構成にします。",
+        "メニューから主要ページや参加導線へアクセスできます。"
+      ],
+      [
+        "ページタイトルと導入を簡潔にまとめ、すぐフォームへ進める構成にします。",
+        "問い合わせの目的を確認したあと、そのまま入力へ進みます。"
+      ],
+      [
+        "フォームは1カラムに統一し、スマートフォンで入力しやすいサイズと間隔を確保します。",
+        "入力後は全幅ボタンから確認画面へ進みます。"
+      ],
+      [
+        "送信までのステップをコンパクトに表示し、あと何段階あるかを分かりやすくします。",
+        "入力・確認・完了の順に進みます。"
+      ],
+      [
+        "SNS窓口も分かりやすく見せ、フォーム以外の連絡方法も選べるようにします。",
+        "普段使っているSNSから気軽に相談できます。"
+      ],
+      [
+        "フッターでは運営体制・サイトマップ・参加導線を整理し、問い合わせページの最後にも次の行動を残します。",
+        "他ページや参加応募フォームへ移動できます。"
+      ]
+    ]
+  }
+};
+
+  function expLine(label, text){
+    var p = document.createElement('p');
+    p.className = 'wf-exp-line';
+    var b = document.createElement('b');
+    b.textContent = label;
+    p.appendChild(b);
+    p.appendChild(document.createTextNode(text));
+    return p;
+  }
+
+  /* 「動線」は押せるものがあるブロックだけに出す。
+     判定はブロック内の操作要素（ボタン・ナビ・チップ・ハンバーガー）の有無。
+     ボタンを持たないが移動が主目的のブロック（目次・前後記事・関連記事・
+     フッター）はタグ名で拾う。 */
+  var FLOW_SEL = '.btn, .chip, .wf-nav span, .burger';
+  var FLOW_TAG = /目次|前後記事|関連記事|フッター/;
+  function needsFlow(blk){
+    if (blk.querySelector(FLOW_SEL)) return true;
+    var tag = blk.querySelector('.tag');
+    return !!tag && FLOW_TAG.test(tag.textContent);
+  }
+
+  /* WF の外（右側）に説明列を作る。PC 用・SP 用を1本ずつ持ち、
+     表示中のデバイスに対応する側だけを出す。
+     注記（実装メモ）も WF 本体から取り出してここへまとめる。 */
+  function buildExpColumns(){
+    Object.keys(EXP).forEach(function(pid){
+      var page = document.getElementById(pid);
+      if (!page) return;
+      var stage = page.querySelector('.stage');
+      if (!stage) return;
+
+      ['pc','sp'].forEach(function(dev){
+        var list = EXP[pid][dev] || [];
+        var blks = A(page.querySelectorAll('.col-' + dev + ' .blk'));
+        if (!blks.length) return;
+
+        var col = document.createElement('div');
+        col.className = 'col-exp for-' + dev;
+        col.dataset.dev = dev;
+
+        var head = document.createElement('div');
+        head.className = 'exp-head';
+        head.innerHTML = '<span>▰ 提案説明（' + (dev === 'pc' ? 'PC' : 'SP') + '）</span>'
+                       + '<span>' + blks.length + 'ブロック</span>';
+        col.appendChild(head);
+
+        blks.forEach(function(blk, i){
+          var e = list[i];
+          if (!e) return;
+          var item = document.createElement('div');
+          item.className = 'exp-item';
+          var tag = blk.querySelector('.tag');
+          var label = document.createElement('span');
+          label.className = 'exp-label';
+          label.textContent = tag ? tag.textContent.replace('✉', '').trim() : ('ブロック ' + (i + 1));
+          item.appendChild(label);
+          item.appendChild(expLine('狙い', e[0]));
+          if (needsFlow(blk)) item.appendChild(expLine('動線', e[1]));
+          /* 注記を WF から抜き取ってこちらへ移す（WF 本体は素の状態に保つ） */
+          A(blk.querySelectorAll('.note')).forEach(function(n){ item.appendChild(n); });
+          col.appendChild(item);
+          blk.dataset.expIdx = i;
+        });
+
+        stage.appendChild(col);
+      });
+    });
+  }
+
+  /* 各説明項目の top を、対応ブロックの縦位置に合わせる。
+     ブロックが短くて説明が入り切らない場合は下へ押し出して重なりを防ぐ。 */
+  function layoutExp(){
+    A(document.querySelectorAll('.col-exp')).forEach(function(col){
+      var page = col.closest('.page');
+      /* 非表示ページ・非表示列は getBoundingClientRect が 0 を返すので計算しない */
+      if (!page || !page.classList.contains('on')) return;
+      if (getComputedStyle(col).display === 'none') return;
+      var blks = A(page.querySelectorAll('.col-' + col.dataset.dev + ' .blk'));
+      var items = A(col.children).filter(function(el){ return el.classList.contains('exp-item'); });
+      var colTop = col.getBoundingClientRect().top;
+      var prevBottom = col.querySelector('.exp-head').offsetHeight + 8;
+      items.forEach(function(item, i){
+        var blk = blks[i];
+        if (!blk) return;
+        var want = blk.getBoundingClientRect().top - colTop;
+        var top = Math.max(want, prevBottom);
+        item.style.top = top + 'px';
+        prevBottom = top + item.offsetHeight + 10;
+      });
+      col.style.height = prevBottom + 'px';
+    });
+  }
+
+  /* レイアウトが変わる操作のあとに再計算する。
+     まず同期で1回（requestAnimationFrame は非表示タブでは発火しないため）、
+     そのうえで描画確定後にもう1回走らせて字詰め・画像確定のズレを吸収する。 */
+  function layoutExpSoon(){
+    layoutExp();
+    requestAnimationFrame(function(){ requestAnimationFrame(layoutExp); });
+  }
+  window.__wfExp = layoutExp;   /* 手動で揃え直したいとき用 */
+
+  var et = document.getElementById('expToggle');
+  et.addEventListener('change', function(){
+    document.body.classList.toggle('hide-exp', !et.checked);
+    layoutExpSoon();
+  });
+
+  /* ---------- ツールバー高さを CSS 変数へ（メモ列の追従位置に使う） ---------- */
+  var toolbar = document.querySelector('.toolbar');
+  function syncToolbarHeight(){
+    document.documentElement.style.setProperty('--tbh', toolbar.offsetHeight + 'px');
+  }
+  syncToolbarHeight();
+  window.addEventListener('resize', function(){ syncToolbarHeight(); layoutExpSoon(); });
+
+  /* ---------- 起動 ---------- */
+  buildExpColumns();          /* メモ列より先に作って [WF][説明][メモ] の順にする */
+  pages.forEach(buildMemoColumn);
+  readStorage();
+  var emb = readEmbedded();
+  if (emb){
+    if (total(data) === 0) data = emb;
+    else if (JSON.stringify(emb) !== JSON.stringify(data)) showBanner(emb);
+  }
+  load();
+  layoutExpSoon();
+  window.addEventListener('load', layoutExpSoon);   /* 画像・フォント確定後にもう一度揃える */
+
+  document.getElementById('memoExport').addEventListener('click', exportHtml);
+
+  var clearBtn = document.getElementById('memoClear'), armed = false, armTimer = null;
+  function disarm(){
+    armed = false; clearBtn.classList.remove('armed'); clearBtn.textContent = 'メモを全消去';
+  }
+  clearBtn.addEventListener('click', function(){
+    if (!armed){
+      armed = true; clearBtn.classList.add('armed'); clearBtn.textContent = 'もう一度押すと全消去';
+      armTimer = setTimeout(disarm, 4000);
+      return;
+    }
+    clearTimeout(armTimer); disarm();
+    data = {};
+    try { localStorage.removeItem(KEY); } catch (e) {}
+    load();
+  });
+
+  window.__wfMemo = {
+    key: KEY, load: load, save: save, setOverall: setOverall, setBlock: setBlock,
+    count: count, total: function(){ return total(data); }, serialize: serialize, exportHtml: exportHtml,
+    dump: function(){ return data; }
+  };
+})();
+</script>
+</body>
+</html>

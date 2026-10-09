@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ブース掲示 A2ポスター レイアウトラフ v0.1｜横浜グリーンエクスポ × ヨコワカ</title>
+<style>
+/* ============================================================
+   A2ポスター レイアウトラフ（ブース掲示用）
+   - A2縦 420mm × 594mm 実寸
+   - グレースケール（配色・装飾は意図的に持たない／後工程で色を載せる前提）
+   - 1ファイル完結／ズーム切替・注記トグル・ガイド表示
+   - 印刷（Cmd+P → 用紙A2 / 余白なし）でそのままPDF化できる
+   ============================================================ */
+:root{
+  --ink:#1f1f1f;
+  --mid:#6b6b6b;
+  --sub:#8f8f8f;
+  --line:#c7c7c7;
+  --line2:#dedede;
+  --fill:#f4f4f4;
+  --fill2:#e8e8e8;
+  --fill3:#dcdcdc;
+  --bg:#f7f7f7;
+  --white:#fff;
+  --font: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Noto Sans JP", "Yu Gothic", sans-serif;
+  --z:.42; /* 画面表示倍率 */
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  font-family:var(--font);
+  background:var(--bg);
+  color:var(--ink);
+  font-size:13px;
+  line-height:1.7;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ---------- ツールバー ---------- */
+.toolbar{
+  position:sticky;top:0;z-index:100;
+  background:var(--white);
+  border-bottom:2px solid var(--ink);
+  padding:8px 16px;
+  display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center;
+}
+.tb-title{font-weight:700;font-size:14px;white-space:nowrap;}
+.tb-title span{font-weight:400;color:var(--sub);font-size:11px;margin-left:6px;}
+.tb-right{display:flex;gap:14px;align-items:center;margin-left:auto;flex-wrap:wrap;}
+.seg{display:flex;border:1px solid var(--line);border-radius:2px;overflow:hidden;}
+.seg button{
+  font-family:var(--font);font-size:11px;padding:5px 10px;border:0;
+  background:var(--white);color:var(--mid);cursor:pointer;border-left:1px solid var(--line);
+}
+.seg button:first-child{border-left:0;}
+.seg button.on{background:var(--fill3);color:var(--ink);font-weight:700;}
+.seg-cap{font-size:11px;color:var(--sub);margin-right:-8px;}
+.chk{font-size:11px;color:var(--mid);cursor:pointer;user-select:none;white-space:nowrap;}
+
+/* ---------- ステージ（紙面） ---------- */
+.wrap{padding:24px 16px 60px;}
+.stage-wrap{
+  position:relative;
+  width:calc(420mm * var(--z));
+  height:calc(594mm * var(--z));
+  margin:0 auto;
+}
+.paper{
+  position:absolute;top:0;left:0;
+  width:420mm;height:594mm;
+  background:var(--white);
+  border:1px solid var(--ink);
+  transform:scale(var(--z));
+  transform-origin:top left;
+  display:flex;flex-direction:column;
+  padding:18mm;
+  overflow:visible; /* 溢れたら気づけるよう敢えて隠さない */
+}
+.paper-cap{
+  text-align:center;font-size:11px;color:var(--mid);
+  margin:0 auto 10px;max-width:900px;
+  display:flex;justify-content:space-between;border-bottom:1px solid var(--line);padding-bottom:5px;
+}
+
+/* ---------- ガイド（トンボ・安全余白） ---------- */
+.guide{position:absolute;inset:0;pointer-events:none;z-index:9;display:none;}
+body.guide-on .guide{display:block;}
+.guide .safe{
+  position:absolute;left:18mm;top:18mm;right:18mm;bottom:18mm;
+  border:1px dashed #b0b0b0;
+}
+.guide .center-v{position:absolute;left:50%;top:0;bottom:0;border-left:1px dashed #dcdcdc;}
+.guide .gl{position:absolute;font-size:8pt;color:#a8a8a8;}
+.guide .gl.g1{left:19mm;top:6mm;}
+.guide .gl.g2{right:19mm;bottom:6mm;}
+
+/* ---------- 注記（印刷では出ない指示・寸法メモ） ---------- */
+.anno{
+  font-size:8pt;line-height:1.35;color:var(--sub);
+  border-left:2px solid var(--line);padding-left:4px;
+  font-weight:400;letter-spacing:0;
+}
+.anno-tag{
+  display:inline-block;font-size:8pt;font-weight:700;letter-spacing:.04em;
+  background:var(--ink);color:var(--white);padding:0 6px;border-radius:2px;
+  vertical-align:middle;
+}
+.anno-tag.g{background:var(--fill3);color:var(--ink);}
+body.anno-off .anno,
+body.anno-off .anno-tag,
+body.anno-off .anno-row,
+body.anno-off .note{display:none !important;}
+.note{color:var(--mid);}
+.anno-row{display:flex;justify-content:space-between;align-items:center;gap:6mm;margin-bottom:2mm;}
+
+/* ---------- 紙面ブロック ---------- */
+.block{position:relative;}
+.block-a{padding-bottom:6mm;}                                  /* 上：EXPO紹介 */
+.block-b{
+  margin-top:auto;                                             /* 下：ヨコワカ活動 */
+  background:var(--fill);
+  border-top:1.2mm solid var(--ink);
+  margin-left:-18mm;margin-right:-18mm;margin-bottom:-18mm;
+  padding:8mm 18mm 11mm;
+}
+
+/* ロゴ行 */
+.logo-row{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:5mm;}
+.logo-ph{
+  border:1px solid var(--line);background:var(--fill);
+  display:flex;align-items:center;justify-content:center;
+  color:var(--mid);font-size:9pt;text-align:center;line-height:1.3;
+}
+.logo-ph.main{width:78mm;height:24mm;}
+.logo-ph.sub{width:52mm;height:18mm;}
+
+/* 見出し */
+.eyebrow{font-size:11pt;letter-spacing:.22em;color:var(--mid);font-weight:700;margin-bottom:2mm;}
+.h-main{
+  font-size:44pt;font-weight:700;line-height:1.18;letter-spacing:.01em;margin:0 0 4mm;
+}
+.h-main .sm{font-size:30pt;}
+.h-sec{
+  font-size:26pt;font-weight:700;line-height:1.3;margin:0 0 3mm;
+  border-left:2.5mm solid var(--ink);padding-left:5mm;
+}
+
+/* 開催概要バー */
+.facts{display:flex;gap:0;border:1px solid var(--ink);margin-bottom:5mm;}
+.fact{flex:1;padding:3.5mm 5mm;border-left:1px solid var(--line);}
+.fact:first-child{border-left:0;}
+.fact dt{font-size:10pt;font-weight:700;color:var(--mid);letter-spacing:.14em;margin:0 0 1mm;}
+.fact dd{margin:0;font-size:19pt;font-weight:700;line-height:1.2;}
+.fact dd .note{font-size:10pt;font-weight:400;color:var(--mid);display:block;}
+
+/* ビジュアル枠 */
+.ph{
+  position:relative;background:var(--fill);border:1px solid var(--line);
+  display:flex;align-items:center;justify-content:center;
+  color:var(--mid);font-size:11pt;text-align:center;overflow:hidden;
+}
+.ph::before,.ph::after{
+  content:"";position:absolute;inset:0;
+  background:linear-gradient(to top right,transparent calc(50% - .3mm),var(--line2) calc(50% - .3mm),var(--line2) calc(50% + .3mm),transparent calc(50% + .3mm));
+}
+.ph::after{background:linear-gradient(to bottom right,transparent calc(50% - .3mm),var(--line2) calc(50% - .3mm),var(--line2) calc(50% + .3mm),transparent calc(50% + .3mm));}
+.ph > span{position:relative;z-index:1;background:var(--fill);padding:1mm 3mm;line-height:1.4;}
+.ph.hero{height:120mm;margin-bottom:5mm;}
+.ph.photo{height:44mm;margin-bottom:3mm;}
+
+/* テーマ */
+.theme{display:flex;gap:7mm;align-items:flex-start;}
+.theme-l{flex:0 0 108mm;}
+.theme-r{flex:1;}
+.theme-label{font-size:11pt;font-weight:700;color:var(--mid);letter-spacing:.14em;margin-bottom:1.5mm;}
+.theme-jp{font-size:21pt;font-weight:700;line-height:1.25;margin:0 0 2.5mm;}
+.theme-copy{font-size:30pt;font-weight:700;line-height:1.2;margin:0 0 1.5mm;}
+.theme-en{font-size:13pt;letter-spacing:.1em;color:var(--mid);font-weight:700;}
+.lead{font-size:13pt;line-height:1.65;margin:0;color:#333;}
+
+/* 下ブロック：2カラム */
+.lead-b{font-size:13pt;line-height:1.6;margin:0 0 5mm;color:#333;}
+.cols{display:flex;gap:7mm;margin-bottom:5mm;}
+.col-l{flex:1 1 auto;min-width:0;}
+.col-r{flex:0 0 132mm;}
+.card{background:var(--white);border:1px solid var(--line);padding:5mm 6mm;height:100%;}
+.card-ttl{
+  font-size:17pt;font-weight:700;line-height:1.3;margin:0 0 3mm;
+  border-bottom:1px solid var(--line);padding-bottom:2mm;
+}
+.sub-ttl{font-size:12pt;font-weight:700;margin:0 0 1.5mm;display:flex;align-items:center;gap:2mm;}
+.sub-ttl::before{content:"";width:2.5mm;height:2.5mm;background:var(--ink);display:inline-block;}
+.list{margin:0 0 4mm;padding:0 0 0 5mm;font-size:11.5pt;line-height:1.55;}
+.list li{margin-bottom:.8mm;}
+.list:last-child{margin-bottom:0;}
+.future{list-style:none;margin:0;padding:0;font-size:11.5pt;line-height:1.5;}
+.future li{padding:1.5mm 0 1.5mm 6mm;border-top:1px dashed var(--line);position:relative;}
+.future li:first-child{border-top:0;}
+.future li::before{content:"→";position:absolute;left:0;font-weight:700;}
+
+/* 参加フロー */
+.flow{display:flex;align-items:stretch;gap:2mm;margin:3mm 0 0;}
+.flow-step{
+  flex:1;border:1px solid var(--line);background:var(--fill2);
+  padding:3mm;font-size:11pt;font-weight:700;line-height:1.35;text-align:center;
+  display:flex;align-items:center;justify-content:center;
+}
+.flow-arw{display:flex;align-items:center;font-size:14pt;font-weight:700;color:var(--mid);}
+
+/* CTAバー */
+.cta{
+  border:1.2mm solid var(--ink);background:var(--white);
+  display:flex;align-items:center;gap:6mm;padding:5mm 6mm;
+}
+.cta-main{flex:1;}
+.cta-ttl{font-size:26pt;font-weight:700;line-height:1.2;margin:0 0 1.5mm;}
+.cta-sub{font-size:11.5pt;line-height:1.5;margin:0;color:#333;}
+.qr{
+  flex:0 0 auto;width:34mm;height:34mm;border:1px solid var(--ink);background:var(--fill);
+  display:flex;align-items:center;justify-content:center;text-align:center;
+  font-size:9pt;color:var(--mid);line-height:1.3;
+}
+.qr-cap{flex:0 0 auto;width:36mm;font-size:10pt;font-weight:700;line-height:1.35;}
+
+/* フッター（主催表記） */
+.foot{
+  display:flex;justify-content:space-between;align-items:center;
+  margin-top:5mm;font-size:10pt;color:var(--mid);
+  border-top:1px solid var(--line);padding-top:2.5mm;
+}
+
+/* ---------- 紙面外：注記パネル ---------- */
+.panel{max-width:900px;margin:36px auto 0;background:var(--white);border:1px solid var(--ink);}
+.panel h2{
+  font-size:14px;margin:0;padding:9px 14px;background:var(--ink);color:var(--white);font-weight:700;
+}
+.panel .inner{padding:14px 16px 18px;}
+.panel h3{font-size:12px;margin:16px 0 6px;border-left:3px solid var(--ink);padding-left:7px;}
+.panel h3:first-child{margin-top:0;}
+.panel table{width:100%;border-collapse:collapse;font-size:11.5px;}
+.panel th,.panel td{border:1px solid var(--line);padding:5px 8px;text-align:left;vertical-align:top;}
+.panel th{background:var(--fill);font-weight:700;white-space:nowrap;}
+.panel ol,.panel ul{margin:0;padding-left:20px;font-size:11.5px;line-height:1.75;}
+.panel li{margin-bottom:2px;}
+.panel .q{font-weight:700;}
+.panel .memo{font-size:11px;color:var(--mid);margin:6px 0 0;}
+.ok{color:var(--ink);font-weight:700;}
+.ng{color:var(--mid);}
+
+/* ---------- 印刷 ---------- */
+@page{size:A2 portrait;margin:0;}
+@media print{
+  body{background:var(--white);}
+  .toolbar,.panel,.paper-cap,.guide{display:none !important;}
+  .wrap{padding:0;}
+  .stage-wrap{width:420mm;height:594mm;margin:0;}
+  .paper{transform:none;border:0;}
+  .anno,.anno-tag,.anno-row,.note{display:none !important;}
+}
+</style>
+</head>
+<body class="guide-on">
+
+<div class="toolbar">
+  <div class="tb-title">A2ポスター レイアウトラフ <span>v0.1 / A2縦 420×594mm / グレースケール</span></div>
+  <div class="tb-right">
+    <span class="seg-cap">表示倍率</span>
+    <div class="seg" id="zoomSeg">
+      <button data-z=".28">28%</button>
+      <button data-z=".42" class="on">42%</button>
+      <button data-z=".6">60%</button>
+      <button data-z="1">100%（実寸）</button>
+    </div>
+    <label class="chk"><input type="checkbox" id="annoToggle" checked> 注記・寸法メモ</label>
+    <label class="chk"><input type="checkbox" id="guideToggle" checked> 安全余白ガイド</label>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <div class="paper-cap">
+    <span>A2縦 420 × 594mm ／ 天地左右 18mm 安全余白 ／ 塗り足し 3mm 別途</span>
+    <span>想定視認距離：見出し 3m・本文 1m以内</span>
+  </div>
+
+  <div class="stage-wrap" id="stageWrap">
+    <div class="paper">
+
+      <!-- ================= 上ブロック：横浜グリーンエクスポ とは？ ================= -->
+      <div class="block block-a">
+
+        <div class="anno-row">
+          <span class="anno-tag">A｜横浜グリーンエクスポ 認知パート</span>
+          <span class="anno">遠目（3m）で「何の博覧会か・いつか」が読み取れること／紙面上半分（〜約330mm）に収める</span>
+        </div>
+
+        <div class="logo-row">
+          <div class="logo-ph main">横浜グリーンエクスポ<br>公式ロゴ（要・使用許諾）</div>
+          <div class="logo-ph sub">ヨコワカ<br>ロゴ</div>
+        </div>
+
+        <p class="anno" style="margin:0 0 3mm;">英字表記（正式名称）を入れるならこの位置。原稿に無く、正式な英語名称の裏取りができていないため本ラフでは空にしている</p>
+        <h1 class="h-main">横浜グリーンエクスポ<br><span class="sm">横浜国際園芸博覧会とは？</span></h1>
+        <p class="anno" style="margin-bottom:5mm;">見出し 44pt / 副題 30pt・太ゴシック。原稿の【 】は装飾記号なので誌面では外す想定（要確認）</p>
+
+        <dl class="facts">
+          <div class="fact">
+            <dt>場所</dt>
+            <dd>横浜・上瀬谷<span class="note">旧上瀬谷通信施設地区（正式名称・要確認）</span></dd>
+          </div>
+          <div class="fact">
+            <dt>開催期間</dt>
+            <dd>2027.3.19 - 9.26<span class="note">曜日・元号併記の要否 要確認</span></dd>
+          </div>
+        </dl>
+
+        <div class="ph hero"><span>テーマビジュアル（公式キービジュアル or 会場イメージ）<br>W384 × H120mm ／ 素材の使用可否・解像度（原寸350dpi）要確認</span></div>
+        <p class="anno" style="margin:-3mm 0 5mm;">カウントダウン枠を外して空いた約40mmをここに寄せ、ビジュアルを H80mm → H120mm に拡大（紙面下部の余白量は変更前と同じ）</p>
+
+        <div class="theme">
+          <div class="theme-l">
+            <p class="theme-label">テーマ</p>
+            <p class="theme-jp">幸せ創る<br>明日の風景</p>
+            <p class="theme-copy">「地球と。<br>咲きに行こう。」</p>
+            <p class="theme-en">Bloom of Future</p>
+          </div>
+          <div class="theme-r">
+            <p class="lead">
+              地球環境の明日を考える場。<br>
+              会場に咲き誇るのは花や緑だけではなく、来場者一人一人がそれぞれの価値観で「咲くことができる」体験の提供を目指しています。
+            </p>
+            <p class="anno" style="margin-top:4mm;">本文 13pt・行間1.65。ここは近づいて読ませるゾーン。原稿3行を2段落に整理（改行位置は仮）</p>
+          </div>
+        </div>
+
+      </div><!-- /block-a -->
+
+
+      <!-- ================= 下ブロック：ヨコワカの活動 ================= -->
+      <div class="block block-b">
+
+        <div class="anno-row">
+          <span class="anno-tag g">B｜ヨコワカ活動＋リボンアース 参加導線</span>
+          <span class="anno">地色をグレー（後工程で別色）に振り、上下で「EXPOの話」→「自分たちの話」を分離</span>
+        </div>
+
+        <h2 class="h-sec">横浜エクスポ若者実行委員会の活動</h2>
+        <p class="lead-b">
+          横浜グリーンエクスポの認知拡大に貢献し、また若者自身の活動の幅を広げるムーブメントを創出します。<br>
+          若者から「若者が参加できる横浜グリーンエクスポ」を作っていきます。
+        </p>
+
+        <div class="cols">
+          <div class="col-l">
+            <div class="card">
+              <p class="card-ttl">★企画・リボンアース</p>
+
+              <p class="sub-ttl">目的・内容</p>
+              <ul class="list">
+                <li>横浜グリーンエクスポの認知拡大</li>
+                <li>未来の風景を、若者が直感的に体感できる入り口になる</li>
+              </ul>
+
+              <p class="sub-ttl">目指す未来</p>
+              <ul class="future">
+                <li>若者が「未来への願い」を言語化し、発信することで当事者意識をもてる未来</li>
+                <li>若者が自身の想いや活動に誇りを持てる未来</li>
+                <li>社会が若者の想いに触れ、共に生きる未来</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="col-r">
+            <div class="card">
+              <p class="card-ttl">みなさんと創りたい！</p>
+              <div class="ph photo"><span>リボン／モニュメントの写真・イラスト<br>W120 × H44mm</span></div>
+              <div class="flow">
+                <div class="flow-step">リボンに<br>思いを書く</div>
+                <div class="flow-arw">➡</div>
+                <div class="flow-step">みんなの想いの詰まった<br>一つのモニュメントを<br>完成させる</div>
+              </div>
+              <p class="lead-b" style="margin:3mm 0 0;font-size:11pt;">
+                モニュメントは横浜グリーンエクスポの会場内や横浜市内に若者活動の象徴として展示されます。
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="cta">
+          <div class="cta-main">
+            <p class="cta-ttl">▶ リボンに、あなたの想いを。</p>
+            <p class="cta-sub">ブースでリボンを受け取って、未来への願いを書いてください。あなたの1本が、モニュメントの一部になります。</p>
+          </div>
+          <div class="qr-cap">活動の詳細・<br>参加はこちら</div>
+          <div class="qr">QRコード<br>34×34mm<br>（遷移先URL未定）</div>
+        </div>
+        <p class="anno" style="margin:2mm 0 0;">CTAは紙面最下部＝ブースで立ったときの目線より下。実際に手を動かしてもらう文言なので、ここだけ枠罫を太くして独立させている（見出し26pt）<br>
+        <b>⚠️ このCTAブロックの3つの文言（見出し・本文・QRキャプション）は未確定の仮コピー。とくに「ブースでリボンを受け取って」はリボンを配布する運用を仮定しているため、実際のブース運営に合わせて要差し替え</b></p>
+
+        <div class="foot">
+          <span>団体名表記：__________<span class="note">（「主催」等の立場・正式表記とも未確定）</span></span>
+          <span>お問い合わせ／SNS：__________<span class="note">（未確定）</span></span>
+        </div>
+
+      </div><!-- /block-b -->
+
+      <!-- ガイド -->
+      <div class="guide">
+        <div class="safe"></div>
+        <div class="center-v"></div>
+        <div class="gl g1">安全余白 18mm</div>
+        <div class="gl g2">仕上がり A2（420×594mm）／塗り足し3mm</div>
+      </div>
+
+    </div><!-- /paper -->
+  </div><!-- /stage-wrap -->
+
+
+  <!-- ================= 紙面外：注記パネル ================= -->
+  <div class="panel">
+    <h2>ラフの読み方・原稿の反映状況・要確認事項</h2>
+    <div class="inner">
+
+      <h3>このラフの位置づけ</h3>
+      <ul>
+        <li>グレースケールの<b>レイアウトラフ</b>です。要素の配置・大小関係・情報の優先順位だけを決めており、配色・書体・装飾は後工程（デザイン）に委ねています。</li>
+        <li>寸法はすべて A2実寸（mm / pt）で入っています。ツールバーの「100%（実寸）」＋印刷（用紙A2・余白なし）で、実際の文字サイズを紙で確認できます。</li>
+        <li>「注記・寸法メモ」をオフにすると、指示メモが消えて純粋な紙面レイアウトだけになります（印刷時は自動で消えます）。</li>
+      </ul>
+
+      <h3>紙面の設計意図（なぜこの並びか）</h3>
+      <table>
+        <tr><th>ゾーン</th><th>役割</th><th>読ませ方</th></tr>
+        <tr><td>A上部（ロゴ〜開催概要）</td><td>「何の博覧会か・いつ・どこで」を一撃で伝える</td><td>3m先の通行者に。見出し44pt・概要19pt</td></tr>
+        <tr><td>A下部（テーマ〜本文）</td><td>EXPOの世界観・意味を伝える</td><td>足を止めた人に。13pt</td></tr>
+        <tr><td>B左（リボンアース）</td><td>企画の目的と目指す未来</td><td>興味を持った人に。11.5pt</td></tr>
+        <tr><td>B右（みなさんと創りたい）</td><td>参加のイメージを視覚化</td><td>写真＋2ステップのフロー図</td></tr>
+        <tr><td>B最下部（CTA＋QR）</td><td>その場で行動してもらう</td><td>立った目線の下＝手が届く位置。太罫で独立</td></tr>
+      </table>
+
+      <h3>原稿の反映チェック</h3>
+      <table>
+        <tr><th>原稿</th><th>反映先</th><th>状態</th></tr>
+        <tr><td>【横浜グリーンエクスポ 横浜国際園芸博覧会とは？】</td><td>A・大見出し</td><td class="ok">反映（【 】は誌面では外す想定）</td></tr>
+        <tr><td>開催まであと●●日</td><td>―</td><td class="ng">不採用（掲載しない）。印刷時点で日数が固定されるため。開催時期は「開催期間」で示す</td></tr>
+        <tr><td>場所／開催期間</td><td>A・開催概要バー</td><td class="ok">反映</td></tr>
+        <tr><td>テーマ／「地球と。咲きに行こう。」／Bloom of Future</td><td>A・テーマ左カラム</td><td class="ok">反映</td></tr>
+        <tr><td>地球環境の明日を考える場。〜（3行）</td><td>A・テーマ右カラム</td><td class="ok">反映（改行位置は仮）</td></tr>
+        <tr><td>【横浜エクスポ若者実行委員会の活動】＋2行</td><td>B・見出し＋リード</td><td class="ok">反映</td></tr>
+        <tr><td>★企画・リボンアース／◎目的・内容</td><td>B左カード</td><td class="ok">反映</td></tr>
+        <tr><td>◎目指す未来（3項目）</td><td>B左カード下部</td><td class="ok">反映</td></tr>
+        <tr><td>◎みなさんと創りたい！／リボンに思いを書く→モニュメント</td><td>B右カード（フロー図化）</td><td class="ok">反映（箇条書き→図に変換）</td></tr>
+        <tr><td>モニュメントの展示先</td><td>B右カード本文</td><td class="ok">反映</td></tr>
+        <tr><td>ロゴ／写真／QR／問い合わせ先</td><td>各プレースホルダ</td><td class="ng">未確定</td></tr>
+        <tr><td>（原稿外）CTA見出し「リボンに、あなたの想いを。」／CTA本文／QRキャプション</td><td>B・最下部CTA</td><td class="ng">原稿に無い仮コピー・要文言確認</td></tr>
+      </table>
+      <p class="memo">※ 原稿の文言は、記号（【】◎・）と改行位置を除きそのまま使用しています。文字を足す・言い換える編集は行っていません（上表の最終行に挙げた原稿外コピーのみ例外）。</p>
+
+      <h3>要確認事項（10件）</h3>
+      <ol>
+        <li><span class="q">公式ロゴ・キービジュアルの使用可否</span>：横浜グリーンエクスポの名称・ロゴ・ビジュアルは協会のガイドラインで使用条件が定められている可能性が高い。使用申請の要否と、使えない場合の代替（文字組みのみで見せる）を決めたい。</li>
+        <li><span class="q">QRの遷移先URL</span>：ヨコワカ公式サイト（制作中のワイヤーのもの）か、リボンアースの参加ページか。URL確定後にQRを生成。</li>
+        <li><span class="q">写真素材の有無</span>：リボン／モニュメントの実物写真があるか。無ければイラスト起こしか、テキストのみの構成に変更。</li>
+        <li><span class="q">会期・地名の正式表記</span>：「2027.3.19 - 9.26」「横浜・上瀬谷」を、正式名称（曜日つき／旧上瀬谷通信施設地区 等）にするか、この短縮のままにするか。</li>
+        <li><span class="q">団体名・問い合わせ・SNSの表記</span>：未確定だが、ブース掲示物には通常必要。団体名の正式表記（「主催」等の立場を含む）とSNSアカウントを確定したい。</li>
+        <li><span class="q">掲示方法と視認距離</span>：イーゼル立て／パネル貼り／壁面のどれか。床置きなら下部30cmほどは人に隠れるため、CTAの位置を上げる必要がある。</li>
+        <li><span class="q">印刷仕様</span>：用紙（マットコート推奨）・ラミネートの有無・部数・入稿形式（PDF/X-1a か Illustrator か）。</li>
+        <li><span class="q">配色の方向性</span>：横浜グリーンエクスポの公式カラーに寄せるか、ヨコワカ独自の配色にするか。次工程で色を載せる前に決めたい。</li>
+        <li><span class="q">「Bloom of Future」等の英字表記</span>：正式なタグラインの綴り・大文字小文字を公式資料で照合したい。英語の正式名称（大見出し上のアイブロウ）は裏取りできないため、本ラフでは空にしてある。</li>
+        <li><span class="q">CTAの文言とブース運営の整合</span>：最下部CTAの3文言は原稿に無い仮コピー。「ブースでリボンを受け取って」と書いているが、実際にブースでリボンを配布するのか（その場で書いて掛けるのか／持ち帰るのか）に合わせて文言を確定したい。</li>
+      </ol>
+      <p class="memo">※ 1・2・5・10 は紙面の構成そのものが変わるため、デザイン工程に進む前に確定させたい項目です。</p>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ---- 表示倍率 ----
+document.getElementById('zoomSeg').addEventListener('click', function(e){
+  var b = e.target.closest('button'); if(!b) return;
+  this.querySelectorAll('button').forEach(function(x){ x.classList.remove('on'); });
+  b.classList.add('on');
+  document.documentElement.style.setProperty('--z', b.dataset.z);
+});
+
+// ---- 注記・ガイドのトグル ----
+document.getElementById('annoToggle').addEventListener('change', function(){
+  document.body.classList.toggle('anno-off', !this.checked);
+});
+document.getElementById('guideToggle').addEventListener('change', function(){
+  document.body.classList.toggle('guide-on', this.checked);
+});
+</script>
+
+</body>
+</html>
