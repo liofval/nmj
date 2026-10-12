@@ -13,19 +13,11 @@ html,body{margin:0;height:100%;background:#fff;color:var(--black);font:14px/1.7 
 #stage{position:fixed;inset:0}
 #stage canvas{display:block;touch-action:none}
 #stage.grab{cursor:grab}#stage.grabbing{cursor:grabbing}
-.panel{position:fixed;left:24px;top:24px;z-index:5;width:300px;background:#fffffff0;border:2px solid var(--black);padding:14px 16px}
-.panel .eyebrow{font:700 12px/1 "Barlow Condensed";letter-spacing:.12em;color:var(--orange)}
-.panel h1{font:900 16px/1.4 "Noto Sans JP";margin:4px 0 10px}
-.panel label{display:block;font-size:12px;font-weight:700;margin-bottom:4px}
-.panel input{width:100%;font:700 16px/1.4 "Noto Sans JP",sans-serif;padding:8px 10px;border:1.5px solid var(--black);border-radius:0}
-.panel input:focus{outline:2px solid var(--orange)}
-.hint{font-size:12px;color:var(--g600);margin-top:6px;min-height:20px}
-.hint.warn{color:var(--orange);font-weight:700}
-.modes{display:flex;gap:0;margin-top:10px}
-.modes button{flex:1;font:700 12px/1 "Noto Sans JP";padding:8px 4px;white-space:nowrap;border:1.5px solid var(--black);background:#fff;cursor:pointer}
-.modes button+button{border-left:0}
-.modes button[aria-pressed="true"]{background:var(--black);color:#fff}
-.panel .note{font-size:11px;color:var(--g600);margin:10px 0 0;line-height:1.6}
+.namefield{position:fixed;left:32px;top:32px;z-index:5;width:280px}
+.namefield input{width:100%;font:700 22px/1.3 "Barlow Condensed",sans-serif;letter-spacing:.04em;color:var(--black);padding:4px 0 6px;border:0;border-bottom:2px solid var(--black);border-radius:0;background:transparent}
+.namefield input::placeholder{color:#B5B5B5}
+.namefield input:focus{outline:none;border-bottom-color:var(--orange)}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 /* スマホ（平面） */
 #flat{position:fixed;inset:0;display:none;align-items:flex-start;justify-content:center;padding-top:150px}
 #flat .hang{position:relative;display:flex;flex-direction:column;align-items:center;transform-origin:50% -150px;animation:sway 4s ease-in-out infinite}
@@ -39,7 +31,7 @@ html,body{margin:0;height:100%;background:#fff;color:var(--black);font:14px/1.7 
 @media (prefers-reduced-motion:reduce){#flat .hang{animation:none}}
 body.is-flat #flat{display:flex}
 body.is-flat #stage{display:none}
-@media (max-width:720px){.panel{left:12px;right:12px;top:auto;bottom:12px;width:auto;padding:10px 12px}.panel .note{display:none}#flat{padding-top:110px}#flat canvas{width:min(46vw,200px)}#bgName{display:none}}
+@media (max-width:720px){.namefield{left:16px;top:16px;width:36vw}#flat{padding-top:110px}#flat canvas{width:min(46vw,200px)}#bgName{display:none}}
 </style>
 <script type="importmap">
 {"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}
@@ -50,18 +42,9 @@ body.is-flat #stage{display:none}
 <div id="stage" class="grab" aria-label="名札。ドラッグすると揺れます"></div>
 <div id="flat"><div class="hang"><span class="strap l"></span><span class="strap r"></span><span class="clip"></span><div class="holder"><canvas id="flatCard" width="1024" height="1396" aria-label="名札"></canvas></div></div></div>
 
-<div class="panel">
-  <div class="eyebrow">EVENT PASS DEMO</div>
-  <h1>名札（イベントパス）</h1>
-  <label for="nameInput">名前（ローマ字）</label>
-  <input id="nameInput" type="text" maxlength="40" autocomplete="off" placeholder="例：Nanase Shigeta">
-  <div class="hint" id="hint"></div>
-  <div class="modes" role="group" aria-label="表示の切り替え">
-    <button type="button" data-mode="auto" aria-pressed="true">自動</button>
-    <button type="button" data-mode="3d" aria-pressed="false">PC 3D</button>
-    <button type="button" data-mode="flat" aria-pressed="false">スマホ 平面</button>
-  </div>
-  <p class="note">名札に入るのは名前だけ。半角英字・スペース・<code>. - '</code> で20文字まで。入っていない・使えない文字があるときは <b>NEXT MOVER</b> と表示します。PC は名札をドラッグすると揺れます。スマホ・幅の狭い画面・「視差効果を減らす」設定では平面で表示します。</p>
+<div class="namefield">
+  <input id="nameInput" type="text" maxlength="40" autocomplete="off" placeholder="your name" aria-label="名前（ローマ字）" aria-describedby="hint">
+  <div class="sr-only" id="hint" aria-live="polite"></div>
 </div>
 
 <script type="module">
@@ -254,7 +237,8 @@ const input = document.getElementById('nameInput');
 const hint = document.getElementById('hint');
 const bgName = document.getElementById('bgName');
 const flatCard = document.getElementById('flatCard');
-let mode = 'auto';
+// 表示は自動判定。確認用に ?view=3d / ?view=flat で固定できる
+const mode = ['3d', 'flat'].includes(new URLSearchParams(location.search).get('view')) ? new URLSearchParams(location.search).get('view') : 'auto';
 const mqCoarse = matchMedia('(pointer:coarse)'), mqReduce = matchMedia('(prefers-reduced-motion:reduce)');
 
 // 背景の大きな名前を画面の幅に収める
@@ -272,7 +256,6 @@ function wantFlat() {
 
 function render() {
   const { name, state } = badgeName(input.value);
-  hint.className = 'hint' + (state === 'invalid' ? ' warn' : '');
   hint.textContent = state === 'ok' ? '' : state === 'empty'
     ? `未入力のため ${FALLBACK} と表示しています`
     : `半角英字（ローマ字）で20文字以内にしてください。今は ${FALLBACK} と表示しています`;
@@ -288,11 +271,6 @@ function render() {
   try { localStorage.setItem('nmj-badge-name', input.value); } catch (e) {}
 }
 
-document.querySelectorAll('.modes button').forEach(b => b.addEventListener('click', () => {
-  mode = b.dataset.mode;
-  document.querySelectorAll('.modes button').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
-  render();
-}));
 input.addEventListener('input', render);
 addEventListener('resize', () => { if (mode === 'auto') render(); });
 mqCoarse.addEventListener('change', render); mqReduce.addEventListener('change', render);
