@@ -44,7 +44,7 @@ body.is-flat #stage{display:none}
 </script>
 </head>
 <body>
-<div id="bgName" aria-hidden="true"></div>
+<div id="bgName" aria-hidden="true">NEXT MOVER</div>
 <div id="stage" class="grab" aria-label="名札。ドラッグすると揺れます"></div>
 <div id="flat"><div class="hang"><span class="strap l"></span><span class="strap r"></span><span class="clip"></span><div class="holder"><span class="holes"><i></i><b></b><i></i></span><canvas id="flatCard" width="1024" height="1396" aria-label="名札"></canvas></div></div></div>
 
@@ -294,7 +294,9 @@ function render() {
   hint.textContent = state === 'ok' ? '' : state === 'empty'
     ? `未入力のため ${FALLBACK} と表示しています`
     : `半角英字（ローマ字）で20文字以内にしてください。今は ${FALLBACK} と表示しています`;
-  bgName.textContent = name; fitBg();
+  // 背景の大きな文字は名前に関係なく NEXT MOVER で固定
+  if (bgName.textContent !== FALLBACK) bgName.textContent = FALLBACK;
+  fitBg();
   const flat = wantFlat();
   if (!flat && three === null) {
     three = 'loading';
