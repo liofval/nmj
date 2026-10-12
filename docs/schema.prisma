@@ -181,6 +181,8 @@ model User {
   googleSub String   @unique
   email     String   @unique
   role      UserRole @default(USER) // ADMIN = NMJ 運営（記事の審査・通報の対応・団体の統合と削除）
+  // 名札（イベントパス）に表示する名前。半角英字・スペース・. - ' で20文字まで。未設定・ルール外は NEXT MOVER を表示（アプリ側の固定値）
+  badgeName String?  @db.VarChar(20)
   createdAt DateTime @default(now())
 
   organizer           Organizer?         @relation("PersonalOrganizer")

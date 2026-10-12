@@ -32,7 +32,7 @@ main .on{display:block}
 <main id="main"></main>
 <script>
 // 資料を更新したら V を変える（タブ内の iframe がブラウザのキャッシュで古いまま表示されるのを防ぐ）
-const V='20261012a';
+const V='20261012b';
 const withV=src=>src+(src.includes('?')?'&':'?')+'v='+V;
 const TABS=[
   {id:'schedule-lp',label:'スケジュール（HP）',src:'./schedule.html?p=lp'},
@@ -43,6 +43,7 @@ const TABS=[
   {id:'hp-wireframe',label:'HP ワイヤー',src:'./hp-wireframe.html'},
   {id:'wireframe',label:'メディア ワイヤー',src:'./wireframes.html'},
   {id:'prototype',label:'デザイン（プロトタイプ）',src:'./prototype.html'},
+  {id:'badge',label:'名札デモ',src:'./badge.html'},
   {id:'figma',label:'デザインプレビュー',src:'./figma-preview/'},
   {id:'er',label:'ER 図',src:'./er-diagram.html'},
   {id:'schema',label:'スキーマ',src:'./schema.prisma',text:true},

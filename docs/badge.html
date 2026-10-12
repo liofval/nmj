@@ -1,0 +1,300 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NEXT MOVE JAPAN 名札（イベントパス）デモ</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700;900&family=Barlow+Condensed:wght@700;800&display=swap" rel="stylesheet">
+<style>
+:root{--black:#111;--g600:#7C7C7C;--g200:#E5E5E5;--g100:#F5F5F5;--orange:#FF6002}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:#fff;color:var(--black);font:14px/1.7 "Noto Sans JP",sans-serif;overflow:hidden}
+#bgName{position:fixed;left:50%;transform:translateX(-50%);width:max-content;bottom:4vh;text-align:center;white-space:nowrap;font:800 22vw/0.9 "Barlow Condensed",sans-serif;letter-spacing:-.01em;color:var(--black);pointer-events:none;user-select:none}
+#stage{position:fixed;inset:0}
+#stage canvas{display:block;touch-action:none}
+#stage.grab{cursor:grab}#stage.grabbing{cursor:grabbing}
+.panel{position:fixed;left:24px;top:24px;z-index:5;width:300px;background:#fffffff0;border:2px solid var(--black);padding:14px 16px}
+.panel .eyebrow{font:700 12px/1 "Barlow Condensed";letter-spacing:.12em;color:var(--orange)}
+.panel h1{font:900 16px/1.4 "Noto Sans JP";margin:4px 0 10px}
+.panel label{display:block;font-size:12px;font-weight:700;margin-bottom:4px}
+.panel input{width:100%;font:700 16px/1.4 "Noto Sans JP",sans-serif;padding:8px 10px;border:1.5px solid var(--black);border-radius:0}
+.panel input:focus{outline:2px solid var(--orange)}
+.hint{font-size:12px;color:var(--g600);margin-top:6px;min-height:20px}
+.hint.warn{color:var(--orange);font-weight:700}
+.modes{display:flex;gap:0;margin-top:10px}
+.modes button{flex:1;font:700 12px/1 "Noto Sans JP";padding:8px 4px;white-space:nowrap;border:1.5px solid var(--black);background:#fff;cursor:pointer}
+.modes button+button{border-left:0}
+.modes button[aria-pressed="true"]{background:var(--black);color:#fff}
+.panel .note{font-size:11px;color:var(--g600);margin:10px 0 0;line-height:1.6}
+/* スマホ（平面） */
+#flat{position:fixed;inset:0;display:none;align-items:flex-start;justify-content:center;padding-top:150px}
+#flat .hang{position:relative;display:flex;flex-direction:column;align-items:center;transform-origin:50% -150px;animation:sway 4s ease-in-out infinite}
+#flat .strap{position:absolute;top:-150px;width:14px;height:170px;background:var(--black)}
+#flat .strap.l{transform:translateX(-34px) rotate(-12deg);transform-origin:top center}
+#flat .strap.r{transform:translateX(34px) rotate(12deg);transform-origin:top center}
+#flat .clip{position:relative;z-index:1;width:22px;height:30px;border:3px solid #9a9a9a;border-radius:6px;background:#ddd;margin-bottom:-6px}
+#flat .holder{position:relative;z-index:1;padding:10px;border:1px solid #d8d8d8;border-radius:12px;background:#ffffffb3;box-shadow:0 18px 40px #0000001f}
+#flat canvas{display:block;width:min(64vw,260px);height:auto;border-radius:4px}
+@keyframes sway{0%,100%{transform:rotate(-2deg)}50%{transform:rotate(2deg)}}
+@media (prefers-reduced-motion:reduce){#flat .hang{animation:none}}
+body.is-flat #flat{display:flex}
+body.is-flat #stage{display:none}
+@media (max-width:720px){.panel{left:12px;right:12px;top:auto;bottom:12px;width:auto;padding:10px 12px}.panel .note{display:none}#flat{padding-top:110px}#flat canvas{width:min(46vw,200px)}#bgName{display:none}}
+</style>
+<script type="importmap">
+{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}
+</script>
+</head>
+<body>
+<div id="bgName" aria-hidden="true"></div>
+<div id="stage" class="grab" aria-label="名札。ドラッグすると揺れます"></div>
+<div id="flat"><div class="hang"><span class="strap l"></span><span class="strap r"></span><span class="clip"></span><div class="holder"><canvas id="flatCard" width="1024" height="1396" aria-label="名札"></canvas></div></div></div>
+
+<div class="panel">
+  <div class="eyebrow">EVENT PASS DEMO</div>
+  <h1>名札（イベントパス）</h1>
+  <label for="nameInput">名前（ローマ字）</label>
+  <input id="nameInput" type="text" maxlength="40" autocomplete="off" placeholder="例：Nanase Shigeta">
+  <div class="hint" id="hint"></div>
+  <div class="modes" role="group" aria-label="表示の切り替え">
+    <button type="button" data-mode="auto" aria-pressed="true">自動</button>
+    <button type="button" data-mode="3d" aria-pressed="false">PC 3D</button>
+    <button type="button" data-mode="flat" aria-pressed="false">スマホ 平面</button>
+  </div>
+  <p class="note">名札に入るのは名前だけ。半角英字・スペース・<code>. - '</code> で20文字まで。入っていない・使えない文字があるときは <b>NEXT MOVER</b> と表示します。PC は名札をドラッグすると揺れます。スマホ・幅の狭い画面・「視差効果を減らす」設定では平面で表示します。</p>
+</div>
+
+<script type="module">
+import * as THREE from 'three';
+
+const FALLBACK = 'NEXT MOVER';
+const NAME_RE = /^[A-Za-z][A-Za-z .'-]{0,19}$/;
+const CW = 1024, CH = 1396;            // 名札テクスチャの大きさ（カード 2.2:3.0 と同じ比率）
+
+// 名前のルール：前後の空白を除き、空白を1つにまとめ、ルールに合えば大文字にする。合わなければ NEXT MOVER
+function badgeName(raw) {
+  const s = (raw || '').trim().replace(/\s+/g, ' ');
+  if (!s) return { name: FALLBACK, state: 'empty' };
+  if (!NAME_RE.test(s)) return { name: FALLBACK, state: 'invalid' };
+  return { name: s.toUpperCase(), state: 'ok' };
+}
+
+// 名札の表面を描く（3D のテクスチャと平面表示の両方で使う）
+function drawCard(cv, name) {
+  const g = cv.getContext('2d');
+  g.clearRect(0, 0, CW, CH);
+  g.fillStyle = '#fff'; g.fillRect(0, 0, CW, CH);
+  g.fillStyle = '#FF6002'; g.fillRect(0, 0, CW, 28);
+  g.fillStyle = '#111'; g.font = '700 46px "Barlow Condensed"'; g.textBaseline = 'alphabetic';
+  g.fillText('NEXT MOVE JAPAN', 80, 150);
+  g.fillStyle = '#FF6002'; g.fillRect(80, 178, 64, 8);
+  // 名前：2語以上なら1行目を黒・2行目以降をオレンジ。幅に収まるまで文字を小さくする
+  const words = name.split(' ');
+  const lines = words.length > 1 ? [words[0], words.slice(1).join(' ')] : [name];
+  const maxW = CW - 160;
+  let size = 300;
+  const fits = () => lines.every(l => { g.font = `800 ${size}px "Barlow Condensed"`; return g.measureText(l).width <= maxW; });
+  while (size > 40 && !fits()) size -= 4;
+  g.font = `800 ${size}px "Barlow Condensed"`;
+  const lh = size * 0.92;
+  const top = 560 + (lines.length === 1 ? lh * 0.5 : 0);
+  lines.forEach((l, i) => { g.fillStyle = i === 0 ? '#111' : '#FF6002'; g.fillText(l, 80, top + i * lh); });
+  g.fillStyle = '#E5E5E5'; g.fillRect(80, CH - 150, CW - 160, 3);
+  g.fillStyle = '#7C7C7C'; g.font = '700 40px "Barlow Condensed"';
+  g.fillText('EVENT PASS', 80, CH - 82);
+}
+
+function drawBack(cv) {
+  const g = cv.getContext('2d');
+  g.fillStyle = '#FF6002'; g.fillRect(0, 0, CW, CH);
+  g.fillStyle = '#fff'; g.font = '800 150px "Barlow Condensed"';
+  ['NEXT', 'MOVE', 'JAPAN'].forEach((w, i) => g.fillText(w, 80, 560 + i * 140));
+}
+
+// ---------- 3D（PC） ----------
+let three = null;   // 初期化は 3D を表示するときだけ（スマホでは WebGL を作らない）
+
+function initThree() {
+  const stage = document.getElementById('stage');
+  let renderer;
+  try { renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true }); }
+  catch (e) { return null; }
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+  renderer.outputColorSpace = THREE.SRGBColorSpace;
+  stage.appendChild(renderer.domElement);
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(35, 1, 0.1, 100);
+  camera.position.set(0, 0, 12);
+  scene.add(new THREE.AmbientLight(0xffffff, 1.6));
+  const key = new THREE.DirectionalLight(0xffffff, 1.6); key.position.set(3, 5, 8); scene.add(key);
+
+  const frontCv = document.createElement('canvas'); frontCv.width = CW; frontCv.height = CH;
+  const backCv = document.createElement('canvas'); backCv.width = CW; backCv.height = CH;
+  drawBack(backCv);
+  const frontTex = new THREE.CanvasTexture(frontCv); frontTex.colorSpace = THREE.SRGBColorSpace; frontTex.anisotropy = 8;
+  const backTex = new THREE.CanvasTexture(backCv); backTex.colorSpace = THREE.SRGBColorSpace;
+  const edge = new THREE.MeshStandardMaterial({ color: 0xf2f2f2, roughness: .7 });
+  const card = new THREE.Mesh(new THREE.BoxGeometry(2.2, 3.0, 0.03), [
+    edge, edge, edge, edge,
+    new THREE.MeshBasicMaterial({ map: frontTex }),       // 名札の面は照明で色がくすまないようにする
+    new THREE.MeshBasicMaterial({ map: backTex }),
+  ]);
+  // 透明なケースと金具
+  const holder = new THREE.Mesh(new THREE.BoxGeometry(2.42, 3.4, 0.08), new THREE.MeshStandardMaterial({ color: 0xffffff, transparent: true, opacity: .08, roughness: .15, depthWrite: false }));
+  holder.position.y = 0.12;
+  const clip = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.34, 0.06), new THREE.MeshStandardMaterial({ color: 0x9a9a9a, metalness: .8, roughness: .3 }));
+  clip.position.y = 1.86;
+  const badge = new THREE.Group(); badge.add(card, holder, clip); scene.add(badge);
+
+  // ストラップと名札の動き：点をつないだ簡易物理（Verlet 積分）
+  const SEG = 5, SEG_LEN = 0.72, HANG = 1.95;        // 金具から名札中心までの距離
+  const P = [];                                         // {x,y,z,px,py,pz,pin}
+  const add = (x, y, pin = false) => { P.push({ x, y, z: 0, px: x, py: y, pz: 0, pin }); return P.length - 1; };
+  const aL = add(-0.9, 5.2, true), aR = add(0.9, 5.2, true);
+  const L = [aL], R = [aR];
+  for (let i = 1; i < SEG; i++) { L.push(add(-0.9 + 0.9 * i / SEG, 5.2 - i * 0.68)); R.push(add(0.9 - 0.9 * i / SEG, 5.2 - i * 0.68)); }
+  const C = add(0, 5.2 - SEG * 0.68);                   // 金具（左右のストラップが合流する点）
+  const K = add(0, 5.2 - SEG * 0.68 - HANG);           // 名札の中心
+  L.push(C); R.push(C);
+  const links = [];
+  for (const chain of [L, R]) for (let i = 0; i < chain.length - 1; i++) links.push([chain[i], chain[i + 1], SEG_LEN]);
+  links.push([C, K, HANG]);
+
+  const strapMat = new THREE.MeshStandardMaterial({ color: 0x111111, roughness: .8 });
+  const straps = [new THREE.Mesh(new THREE.BufferGeometry(), strapMat), new THREE.Mesh(new THREE.BufferGeometry(), strapMat)];
+  straps.forEach(s => scene.add(s));
+
+  let spin = 0, spinV = 0, drag = null;
+  const ray = new THREE.Raycaster(), ndc = new THREE.Vector2(), plane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0), hit = new THREE.Vector3();
+  const toWorld = e => {
+    const r = renderer.domElement.getBoundingClientRect();
+    ndc.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
+    ray.setFromCamera(ndc, camera);
+    return ray;
+  };
+  const el = renderer.domElement;
+  el.addEventListener('pointerdown', e => {
+    if (!toWorld(e).intersectObject(card).length) return;
+    ray.ray.intersectPlane(plane, hit);
+    drag = { dx: P[K].x - hit.x, dy: P[K].y - hit.y };
+    el.setPointerCapture(e.pointerId); stage.classList.replace('grab', 'grabbing');
+  });
+  el.addEventListener('pointermove', e => {
+    if (!drag) return;
+    toWorld(e).ray.intersectPlane(plane, hit);
+    const k = P[K];
+    k.px = k.x; k.py = k.y;                             // 動かした分が離したときの勢いになる
+    k.x = hit.x + drag.dx; k.y = hit.y + drag.dy;
+  });
+  const end = () => { drag = null; stage.classList.replace('grabbing', 'grab'); };
+  el.addEventListener('pointerup', end); el.addEventListener('pointercancel', end);
+
+  function step(dt) {
+    for (const p of P) {
+      if (p.pin || (drag && p === P[K])) continue;
+      const vx = (p.x - p.px) * 0.985, vy = (p.y - p.py) * 0.985, vz = (p.z - p.pz) * 0.9;
+      p.px = p.x; p.py = p.y; p.pz = p.z;
+      p.x += vx; p.y += vy - 18 * dt * dt; p.z += vz;
+    }
+    for (let it = 0; it < 12; it++) for (const [a, b, len] of links) {
+      const A = P[a], B = P[b];
+      const dx = B.x - A.x, dy = B.y - A.y, dz = B.z - A.z;
+      const d = Math.hypot(dx, dy, dz) || 1e-6;
+      if (len === SEG_LEN && d < len) continue;        // ストラップは伸びないが、たるむことはできる
+      const diff = (d - len) / d;
+      const wa = A.pin ? 0 : (drag && A === P[K] ? 0 : 1), wb = B.pin ? 0 : (drag && B === P[K] ? 0 : 1);
+      const w = wa + wb; if (!w) continue;
+      A.x += dx * diff * wa / w; A.y += dy * diff * wa / w; A.z += dz * diff * wa / w;
+      B.x -= dx * diff * wb / w; B.y -= dy * diff * wb / w; B.z -= dz * diff * wb / w;
+    }
+    // 横の速さで名札がくるっと回る（ばねで正面に戻る）
+    const vxK = (P[K].x - P[K].px) / dt;
+    spinV += (-14 * spin - 3 * spinV + vxK * 1.2) * dt;
+    spin += spinV * dt;
+  }
+
+  function sync() {
+    const c = P[C], k = P[K];
+    badge.position.set(k.x, k.y, 0);
+    badge.rotation.set(0, spin, Math.atan2(k.x - c.x, -(k.y - c.y)));
+    for (const [i, chain] of [L, R].entries()) {
+      const pts = chain.map(j => new THREE.Vector3(P[j].x, P[j].y, P[j].z - 0.05));
+      straps[i].geometry.dispose();
+      straps[i].geometry = new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 48, 0.045, 6, false);
+    }
+  }
+
+  function resize() {
+    const w = innerWidth, h = innerHeight;
+    renderer.setSize(w, h); camera.aspect = w / h; camera.updateProjectionMatrix();
+  }
+  addEventListener('resize', resize); resize();
+
+  let last = performance.now(), acc = 0, running = true;
+  // 最初は少し横に振った状態から始める（落ちてきて揺れる）
+  P[K].px = P[K].x - 0.12; P[K].py = P[K].y + 0.3;
+  function loop(now) {
+    if (!running) return;
+    requestAnimationFrame(loop);
+    if (document.hidden || document.body.classList.contains('is-flat')) { last = now; return; }
+    acc += Math.min((now - last) / 1000, 0.05); last = now;
+    while (acc >= 1 / 120) { step(1 / 120); acc -= 1 / 120; }
+    sync(); renderer.render(scene, camera);
+  }
+  requestAnimationFrame(loop);
+  return { frontCv, frontTex };
+}
+
+// ---------- 表示の切り替え・名前の反映 ----------
+const input = document.getElementById('nameInput');
+const hint = document.getElementById('hint');
+const bgName = document.getElementById('bgName');
+const flatCard = document.getElementById('flatCard');
+let mode = 'auto';
+const mqCoarse = matchMedia('(pointer:coarse)'), mqReduce = matchMedia('(prefers-reduced-motion:reduce)');
+
+// 背景の大きな名前を画面の幅に収める
+function fitBg() {
+  bgName.style.fontSize = '';
+  const max = innerWidth * 0.96, w = bgName.scrollWidth;
+  if (w > max) bgName.style.fontSize = (parseFloat(getComputedStyle(bgName).fontSize) * max / w) + 'px';
+}
+
+function wantFlat() {
+  if (mode === 'flat') return true;
+  if (mode === '3d') return false;
+  return mqCoarse.matches || mqReduce.matches || innerWidth < 768;
+}
+
+function render() {
+  const { name, state } = badgeName(input.value);
+  hint.className = 'hint' + (state === 'invalid' ? ' warn' : '');
+  hint.textContent = state === 'ok' ? '' : state === 'empty'
+    ? `未入力のため ${FALLBACK} と表示しています`
+    : `半角英字（ローマ字）で20文字以内にしてください。今は ${FALLBACK} と表示しています`;
+  bgName.textContent = name; fitBg();
+  const flat = wantFlat();
+  if (!flat && three === null) three = initThree() || false;
+  document.body.classList.toggle('is-flat', flat || three === false);
+  if (three) { drawCard(three.frontCv, name); three.frontTex.needsUpdate = true; }
+  drawCard(flatCard, name);
+  try { localStorage.setItem('nmj-badge-name', input.value); } catch (e) {}
+}
+
+document.querySelectorAll('.modes button').forEach(b => b.addEventListener('click', () => {
+  mode = b.dataset.mode;
+  document.querySelectorAll('.modes button').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+  render();
+}));
+input.addEventListener('input', render);
+addEventListener('resize', () => { if (mode === 'auto') render(); });
+mqCoarse.addEventListener('change', render); mqReduce.addEventListener('change', render);
+
+try { input.value = localStorage.getItem('nmj-badge-name') || ''; } catch (e) {}
+// 書体の読み込みを待ってから描く（待たないと別の書体で名札に焼き付いてしまう）
+await Promise.all(['800 300px "Barlow Condensed"', '700 46px "Barlow Condensed"'].map(f => document.fonts.load(f)));
+render();
+</script>
+</body>
+</html>
