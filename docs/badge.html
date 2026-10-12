@@ -65,7 +65,7 @@ body.is-flat #stage{display:none}
 </div>
 
 <script type="module">
-import * as THREE from 'three';
+let THREE = null;   // three.js は 3D を表示するときだけ読み込む（取得に失敗しても平面表示は動く）
 
 const FALLBACK = 'NEXT MOVER';
 const NAME_RE = /^[A-Za-z][A-Za-z .'-]{0,19}$/;
@@ -112,7 +112,8 @@ function drawBack(cv) {
 }
 
 // ---------- 3D（PC） ----------
-let three = null;   // 初期化は 3D を表示するときだけ（スマホでは WebGL を作らない）
+let three = null;   // null=未初期化 / 'loading' / false=使えない / {...}=使える。スマホでは WebGL を作らない
+let glLost = false;  // 描画中に WebGL が止まったら平面表示に切り替える
 
 function initThree() {
   const stage = document.getElementById('stage');
@@ -122,6 +123,8 @@ function initThree() {
   renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   stage.appendChild(renderer.domElement);
+  renderer.domElement.addEventListener('webglcontextlost', e => { e.preventDefault(); glLost = true; render(); });
+  renderer.domElement.addEventListener('webglcontextrestored', () => { glLost = false; render(); });
 
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(35, 1, 0.1, 100);
@@ -275,8 +278,12 @@ function render() {
     : `半角英字（ローマ字）で20文字以内にしてください。今は ${FALLBACK} と表示しています`;
   bgName.textContent = name; fitBg();
   const flat = wantFlat();
-  if (!flat && three === null) three = initThree() || false;
-  document.body.classList.toggle('is-flat', flat || three === false);
+  if (!flat && three === null) {
+    three = 'loading';
+    import('three').then(m => { THREE = m; three = initThree() || false; }, () => { three = false; }).then(render);
+  }
+  document.body.classList.toggle('is-flat', flat || three === false || three === 'loading' || glLost);
+  if (three === 'loading') { drawCard(flatCard, name); return; }
   if (three) { drawCard(three.frontCv, name); three.frontTex.needsUpdate = true; }
   drawCard(flatCard, name);
   try { localStorage.setItem('nmj-badge-name', input.value); } catch (e) {}
@@ -293,7 +300,7 @@ mqCoarse.addEventListener('change', render); mqReduce.addEventListener('change',
 
 try { input.value = localStorage.getItem('nmj-badge-name') || ''; } catch (e) {}
 // 書体の読み込みを待ってから描く（待たないと別の書体で名札に焼き付いてしまう）
-await Promise.all(['800 300px "Barlow Condensed"', '700 46px "Barlow Condensed"'].map(f => document.fonts.load(f)));
+await Promise.allSettled(['800 300px "Barlow Condensed"', '700 46px "Barlow Condensed"'].map(f => document.fonts.load(f)));
 render();
 </script>
 </body>
