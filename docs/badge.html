@@ -13,8 +13,8 @@ html,body{margin:0;height:100%;background:#fff;color:var(--black);font:14px/1.7 
 #stage{position:fixed;inset:0}
 #stage canvas{display:block;touch-action:none}
 #stage.grab{cursor:grab}#stage.grabbing{cursor:grabbing}
-.namefield{position:fixed;left:32px;top:32px;z-index:5;width:280px}
-.namefield input{width:100%;font:700 22px/1.3 "Barlow Condensed",sans-serif;letter-spacing:.04em;color:var(--black);padding:4px 0 6px;border:0;border-bottom:2px solid var(--black);border-radius:0;background:transparent}
+.namefield{position:fixed;right:32px;top:32px;z-index:5;width:280px}
+.namefield input{width:100%;text-align:right;font:700 22px/1.3 "Barlow Condensed",sans-serif;letter-spacing:.04em;color:var(--black);padding:4px 0 6px;border:0;border-bottom:2px solid var(--black);border-radius:0;background:transparent}
 .namefield input::placeholder{color:#B5B5B5}
 .namefield input:focus{outline:none;border-bottom-color:var(--orange)}
 .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
@@ -37,7 +37,7 @@ html,body{margin:0;height:100%;background:#fff;color:var(--black);font:14px/1.7 
 @media (prefers-reduced-motion:reduce){#flat .hang{animation:none}}
 body.is-flat #flat{display:flex}
 body.is-flat #stage{display:none}
-@media (max-width:720px){.namefield{left:16px;top:16px;width:36vw}#flat{padding-top:110px}#flat canvas{width:min(46vw,200px)}#bgName{display:none}}
+@media (max-width:720px){.namefield{right:16px;top:16px;width:36vw}#flat{padding-top:110px}#flat canvas{width:min(46vw,200px)}#bgName{display:none}}
 </style>
 <script type="importmap">
 {"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}
