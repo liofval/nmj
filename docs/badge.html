@@ -283,8 +283,7 @@ function render() {
     import('three').then(m => { THREE = m; three = initThree() || false; }, () => { three = false; }).then(render);
   }
   document.body.classList.toggle('is-flat', flat || three === false || three === 'loading' || glLost);
-  if (three === 'loading') { drawCard(flatCard, name); return; }
-  if (three) { drawCard(three.frontCv, name); three.frontTex.needsUpdate = true; }
+  if (three && three !== 'loading') { drawCard(three.frontCv, name); three.frontTex.needsUpdate = true; }
   drawCard(flatCard, name);
   try { localStorage.setItem('nmj-badge-name', input.value); } catch (e) {}
 }
