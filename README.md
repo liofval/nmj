@@ -10,6 +10,7 @@ GitHub Pages で公開しています:
 
 | ドキュメント | 内容 |
 | --- | --- |
+| [トンマナ提案 01](https://liofval.github.io/nmj/design-direction/01/) | OPEN ENERGY — COLORFUL / SOCIAL / MATURE。ブランド・UI・HOME・イベント詳細の比較用プロトタイプ |
 | [プロトタイプ](https://liofval.github.io/nmj/prototype.html) | 画面遷移つきデザインプロトタイプ (PC) |
 | [ワイヤーフレーム v0.4](https://liofval.github.io/nmj/wireframes.html) | クリック遷移ワイヤーフレーム (PC / SP) |
 | [Figma プレビュー](https://liofval.github.io/nmj/figma-preview/) | Figma 出力 PNG プレビュー 全 8 画面 |
