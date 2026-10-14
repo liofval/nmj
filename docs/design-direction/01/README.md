@@ -1,21 +1,30 @@
-# Design Direction 01 — HP訴求軸・デザイン方向性提案
+# Design Direction 01 — YOUTH / ENERGY / MOVEMENT / VOICE
 
 公開先: https://liofval.github.io/nmj/design-direction/01/
 
-プロジェクト内の入口: https://liofval.github.io/nmj/project.html#hp-wireframe
+参照ワイヤー: https://liofval.github.io/nmj/project.html#hp-wireframe
 
-HP PURPOSE / TARGET / COMMUNICATION AXIS / KEYWORDS / COLOR / TYPOGRAPHY / VOICE / MOTION / HOME WIREFRAME / DESIGN PRINCIPLESを順に確認する提案資料。完成サイトや採用決定ではありません。
+参照元のHOME8セクションを先に反映し、独立した `home.css` / `home.js` で再設計。情報構造・順序・見出し・本文を維持。構造とデザインの対応は [STRUCTURE.md](STRUCTURE.md)。
 
-- 3つの訴求軸を比較し、HOMEのHEROコピーと色面を切り替え。
-- 5色のブランドカラー候補とArchivo Black / Montserrat / Latoを表示。
-- VOICEからMOVEへの伝播デモ。再生・停止・モーション軽減設定対応。
-- HOMEの8セクション、既存情報との対応、若者・パートナーの2方向CTAを提示。
-- 共通CSS/JSは `docs/hp-direction/`。同ディレクトリのHTMLは本ページへの案内。
+OrangeはEnergy / Action / Move、Neutralは整理の土台。Yellow / Blue / Cyan / Lavenderは部分色面やVOICE・写真の背面に使用。一セクションは原則2色＋Neutral、写真に存在する色は別扱い。
 
-## 前版と既存資料
+写真は検討用イメージ、実際のNMJ活動ではない。ローカル画像と出典は `assets/`。VOICEの順次出現・写真と色面の控えめなスクロール追従・写真cropとカードhover・CTAの矢印を実装。停止とモーション軽減設定に対応。
 
-前版OPEN ENERGYは [previous.html](https://liofval.github.io/nmj/design-direction/01/previous.html) に保持し、元の `style.css` / `script.js` で表示。HOME / CONCEPT / COLOR / TYPE / UI / EVENT DETAILを引き続き閲覧可能。
+## 資料の分離と保存
 
-既存の `docs/hp-wireframe.html` と `docs/prototype.html` は未変更。提案内から元のHPワイヤーを別タブ・展開式iframeで比較できます。
+- `docs/hp-direction/index.html`: 最新参照ワイヤー。プロジェクトのHPタブから表示。
+- `discussion.html`: 訴求軸・デザイン方向性の比較資料。
+- `previous.html`: 前版OPEN ENERGY（元のstyle.css / script.jsを使用）。
+- `docs/hp-wireframe.html`・`docs/prototype.html`: 既存資料、未変更。
 
-掲載事例・言葉・写真領域は構成検討用サンプル。申し込み・問い合わせ送信・投票保存は行いません。
+## 操作
+
+A / B / CでワイヤーにあったHEROコピーを比較。色はコピー切り替え時も役割を維持。若者CTAはEVENTSへ、企業・行政・地域CTAは送信を伴わない説明ダイアログ。イベントからメディアワイヤーへ移動できる。
+
+## 確認
+
+```sh
+python3 -m http.server 8000 --directory docs
+```
+
+http://localhost:8000/design-direction/01/ と http://localhost:8000/project.html#hp-wireframe を比較。

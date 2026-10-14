@@ -1,6 +1,6 @@
 # NMJ HP Direction — 訴求軸・デザイン方向性提案
 
-公開先: https://liofval.github.io/nmj/design-direction/01/
+参照ワイヤーと方向性資料: https://liofval.github.io/nmj/project.html#hp-wireframe
 
 プロジェクト内の入口: https://liofval.github.io/nmj/project.html#hp-wireframe
 
@@ -21,7 +21,7 @@ HP PURPOSE → TARGET → COMMUNICATION AXIS → KEYWORDS → COLOR → TYPOGRAP
 
 `docs/hp-wireframe.html` は編集せず維持。提案内のリンクと展開式iframeで原資料を比較できる。既存prototypeは変更しない。前版Design Direction 01は `docs/design-direction/01/previous.html` に保持。
 
-`project.html` の `hp-wireframe` タブIDと公開URLは維持し、表示先をDesign Direction 01へ変更。ほかのタブの表示先・機能は維持。
+`project.html` の `hp-wireframe` タブIDと公開URLは維持し、表示先を独立したこの資料へ接続。ほかのタブの表示先・機能は維持。
 
 ## ローカル確認
 
@@ -30,3 +30,5 @@ python3 -m http.server 8000 --directory docs
 ```
 
 http://localhost:8000/project.html#hp-wireframe を開く。PC 1440pxを基準に、760px以下ではモバイルレイアウト。
+
+Design Direction 01の再設計時に参照資料を独立。提案内容とHOMEワイヤーは保持し、ビジュアル変更はDesign Direction側のhome.css / home.jsのみで実施。

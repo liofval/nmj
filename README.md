@@ -10,7 +10,7 @@ GitHub Pages で公開しています:
 
 | ドキュメント | 内容 |
 | --- | --- |
-| [トンマナ提案 01](https://liofval.github.io/nmj/design-direction/01/) | HP訴求軸・デザイン方向性・VOICE・モーション・HOMEワイヤーの比較提案。前版OPEN ENERGYも参照可能 |
+| [トンマナ提案 01](https://liofval.github.io/nmj/design-direction/01/) | 最新HOMEワイヤーを維持した写真・VOICE・色面によるデザイン案。方向性資料と前版も参照可能 |
 | [プロトタイプ](https://liofval.github.io/nmj/prototype.html) | 画面遷移つきデザインプロトタイプ (PC) |
 | [ワイヤーフレーム v0.4](https://liofval.github.io/nmj/wireframes.html) | クリック遷移ワイヤーフレーム (PC / SP) |
 | [Figma プレビュー](https://liofval.github.io/nmj/figma-preview/) | Figma 出力 PNG プレビュー 全 8 画面 |
