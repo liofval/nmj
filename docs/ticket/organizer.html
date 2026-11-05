@@ -175,9 +175,10 @@
   // リンクをコピー
   var copy = document.querySelector('[data-copy]');
   copy.addEventListener('click', function () {
-    var done = function () { copy.textContent = 'コピー済'; setTimeout(function () { copy.textContent = 'リンク'; }, 1600); };
-    if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(location.href).then(done, done);
-    else done();
+    var show = function (msg) { copy.textContent = msg; setTimeout(function () { copy.textContent = 'リンク'; }, 1600); };
+    var done = function () { show('コピー済'); }, fail = function () { show('コピーできませんでした'); };
+    if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(location.href).then(done, fail);
+    else fail();
   });
 })();
 </script>

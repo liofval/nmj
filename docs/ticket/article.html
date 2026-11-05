@@ -95,9 +95,10 @@
   // リンクをコピー
   var copy = document.querySelector('[data-copy]');
   copy.addEventListener('click', function () {
-    var done = function () { copy.textContent = 'コピーしました'; setTimeout(function () { copy.textContent = 'リンクをコピー'; }, 1600); };
-    if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(location.href).then(done, done);
-    else done();
+    var show = function (msg) { copy.textContent = msg; setTimeout(function () { copy.textContent = 'リンクをコピー'; }, 1600); };
+    var done = function () { show('コピーしました'); }, fail = function () { show('コピーできませんでした'); };
+    if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(location.href).then(done, fail);
+    else fail();
   });
   // 目次の現在地（スクロールに合わせて太字）
   var links = document.querySelectorAll('.ar-toc__item[href^="#sec"]');
