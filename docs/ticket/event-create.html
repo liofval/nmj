@@ -1,0 +1,320 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>イベントを作成｜NEXT MOVE TICKETS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Zen+Kaku+Gothic+New:wght@400;500;700;900&family=DM+Mono:wght@400;500&family=Instrument+Serif:ital@1&family=Barlow+Condensed:wght@700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="org.css">
+<script src="common.js" defer></script>
+</head>
+<body class="org-page">
+<div data-header="org" data-active="dashboard"></div>
+<main>
+  <!-- 見出し（Figma 1775:10568） -->
+  <div class="wrap ec-head">
+    <div class="ec-head__left">
+      <h1 class="ec-head__title">イベントを作成</h1>
+      <button class="org-btn" type="button">過去のイベントから複製</button>
+    </div>
+    <div class="ec-head__right">
+      <span class="ec-autosave">自動保存 12:04</span>
+      <button class="org-btn" type="button">プレビュー</button>
+      <button class="btn btn--black" type="submit" form="event-form">公開する<img class="icon" src="assets/icon-arrow-btn-white.svg" alt=""></button>
+    </div>
+  </div>
+
+  <!-- 本体（Figma 1775:10581） -->
+  <div class="wrap ec-layout">
+    <!-- 目次（Figma 1775:10582） -->
+    <nav class="ec-toc" aria-label="入力の進み具合">
+      <a class="ec-toc__item is-done" href="#sec-01"><span class="ec-toc__num">✓</span><span class="ec-toc__label">主催者・ジャンル・地域</span></a>
+      <a class="ec-toc__item is-done" href="#sec-02"><span class="ec-toc__num">✓</span><span class="ec-toc__label">基本情報</span></a>
+      <a class="ec-toc__item is-current" href="#sec-03" aria-current="step"><span class="ec-toc__num">3</span><span class="ec-toc__label">参加枠</span></a>
+      <a class="ec-toc__item" href="#sec-04"><span class="ec-toc__num">4</span><span class="ec-toc__label">申込時の質問</span></a>
+      <a class="ec-toc__item" href="#sec-05"><span class="ec-toc__num">5</span><span class="ec-toc__label">参加者情報の扱い</span></a>
+      <a class="ec-toc__item is-later" href="#sec-06"><span class="ec-toc__num">6</span><span class="ec-toc__label">入金先（後日）</span></a>
+      <div class="ec-toc__todo">
+        <p class="ec-toc__todo-title">公開まであと</p>
+        <p>・参加枠を1つ以上</p>
+        <p>・個人情報の利用目的</p>
+      </div>
+    </nav>
+
+    <!-- フォーム（Figma 1775:10611）。送信先なし -->
+    <form class="ec-form" id="event-form" action="#" onsubmit="return false;" autocomplete="off" novalidate>
+      <!-- 01 -->
+      <section class="ec-sec" id="sec-01" aria-labelledby="sec-01-title">
+        <div class="ec-sec__head">
+          <span class="ec-sec__num">01</span>
+          <h2 class="ec-sec__title" id="sec-01-title">主催者・ジャンル・地域</h2>
+        </div>
+        <div class="ec-row">
+          <div class="ec-field ec-field--box">
+            <label class="ec-label" for="f-org">主催者<span class="ec-req">必須</span></label>
+            <select class="ec-select" id="f-org" name="org" required>
+              <option selected>慶應軽音サークル（@keio-lightmusic）</option>
+              <option>個人として主催</option>
+            </select>
+            <p class="ec-help">自分／管理している団体から選ぶ</p>
+          </div>
+          <div class="ec-field ec-field--box">
+            <label class="ec-label" for="f-genre">ジャンル<span class="ec-req">必須</span></label>
+            <select class="ec-select" id="f-genre" name="genre" required>
+              <option selected>音楽・ライブ</option>
+              <option>スポーツ</option>
+              <option>テック・ハッカソン</option>
+              <option>アート・カルチャー</option>
+              <option>交流・新歓</option>
+            </select>
+          </div>
+          <div class="ec-field ec-field--box">
+            <label class="ec-label" for="f-area">地域<span class="ec-req">必須</span></label>
+            <select class="ec-select" id="f-area" name="area" required>
+              <option selected>東京都</option>
+              <option>神奈川県</option>
+              <option>埼玉県</option>
+              <option>千葉県</option>
+              <option>オンライン</option>
+            </select>
+            <p class="ec-help">オンラインのみなら「オンライン」</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 02 -->
+      <section class="ec-sec" id="sec-02" aria-labelledby="sec-02-title">
+        <div class="ec-sec__head">
+          <span class="ec-sec__num">02</span>
+          <h2 class="ec-sec__title" id="sec-02-title">基本情報</h2>
+        </div>
+        <div class="ec-field ec-field--line">
+          <label class="ec-label" for="f-title">タイトル<span class="ec-req">必須</span></label>
+          <input class="ec-input" id="f-title" name="title" type="text" value="インカレ・バンド対抗ライブ vol.4" required>
+        </div>
+        <div class="ec-flyer">
+          <img class="ec-flyer__img" src="assets/flyer-band-battle.jpg" alt="現在のフライヤー画像">
+          <div class="ec-flyer__body">
+            <p class="ec-flyer__title">フライヤー画像（4:5 推奨）</p>
+            <p class="ec-help">JPG / PNG · 10MB まで。一覧やカードではこの画像が表示されます。</p>
+            <div class="ec-flyer__btns">
+              <label class="org-btn ec-file">画像を変更<input type="file" name="flyer" accept="image/jpeg,image/png"></label>
+              <button class="org-btn" type="button">トリミング</button>
+            </div>
+          </div>
+        </div>
+        <div class="ec-row">
+          <div class="ec-field ec-field--line">
+            <label class="ec-label" for="f-start">開始<span class="ec-req">必須</span></label>
+            <input class="ec-input" id="f-start" name="start" type="text" value="2026/11/08（土）17:30" required>
+          </div>
+          <div class="ec-field ec-field--line">
+            <label class="ec-label" for="f-end">終了</label>
+            <input class="ec-input" id="f-end" name="end" type="text" value="21:00">
+          </div>
+          <div class="ec-field ec-field--line">
+            <label class="ec-label" for="f-open">開場</label>
+            <input class="ec-input" id="f-open" name="open" type="text" value="17:00">
+          </div>
+        </div>
+        <div class="ec-group">
+          <p class="ec-label" id="lbl-venue-type">会場</p>
+          <div class="ec-seg" role="radiogroup" aria-labelledby="lbl-venue-type">
+            <input type="radio" name="venue_type" id="vt-offline" value="offline" checked><label for="vt-offline">対面</label>
+            <input type="radio" name="venue_type" id="vt-online" value="online"><label for="vt-online">オンライン</label>
+            <input type="radio" name="venue_type" id="vt-both" value="both"><label for="vt-both">両方</label>
+          </div>
+          <div class="ec-row">
+            <div class="ec-field ec-field--line">
+              <label class="ec-label" for="f-venue">会場名<span class="ec-req">必須</span></label>
+              <input class="ec-input" id="f-venue" name="venue" type="text" value="下北沢 SHELTER" required>
+            </div>
+            <div class="ec-field ec-field--line">
+              <label class="ec-label" for="f-address">住所<span class="ec-req">必須</span></label>
+              <input class="ec-input" id="f-address" name="address" type="text" value="東京都世田谷区北沢2-6-10" required>
+            </div>
+          </div>
+        </div>
+        <div class="ec-field ec-field--box">
+          <label class="ec-label" for="f-desc">説明</label>
+          <textarea class="ec-textarea" id="f-desc" name="description" rows="2">関東の大学軽音サークル12組が、30分ずつの持ち時間で競う年に一度の対抗戦です。</textarea>
+          <p class="ec-help">Markdown で書けます</p>
+        </div>
+      </section>
+
+      <!-- 03 -->
+      <section class="ec-sec" id="sec-03" aria-labelledby="sec-03-title">
+        <div class="ec-sec__head">
+          <span class="ec-sec__num">03</span>
+          <h2 class="ec-sec__title" id="sec-03-title">参加枠</h2>
+          <button class="org-btn" type="button">＋ 枠を追加</button>
+        </div>
+        <div class="ec-row ec-row--end">
+          <div class="ec-field ec-field--line ec-field--cap">
+            <label class="ec-label" for="f-cap">イベント全体の上限（任意）</label>
+            <input class="ec-input" id="f-cap" name="capacity_total" type="text" inputmode="numeric" value="70 人">
+          </div>
+          <p class="ec-help ec-help--grow">枠の定員の合計より少なくできます。空欄なら枠の定員だけ。</p>
+        </div>
+
+        <fieldset class="ec-tier">
+          <legend class="sr-only">参加枠: 学生</legend>
+          <div class="ec-tier__head">
+            <div class="ec-tier__name">
+              <span class="ec-tier__handle" aria-hidden="true">≡</span>
+              <span class="ec-tier__title">学生</span>
+              <span class="ec-tier__note">学生証の提示が必要</span>
+            </div>
+            <button class="org-btn org-btn--plain ec-tier__del" type="button">削除</button>
+          </div>
+          <div class="ec-row">
+            <div class="ec-field ec-field--line">
+              <label class="ec-label" for="t1-cap">定員<span class="ec-req">必須</span></label>
+              <input class="ec-input" id="t1-cap" name="tier[0][capacity]" type="text" inputmode="numeric" value="40 人" required>
+            </div>
+            <div class="ec-field ec-field--line">
+              <label class="ec-label" for="t1-price">価格<span class="ec-req">必須</span></label>
+              <input class="ec-input" id="t1-price" name="tier[0][price]" type="text" inputmode="numeric" value="¥ 1,500" required>
+            </div>
+            <div class="ec-field ec-field--line">
+              <label class="ec-label" for="t1-period">受付期間</label>
+              <input class="ec-input" id="t1-period" name="tier[0][period]" type="text" value="〜11/7 23:59">
+            </div>
+          </div>
+        </fieldset>
+
+        <fieldset class="ec-tier">
+          <legend class="sr-only">参加枠: 一般</legend>
+          <div class="ec-tier__head">
+            <div class="ec-tier__name">
+              <span class="ec-tier__handle" aria-hidden="true">≡</span>
+              <span class="ec-tier__title">一般</span>
+              <span class="ec-tier__note">1ドリンク別</span>
+            </div>
+            <button class="org-btn org-btn--plain ec-tier__del" type="button">削除</button>
+          </div>
+          <div class="ec-row">
+            <div class="ec-field ec-field--line">
+              <label class="ec-label" for="t2-cap">定員<span class="ec-req">必須</span></label>
+              <input class="ec-input" id="t2-cap" name="tier[1][capacity]" type="text" inputmode="numeric" value="10 人" required>
+            </div>
+            <div class="ec-field ec-field--line">
+              <label class="ec-label" for="t2-price">価格<span class="ec-req">必須</span></label>
+              <input class="ec-input" id="t2-price" name="tier[1][price]" type="text" inputmode="numeric" value="¥ 2,000" required>
+            </div>
+            <div class="ec-field ec-field--line">
+              <label class="ec-label" for="t2-period">受付期間</label>
+              <input class="ec-input" id="t2-period" name="tier[1][period]" type="text" value="〜11/7 23:59">
+            </div>
+          </div>
+        </fieldset>
+
+        <fieldset class="ec-tier">
+          <legend class="sr-only">参加枠: 早割（学生）</legend>
+          <div class="ec-tier__head">
+            <div class="ec-tier__name">
+              <span class="ec-tier__handle" aria-hidden="true">≡</span>
+              <span class="ec-tier__title">早割（学生）</span>
+            </div>
+            <button class="org-btn org-btn--plain ec-tier__del" type="button">削除</button>
+          </div>
+          <div class="ec-row">
+            <div class="ec-field ec-field--line">
+              <label class="ec-label" for="t3-cap">定員<span class="ec-req">必須</span></label>
+              <input class="ec-input" id="t3-cap" name="tier[2][capacity]" type="text" inputmode="numeric" value="20 人" required>
+            </div>
+            <div class="ec-field ec-field--line">
+              <label class="ec-label" for="t3-price">価格<span class="ec-req">必須</span></label>
+              <input class="ec-input" id="t3-price" name="tier[2][price]" type="text" inputmode="numeric" value="¥ 1,000" required>
+            </div>
+            <div class="ec-field ec-field--line">
+              <label class="ec-label" for="t3-period">受付期間</label>
+              <input class="ec-input" id="t3-period" name="tier[2][period]" type="text" value="〜10/31 23:59">
+            </div>
+          </div>
+        </fieldset>
+      </section>
+
+      <!-- 04 -->
+      <section class="ec-sec" id="sec-04" aria-labelledby="sec-04-title">
+        <div class="ec-sec__head">
+          <span class="ec-sec__num">04</span>
+          <h2 class="ec-sec__title" id="sec-04-title">申込時の質問</h2>
+          <button class="org-btn" type="button">＋ 自由記述の質問</button>
+        </div>
+        <p class="ec-fixed-label">全イベント共通（削除・変更できません）</p>
+        <div class="ec-fixed">
+          <span class="ec-fixed__tag">固定</span>
+          <span class="ec-fixed__name">氏名・フリガナ</span>
+          <span class="ec-fixed__badge">個人情報</span>
+          <span class="ec-fixed__badge">必須</span>
+        </div>
+        <div class="ec-fixed">
+          <span class="ec-fixed__tag">固定</span>
+          <span class="ec-fixed__name">所属（学校名と学年／社会人）</span>
+          <span class="ec-fixed__badge">必須</span>
+        </div>
+        <p class="ec-fixed-label">よく使う質問を追加</p>
+        <div class="ec-chips">
+          <button class="chip" type="button">＋ 電話番号</button>
+          <button class="chip" type="button">＋ 緊急連絡先</button>
+          <button class="chip" type="button">＋ アレルギー・食事制限</button>
+          <button class="chip" type="button">＋ 楽器の経験</button>
+        </div>
+      </section>
+
+      <!-- 05 -->
+      <section class="ec-sec" id="sec-05" aria-labelledby="sec-05-title">
+        <div class="ec-sec__head">
+          <span class="ec-sec__num">05</span>
+          <h2 class="ec-sec__title" id="sec-05-title">参加者情報の扱い</h2>
+        </div>
+        <div class="ec-group ec-group--mid">
+          <p class="ec-label" id="lbl-list">参加者リストの公開</p>
+          <div class="ec-seg" role="radiogroup" aria-labelledby="lbl-list">
+            <input type="radio" name="attendee_list" id="al-org" value="organizer" checked><label for="al-org">主催者のみ（既定）</label>
+            <input type="radio" name="attendee_list" id="al-nick" value="nickname"><label for="al-nick">参加者のあだ名を公開</label>
+          </div>
+        </div>
+        <div class="ec-group ec-group--mid">
+          <p class="ec-label" id="lbl-retention">個人情報の保持期間</p>
+          <div class="ec-seg" role="radiogroup" aria-labelledby="lbl-retention">
+            <input type="radio" name="retention" id="rt-30" value="30d" checked><label for="rt-30">30日（推奨）</label>
+            <input type="radio" name="retention" id="rt-90" value="90d"><label for="rt-90">90日</label>
+            <input type="radio" name="retention" id="rt-1y" value="1y"><label for="rt-1y">1年</label>
+          </div>
+          <p class="ec-callout">イベント終了からこの期間が過ぎると、申込時の回答は自動で削除されます。参加記録と支払い履歴は残ります。事後に連絡が必要な合宿・野外イベント以外は、短い期間を選んでください。</p>
+        </div>
+        <div class="ec-field ec-field--line">
+          <label class="ec-label" for="f-purpose">利用目的<span class="ec-req">必須</span></label>
+          <input class="ec-input" id="f-purpose" name="purpose" type="text" value="当日の受付と、名札の作成に使用します" required>
+        </div>
+      </section>
+
+      <!-- 06（後日・無効） -->
+      <section class="ec-sec ec-sec--disabled" id="sec-06" aria-labelledby="sec-06-title">
+        <div class="ec-sec__head">
+          <span class="ec-sec__num">06</span>
+          <h2 class="ec-sec__title" id="sec-06-title">入金先</h2>
+        </div>
+        <p class="ec-sec__note">実決済を始めるときに設定できるようになります（現在はモック決済）。</p>
+      </section>
+    </form>
+  </div>
+</main>
+
+<!-- 保存バー（Figma 1775:10884）。画面下に固定 -->
+<div class="ec-savebar">
+  <div class="wrap ec-savebar__inner">
+    <p class="ec-savebar__text">公開すると、フォロワー 234人にメールで通知されます</p>
+    <div class="ec-savebar__btns">
+      <button class="org-btn" type="button">下書き保存</button>
+      <button class="btn btn--coral" type="submit" form="event-form">公開する<img class="icon" src="assets/icon-arrow-btn.svg" alt=""></button>
+    </div>
+  </div>
+</div>
+</body>
+</html>

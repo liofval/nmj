@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>慶應軽音サークル｜NEXT MOVE TICKETS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Zen+Kaku+Gothic+New:wght@400;500;700;900&family=DM+Mono:wght@400;500&family=Instrument+Serif:ital@1&family=Barlow+Condensed:wght@700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="media.css">
+<script src="common.js" defer></script>
+</head>
+<body>
+
+<div data-header="v2" data-active="none"></div>
+
+<main>
+  <img class="org-cover" src="assets/flyer-band-battle.jpg" alt="">
+
+  <!-- Profile -->
+  <section class="wrap org-profile" aria-label="団体プロフィール">
+    <div class="org-profile__avatar" role="img" aria-label="慶應軽音サークルのアイコン"></div>
+    <div class="org-profile__info">
+      <div class="org-profile__name-row">
+        <h1 class="org-profile__name">慶應軽音サークル</h1>
+        <span class="tag tag--outline">団体</span>
+      </div>
+      <div class="org-profile__stats">
+        <span class="org-profile__handle">@keio-lightmusic</span>
+        <span class="org-stat"><span class="org-stat__num" data-follower-count>234</span><span class="org-stat__label">フォロワー</span></span>
+        <span class="org-stat"><span class="org-stat__num">18</span><span class="org-stat__label">イベント</span></span>
+        <a class="chip-sm chip-sm--xs" href="#">X</a>
+        <a class="chip-sm chip-sm--xs" href="#">Instagram</a>
+      </div>
+    </div>
+    <div class="org-profile__actions">
+      <button class="btn btn--black btn--plain" type="button" data-follow aria-pressed="false">＋ フォローする</button>
+      <button class="btn-sm" type="button" data-copy>リンク</button>
+      <button class="btn-sm" type="button" aria-label="その他の操作">…</button>
+    </div>
+  </section>
+
+  <!-- タブ -->
+  <div class="org-tabs-wrap">
+    <div class="wrap ptabs org-tabs" role="tablist" aria-label="団体ページ">
+      <button class="ptab is-active" type="button" role="tab" aria-selected="true" aria-controls="panel-events" id="tab-events">イベント</button>
+      <button class="ptab" type="button" role="tab" aria-selected="false" aria-controls="panel-about" id="tab-about">紹介</button>
+    </div>
+  </div>
+
+  <div class="wrap org-content">
+    <!-- イベント -->
+    <div class="org-main" role="tabpanel" id="panel-events" aria-labelledby="tab-events">
+      <div class="headline">
+        <h2 class="headline__en">UPCOMING</h2>
+        <p class="headline__ja">今後のイベント 3件</p>
+      </div>
+      <div class="event-grid">
+        <a class="event-card" href="#">
+          <img class="event-card__flyer" src="assets/flyer-band-battle.jpg" alt="インカレ・バンド対抗ライブ vol.4 のフライヤー">
+          <p class="event-card__date">11/8（土）17:30</p>
+          <h3 class="event-card__title">インカレ・バンド対抗ライブ vol.4</h3>
+          <p class="event-card__venue">下北沢 SHELTER</p>
+          <p class="event-card__org">慶應軽音サークル</p>
+          <div class="event-card__bottom"><span class="price">¥1,500〜</span><span class="pill pill--few">残り23枚</span></div>
+        </a>
+        <a class="event-card" href="#">
+          <img class="event-card__flyer" src="assets/flyer-acoustic.jpg" alt="冬の弾き語りナイト のフライヤー">
+          <p class="event-card__date">11/28（土）18:00</p>
+          <h3 class="event-card__title">冬の弾き語りナイト</h3>
+          <p class="event-card__venue">三田 Live house Re:</p>
+          <p class="event-card__org">慶應軽音サークル</p>
+          <div class="event-card__bottom"><span class="price">¥1,000</span><span class="pill pill--soon">11/10 から</span></div>
+        </a>
+        <a class="event-card" href="#">
+          <img class="event-card__flyer" src="assets/flyer-halloween.jpg" alt="追いコン 2026 のフライヤー">
+          <p class="event-card__date">12/20（日）19:00</p>
+          <h3 class="event-card__title">追いコン 2026 — 4年生を送る夜</h3>
+          <p class="event-card__venue">渋谷 club asia</p>
+          <p class="event-card__org">慶應軽音サークル</p>
+          <div class="event-card__bottom"><span class="price">¥2,500</span><span class="pill pill--soon">12/1 から</span></div>
+        </a>
+      </div>
+
+      <div class="headline org-archive-head">
+        <h2 class="headline__en">ARCHIVE</h2>
+        <p class="headline__ja">過去のイベント</p>
+      </div>
+      <div class="org-year">
+          <button class="org-year__btn" type="button" aria-expanded="false" aria-controls="year-2025">
+            <span class="org-year__label"><span class="org-year__caret" aria-hidden="true">▶</span><span class="org-year__title">2025年</span></span>
+            <span class="org-year__count">12件</span>
+          </button>
+          <ul class="org-year__list" id="year-2025" hidden>
+            <li><time>2025.12.20</time><a href="#">追いコン 2025</a></li>
+            <li><time>2025.11.22</time><a href="#">三田祭 野外ステージ</a></li>
+            <li><time>2025.07.12</time><a href="#">夏の定期ライブ</a></li>
+          </ul>
+        </div>
+        <div class="org-year">
+          <button class="org-year__btn" type="button" aria-expanded="false" aria-controls="year-2024">
+            <span class="org-year__label"><span class="org-year__caret" aria-hidden="true">▶</span><span class="org-year__title">2024年</span></span>
+            <span class="org-year__count">6件</span>
+          </button>
+          <ul class="org-year__list" id="year-2024" hidden>
+            <li><time>2024.12.21</time><a href="#">追いコン 2024</a></li>
+            <li><time>2024.10.05</time><a href="#">インカレ・バンド対抗ライブ vol.3</a></li>
+          </ul>
+        </div>
+    </div>
+
+    <!-- 紹介 -->
+    <div class="org-main" role="tabpanel" id="panel-about" aria-labelledby="tab-about" hidden>
+      <div class="headline">
+        <h2 class="headline__en">ABOUT</h2>
+        <p class="headline__ja">紹介</p>
+      </div>
+      <div class="org-intro">
+        <p>1987年から続く、慶應義塾大学の軽音楽サークルです。年4回の定期ライブと、他大学との対抗ライブを開催しています。初心者歓迎、楽器の貸し出しあり。</p>
+      </div>
+    </div>
+
+    <!-- About（右） -->
+    <aside class="org-about">
+      <div class="org-about__box">
+        <p class="org-about__title">紹介</p>
+        <p class="org-about__text">1987年から続く、慶應義塾大学の軽音楽サークルです。年4回の定期ライブと、他大学との対抗ライブを開催しています。初心者歓迎、楽器の貸し出しあり。</p>
+      </div>
+      <div class="org-members">
+        <p class="org-about__title">運営メンバー 3人</p>
+        <div class="org-member"><span class="dot bg-mint"></span><span class="org-member__name">やまだ</span><span class="org-member__role">代表</span></div>
+        <div class="org-member"><span class="dot bg-pink"></span><span class="org-member__name">みお</span><span class="org-member__role">会計</span></div>
+        <div class="org-member"><span class="dot bg-coral"></span><span class="org-member__name">たける</span><span class="org-member__role">広報</span></div>
+      </div>
+      <a class="org-report" href="#">このページを通報する</a>
+    </aside>
+  </div>
+</main>
+
+<div data-footer></div>
+
+<script>
+(function () {
+  // タブ切り替え
+  var tabs = document.querySelectorAll('.org-tabs .ptab');
+  for (var i = 0; i < tabs.length; i++) {
+    tabs[i].addEventListener('click', function () {
+      for (var j = 0; j < tabs.length; j++) {
+        var on = tabs[j] === this;
+        tabs[j].classList.toggle('is-active', on);
+        tabs[j].setAttribute('aria-selected', on ? 'true' : 'false');
+        document.getElementById(tabs[j].getAttribute('aria-controls')).hidden = !on;
+      }
+    });
+  }
+  // 過去のイベントの開閉
+  var years = document.querySelectorAll('.org-year__btn');
+  for (var k = 0; k < years.length; k++) {
+    years[k].addEventListener('click', function () {
+      var open = this.getAttribute('aria-expanded') !== 'true';
+      this.setAttribute('aria-expanded', open ? 'true' : 'false');
+      document.getElementById(this.getAttribute('aria-controls')).hidden = !open;
+    });
+  }
+  // フォロー
+  var follow = document.querySelector('[data-follow]');
+  var count = document.querySelector('[data-follower-count]');
+  follow.addEventListener('click', function () {
+    var on = follow.getAttribute('aria-pressed') !== 'true';
+    follow.setAttribute('aria-pressed', on ? 'true' : 'false');
+    follow.textContent = on ? 'フォロー中' : '＋ フォローする';
+    count.textContent = on ? '235' : '234';
+  });
+  // リンクをコピー
+  var copy = document.querySelector('[data-copy]');
+  copy.addEventListener('click', function () {
+    var done = function () { copy.textContent = 'コピー済'; setTimeout(function () { copy.textContent = 'リンク'; }, 1600); };
+    if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(location.href).then(done, done);
+    else done();
+  });
+})();
+</script>
+</body>
+</html>

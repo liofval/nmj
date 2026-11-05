@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>マイページ｜NEXT MOVE TICKETS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Zen+Kaku+Gothic+New:wght@400;500;700;900&family=DM+Mono:wght@400;500&family=Instrument+Serif:ital@1&family=Barlow+Condensed:wght@700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="media.css">
+<script src="common.js" defer></script>
+</head>
+<body>
+
+<div data-header="v2" data-active="none"></div>
+
+<main>
+  <!-- Profile -->
+  <section class="wrap my-profile" aria-label="プロフィール">
+    <span class="dot bg-lavender" role="img" aria-label="やまだ のアイコン"></span>
+    <div class="my-profile__info">
+      <h1 class="my-profile__name">やまだ</h1>
+      <p class="my-profile__links"><span>@yamada</span><a href="#">X</a><a href="#">Instagram</a></p>
+    </div>
+    <a class="btn btn--outline" href="#">プロフィールを編集</a>
+  </section>
+
+  <div class="wrap my-content">
+    <div class="my-main">
+      <!-- お知らせ -->
+      <section class="my-block my-block--flush" aria-labelledby="h-notice">
+        <div class="my-block__head">
+          <h2 class="my-block__title" id="h-notice">お知らせ</h2>
+          <p class="my-block__note">同じ内容がメールにも届きます</p>
+        </div>
+        <a class="my-notice is-unread" href="#"><span class="dot bg-coral" aria-label="未読"></span><span class="my-notice__text">慶應軽音サークル：11/8 の集合場所が変更になりました</span><span class="my-notice__time">2時間前</span></a>
+        <a class="my-notice" href="#"><span class="dot bg-white"></span><span class="my-notice__text">インカレ・バンド対抗ライブ vol.4 の QR チケットを発行しました</span><span class="my-notice__time">昨日</span></a>
+      </section>
+
+      <!-- チケット（参加予定／履歴） -->
+      <section class="my-block" aria-label="チケット">
+        <div class="ptabs my-tabs" role="tablist">
+          <button class="my-tab is-active" type="button" role="tab" aria-selected="true" aria-controls="panel-upcoming" id="tab-upcoming">参加予定<span class="my-tab__count">2</span></button>
+          <button class="my-tab" type="button" role="tab" aria-selected="false" aria-controls="panel-history" id="tab-history">履歴</button>
+        </div>
+
+        <div class="my-tab-panel" role="tabpanel" id="panel-upcoming" aria-labelledby="tab-upcoming">
+          <div class="my-ticket">
+            <div class="my-ticket__date"><span class="my-ticket__day">11.08</span><span class="my-ticket__time">土 17:30</span></div>
+            <img class="my-ticket__img" src="assets/flyer-band-battle.jpg" alt="">
+            <div class="my-ticket__body">
+              <span class="pill pill--open">参加予定 · あと10日</span>
+              <p class="my-ticket__title">インカレ・バンド対抗ライブ vol.4</p>
+              <p class="my-ticket__info">下北沢 SHELTER · 学生 × 2枚 · ¥3,000（支払い済み）</p>
+            </div>
+            <div class="my-ticket__actions">
+              <a class="btn-sm btn-sm--black" href="#">QR チケット</a>
+              <a class="btn-sm" href="#">申込内容</a>
+              <a class="my-ticket__cancel" href="#">キャンセル</a>
+            </div>
+          </div>
+          <div class="my-ticket">
+            <div class="my-ticket__date"><span class="my-ticket__day">11.15</span><span class="my-ticket__time">土 19:00</span></div>
+            <img class="my-ticket__img" src="assets/article-interview.jpg" alt="">
+            <div class="my-ticket__body">
+              <span class="pill pill--open">参加予定 · あと17日</span>
+              <p class="my-ticket__title">先輩に聞く、はじめてのインターン選び</p>
+              <p class="my-ticket__info">オンライン · 無料 × 1</p>
+            </div>
+            <div class="my-ticket__actions">
+              <a class="btn-sm btn-sm--black" href="#">参加 URL を開く</a>
+              <a class="btn-sm" href="#">申込内容</a>
+              <a class="my-ticket__cancel" href="#">キャンセル</a>
+            </div>
+          </div>
+          <p class="my-caution">※ 開始後はキャンセルできません。有料枠の支払い済み分は返金されません。</p>
+        </div>
+
+        <div class="my-tab-panel" role="tabpanel" id="panel-history" aria-labelledby="tab-history" hidden>
+          <div class="my-ticket my-ticket--past">
+            <div class="my-ticket__date"><span class="my-ticket__day">10.19</span><span class="my-ticket__time">日 7:30</span></div>
+            <img class="my-ticket__img" src="assets/flyer-morning-run.jpg" alt="">
+            <div class="my-ticket__body">
+              <span class="pill pill--soldout">参加済み</span>
+              <p class="my-ticket__title">朝の代々木公園ランニング＆モーニング</p>
+              <p class="my-ticket__info">代々木公園 原宿門 · 無料 × 1</p>
+            </div>
+            <div class="my-ticket__actions">
+              <a class="btn-sm" href="#">申込内容</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 保存したイベント -->
+      <section class="my-block my-saved" aria-labelledby="h-saved">
+        <div class="my-block__head">
+          <h2 class="my-block__title" id="h-saved">保存したイベント</h2>
+          <a class="my-block__link" href="events.html">すべて見る →</a>
+        </div>
+        <div class="event-grid">
+          <a class="event-card" href="#">
+            <img class="event-card__flyer" src="assets/flyer-zine-fair.jpg" alt="学生ZINEフェア のフライヤー">
+            <p class="event-card__date">11/2（日）12:00</p>
+            <h3 class="event-card__title">学生ZINEフェア — 刷って、並べて、交換する</h3>
+            <p class="event-card__venue">吉祥寺 Art Center Ongoing</p>
+            <p class="event-card__org">武蔵美ZINE部</p>
+            <div class="event-card__bottom"><span class="price">¥300</span><span class="pill pill--open">受付中</span></div>
+          </a>
+          <a class="event-card" href="#">
+            <img class="event-card__flyer" src="assets/article-guide.jpg" alt="国際交流ボードゲームナイト のフライヤー">
+            <p class="event-card__date">11/1（土）18:00</p>
+            <h3 class="event-card__title">国際交流ボードゲームナイト</h3>
+            <p class="event-card__venue">高田馬場 JAM Café</p>
+            <p class="event-card__org">Waseda Global</p>
+            <div class="event-card__bottom"><span class="price">¥500</span><span class="pill pill--few">残り6枚</span></div>
+          </a>
+        </div>
+      </section>
+    </div>
+
+    <!-- Side -->
+    <aside class="my-side">
+      <div class="my-host">
+        <p class="my-host__title">主催者として</p>
+        <div class="my-host__row">
+          <span class="my-host__mark bg-lavender"></span>
+          <div class="my-host__text"><span class="my-host__name">慶應軽音サークル</span><span class="my-host__role">owner</span></div>
+          <a class="my-host__link" href="dashboard.html">管理画面へ →</a>
+        </div>
+        <div class="my-host__row">
+          <span class="my-host__mark bg-mint"></span>
+          <div class="my-host__text"><span class="my-host__name">やまだ（個人）</span><span class="my-host__role">個人主催</span></div>
+          <a class="my-host__link" href="dashboard.html">管理画面へ →</a>
+        </div>
+        <a class="my-host__new" href="#">＋ 新しい団体を作る</a>
+      </div>
+      <div class="my-follow">
+        <div class="my-follow__head">
+          <p class="my-follow__title">フォロー中の団体</p>
+          <a class="my-follow__all" href="#">すべて →</a>
+        </div>
+        <div class="my-follow__stack">
+          <a class="dot bg-coral" href="#" aria-label="フォロー中の団体 1"></a>
+          <a class="dot bg-mint" href="#" aria-label="フォロー中の団体 2"></a>
+          <a class="dot bg-lavender" href="organizer.html" aria-label="慶應軽音サークル"></a>
+          <a class="dot bg-pink" href="#" aria-label="フォロー中の団体 4"></a>
+          <a class="dot bg-black" href="#" aria-label="フォロー中の団体 5"></a>
+        </div>
+        <p class="my-follow__more">＋8 団体</p>
+      </div>
+    </aside>
+  </div>
+</main>
+
+<div data-footer></div>
+
+<script>
+/* 参加予定／履歴の切り替え */
+(function () {
+  var tabs = document.querySelectorAll('.my-tabs .my-tab');
+  for (var i = 0; i < tabs.length; i++) {
+    tabs[i].addEventListener('click', function () {
+      for (var j = 0; j < tabs.length; j++) {
+        var on = tabs[j] === this;
+        tabs[j].classList.toggle('is-active', on);
+        tabs[j].setAttribute('aria-selected', on ? 'true' : 'false');
+        document.getElementById(tabs[j].getAttribute('aria-controls')).hidden = !on;
+      }
+    });
+  }
+})();
+</script>
+</body>
+</html>

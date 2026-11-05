@@ -1,0 +1,253 @@
+/* =========================================================
+   NEXT MOVE TICKETS — 共通スタイル
+   Figma「NMJ Ticket｜PC」(1743:7675) の変数・部品から起こしたもの
+   使い方は BASE.md を参照
+   ========================================================= */
+
+/* ---------- 1. トークン（Figma 変数） ---------- */
+:root {
+  /* color */
+  --color-black: #000000;
+  --color-white: #ffffff;
+  --color-ink: #111113;
+  --color-surface: #ffffff;
+  --color-line: #e6e4de;
+  --color-line-strong: #d2d0c8;
+  --color-subtle: #b4b4ba;
+  --color-muted: #85858c;
+  --color-muted-dark: #a3a3a3;
+  --color-gray-100: #f3f3f1;
+  --color-coral: #fa435b;
+  --color-mint: #6dc9bc;
+  --color-lavender: #9589d3;
+  --color-pink: #ffdce0;
+
+  /* font family */
+  --font-jp: "Zen Kaku Gothic New", "Hiragino Sans", sans-serif;
+  --font-display: "Anton", "Zen Kaku Gothic New", sans-serif;
+  --font-mono: "DM Mono", ui-monospace, monospace;
+  --font-serif: "Instrument Serif", serif;
+  --font-condensed: "Barlow Condensed", sans-serif; /* Top のイベントパス専用 */
+
+  /* layout */
+  --page-max: 1440px;
+  --page-pad: 40px;
+  --gap-section: 96px;
+}
+
+/* ---------- 2. ベース ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  background: var(--color-white);
+  color: var(--color-black);
+  font-family: var(--font-jp);
+  font-size: 15px;
+  line-height: 1.85;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+img { display: block; max-width: 100%; }
+a { color: inherit; text-decoration: none; }
+p, h1, h2, h3, h4, ul, ol, figure { margin: 0; padding: 0; }
+ul, ol { list-style: none; }
+button, input, select { font: inherit; color: inherit; }
+
+/* ---------- 3. タイポ（Figma テキストスタイル） ---------- */
+.t-display-m { font-family: var(--font-display); font-weight: 400; font-size: 44px; line-height: 1; }  /* Ticket/Display/M */
+.t-h2 { font-weight: 700; font-size: 22px; line-height: 1.45; }                                         /* Ticket/JP/H2 */
+.t-h3 { font-weight: 700; font-size: 17px; line-height: 1.55; }                                         /* Ticket/JP/H3 */
+.t-body { font-weight: 400; font-size: 15px; line-height: 1.85; }                                       /* Ticket/JP/Body */
+.t-small { font-weight: 400; font-size: 13px; line-height: 1.65; }                                      /* Ticket/JP/Small */
+.t-button { font-weight: 700; font-size: 15px; line-height: 1; letter-spacing: 0.02em; }                /* Ticket/JP/Button */
+.t-mono-label { font-family: var(--font-mono); font-weight: 500; font-size: 11px; line-height: 1.2; letter-spacing: 0.06em; text-transform: uppercase; } /* Ticket/Mono/Label */
+.t-mono-body { font-family: var(--font-mono); font-weight: 400; font-size: 13px; line-height: 1.5; }    /* Ticket/Mono/Body */
+.t-muted { color: var(--color-muted); }
+
+/* ---------- 4. レイアウト ---------- */
+.wrap { max-width: var(--page-max); margin: 0 auto; padding-left: var(--page-pad); padding-right: var(--page-pad); }
+.section { padding-top: 48px; padding-bottom: var(--gap-section); }
+.section--gray { background: var(--color-gray-100); padding-top: var(--gap-section); }
+.section--pink { background: var(--color-pink); }
+.section--flush-top { padding-top: 0; }
+
+/* セクション見出し（英字 Display ＋ 和文 H2 ＋ 右に「すべて見る」） */
+.sec-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; margin-bottom: 32px; }
+.sec-head__titles { display: flex; flex-direction: column; gap: 6px; white-space: nowrap; }
+.sec-head__en { font-family: var(--font-display); font-weight: 400; font-size: 44px; line-height: 1; }
+.sec-head__ja { font-weight: 700; font-size: 22px; line-height: 1.45; }
+
+/* テキスト＋矢印のリンク（すべて見る →） */
+.link-arrow { display: inline-flex; align-items: center; gap: 10px; font-size: 15px; line-height: 1.85; white-space: nowrap; }
+.link-arrow:hover { text-decoration: underline; text-underline-offset: 4px; }
+
+/* ---------- 5. アイコン ---------- */
+.icon { display: block; width: 20px; height: 20px; flex-shrink: 0; }
+.icon--14 { width: 14px; height: 14px; }
+
+/* ---------- 6. ボタン ---------- */
+.btn {
+  display: inline-flex; align-items: center; gap: 28px;
+  padding: 20px 24px 20px 28px;
+  font-family: var(--font-jp); font-weight: 700; font-size: 15px; line-height: 1; letter-spacing: 0.02em;
+  white-space: nowrap; border: 0; cursor: pointer;
+}
+.btn--black { background: var(--color-black); color: var(--color-white); }
+.btn--coral { background: var(--color-coral); color: var(--color-black); }
+.btn--outline { background: var(--color-white); color: var(--color-black); border: 1.5px solid var(--color-black); padding: 20px 28px; }
+.btn:hover { opacity: .88; }
+
+/* ---------- 7. チップ ---------- */
+.chip {
+  display: inline-flex; align-items: center;
+  padding: 9px 18px; border: 1px solid var(--color-black); border-radius: 999px;
+  background: var(--color-white); color: var(--color-black);
+  font-size: 13px; line-height: 1.65; white-space: nowrap; cursor: pointer;
+}
+.chip.is-active { background: var(--color-black); color: var(--color-white); }
+.chip-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.chip-row__label { font-size: 13px; line-height: 1.65; color: var(--color-muted); white-space: nowrap; }
+
+/* ---------- 8. ステータスピル ---------- */
+.pill { display: inline-flex; align-items: center; padding: 5px 10px; border-radius: 999px; font-weight: 700; font-size: 12px; line-height: 1.4; color: var(--color-black); white-space: nowrap; }
+.pill--open { background: var(--color-mint); }                                   /* 受付中 */
+.pill--few { background: var(--color-coral); }                                   /* 残りわずか */
+.pill--soldout { background: var(--color-gray-100); border: 1px solid var(--color-black); } /* 売り切れ */
+
+/* ---------- 9. 検索ボックス ---------- */
+.searchbox { display: flex; align-items: stretch; width: 100%; max-width: 900px; border: 1.5px solid var(--color-black); background: var(--color-white); }
+.searchbox__field { display: flex; align-items: center; gap: 12px; padding: 18px 20px; white-space: nowrap; }
+.searchbox__field--grow { flex: 1 1 auto; min-width: 0; }
+.searchbox__field + .searchbox__field { border-left: 1px solid var(--color-line); }
+.searchbox__input { border: 0; outline: 0; background: transparent; padding: 0; width: 100%; font-size: 15px; line-height: 1.85; }
+.searchbox__input::placeholder { color: var(--color-muted); }
+.searchbox__label { font-size: 13px; line-height: 1.65; color: var(--color-muted); }
+.searchbox__value { font-size: 15px; line-height: 1.85; }
+.searchbox .btn { margin: 2px 0; flex-shrink: 0; }
+
+/* ---------- 10. イベントカード（EventCard v2） ---------- */
+.event-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 302px)); gap: 16px; align-items: start; }
+.event-card { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.event-card__flyer { width: 100%; aspect-ratio: 302 / 377.5; object-fit: cover; margin-bottom: 14px; background: var(--color-gray-100); }
+.event-card__date { font-weight: 700; font-size: 14px; line-height: 1.65; }
+.event-card__title { font-weight: 700; font-size: 17px; line-height: 1.55; }
+.event-card__venue { font-size: 13px; line-height: 1.65; }
+.event-card__org { font-size: 13px; line-height: 1.65; color: var(--color-muted); }
+.event-card__bottom { display: flex; align-items: center; justify-content: space-between; padding-top: 12px; border-top: 1px solid var(--color-black); }
+.price { font-family: var(--font-display); font-weight: 400; font-size: 24px; line-height: 1; letter-spacing: 0.01em; white-space: nowrap; }
+.price--free { font-family: var(--font-jp); font-weight: 900; font-size: 20px; }
+.event-card:hover .event-card__title { text-decoration: underline; text-underline-offset: 3px; }
+
+/* ---------- 11. ジャンルカード ---------- */
+.genre-grid { display: flex; gap: 16px; }
+.genre-card { flex: 1 1 0; min-width: 0; height: 168px; padding: 20px; display: flex; flex-direction: column; justify-content: space-between; color: var(--color-black); }
+.genre-card__top { display: flex; align-items: flex-start; justify-content: space-between; font-size: 13px; line-height: 1.65; }
+.genre-card__bottom { display: flex; align-items: flex-end; justify-content: space-between; white-space: nowrap; }
+.genre-card__en { font-family: var(--font-display); font-size: 44px; line-height: 1; }
+.genre-card__count { font-size: 13px; line-height: 1.65; }
+.genre-card--coral { background: var(--color-coral); }
+.genre-card--mint { background: var(--color-mint); }
+.genre-card--lavender { background: var(--color-lavender); }
+.genre-card--pink { background: var(--color-pink); }
+.genre-card--gray { background: var(--color-gray-100); border: 1px solid var(--color-black); }
+.genre-card--white { background: var(--color-white); border: 1px solid var(--color-black); }
+.genre-card:hover { opacity: .9; }
+
+/* ---------- 12. 記事カード（Journal） ---------- */
+.article-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 32px; }
+.article-card { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.article-card__img { width: 100%; aspect-ratio: 432 / 288; object-fit: cover; background: var(--color-line); }
+.article-card__cat { font-size: 13px; line-height: 1.65; }
+.article-card__title { font-weight: 700; font-size: 22px; line-height: 1.45; }
+.article-card__meta { font-size: 13px; line-height: 1.65; color: var(--color-muted); }
+.article-card:hover .article-card__title { text-decoration: underline; text-underline-offset: 4px; }
+
+/* ---------- 13. 主催者向け帯（CTA バンド） ---------- */
+.cta-band { background: var(--color-pink); }
+.cta-band__inner { display: flex; align-items: center; justify-content: space-between; gap: 32px; padding-top: 56px; padding-bottom: 56px; }
+.cta-band__text { display: flex; flex-direction: column; gap: 10px; }
+
+/* ---------- 14. ヘッダー（3種） ---------- */
+/* 14-1. Header（default）: Top 用。白地・ロゴ大・中央ナビ */
+.header { background: var(--color-white); }
+.header__inner { display: flex; align-items: center; justify-content: space-between; padding-top: 28px; padding-bottom: 28px; min-height: 100px; }
+.header__logo { font-family: var(--font-display); font-size: 34px; line-height: 1; white-space: nowrap; }
+.header__nav { display: flex; gap: 36px; font-size: 15px; line-height: 1.85; white-space: nowrap; }
+.header__nav a:hover { text-decoration: underline; text-underline-offset: 4px; }
+.header__right { display: flex; align-items: center; gap: 24px; }
+.mytickets { display: inline-flex; align-items: center; border: 1.5px solid var(--color-black); padding: 10px 20px; font-family: var(--font-serif); font-style: italic; font-size: 19px; line-height: 1.1; white-space: nowrap; }
+.mytickets:hover { background: var(--color-black); color: var(--color-white); }
+
+/* 14-2. Header v2: 下層ページ用。下線タブ＋アバター */
+.header-v2 { background: var(--color-white); border-bottom: 1px solid var(--color-black); }
+.header-v2__inner { display: flex; align-items: center; justify-content: space-between; height: 73px; }
+.header-v2__left { display: flex; align-items: center; gap: 48px; height: 100%; }
+.header-v2__logo { font-family: var(--font-display); font-size: 32px; line-height: normal; white-space: nowrap; }
+.header-v2__tabs { display: flex; gap: 32px; align-items: flex-end; height: 100%; }
+.header-v2__tab { display: flex; align-items: flex-end; padding: 26px 0 22px; font-weight: 500; font-size: 15px; line-height: normal; white-space: nowrap; border-bottom: 3px solid transparent; }
+.header-v2__tab.is-active { font-weight: 700; border-bottom-color: var(--color-black); }
+.header-v2__right { display: flex; align-items: center; gap: 20px; }
+.header-v2 .mytickets { padding: 8px 16px; font-size: 18px; line-height: normal; }
+.avatar { width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0; }
+
+/* 14-3. Header Org: 主催者ダッシュボード用。黒地 */
+.header-org { background: var(--color-black); color: var(--color-white); }
+.header-org__inner { display: flex; align-items: center; justify-content: space-between; padding-top: 18px; padding-bottom: 18px; min-height: 78px; }
+.header-org__left { display: flex; align-items: center; gap: 24px; }
+.header-org__logo { font-family: var(--font-display); font-size: 28px; line-height: normal; white-space: nowrap; }
+.header-org__badge { background: var(--color-coral); color: var(--color-black); padding: 3px 8px; font-weight: 700; font-size: 12px; line-height: normal; white-space: nowrap; }
+.org-switcher { display: inline-flex; align-items: center; gap: 10px; padding: 8px 14px; border: 1px solid var(--color-muted-dark); background: transparent; cursor: pointer; white-space: nowrap; }
+.org-switcher__swatch { width: 22px; height: 22px; background: var(--color-lavender); }
+.org-switcher__name { font-weight: 700; font-size: 14px; line-height: normal; }
+.org-switcher__caret { font-size: 10px; line-height: normal; }
+.header-org__nav { display: flex; gap: 28px; font-size: 14px; line-height: normal; white-space: nowrap; }
+.header-org__nav a { color: var(--color-muted-dark); }
+.header-org__nav a.is-active { color: var(--color-white); font-weight: 700; }
+.header-org__nav a:hover { color: var(--color-white); }
+.header-org__switch { font-size: 13px; line-height: normal; white-space: nowrap; }
+
+/* ---------- 15. フッター（Footer v2） ---------- */
+.footer { background: var(--color-black); color: var(--color-white); overflow: hidden; }
+.footer__inner { display: flex; flex-direction: column; gap: 48px; padding-top: 80px; padding-bottom: 36px; }
+.footer__top { display: flex; justify-content: flex-end; }
+.footer__cols { display: flex; gap: 64px; white-space: nowrap; }
+.footer__col { display: flex; flex-direction: column; gap: 12px; }
+.footer__col-title { color: var(--color-muted-dark); }
+.footer__col a { font-size: 13px; line-height: 1.65; }
+.footer__col a:hover { text-decoration: underline; text-underline-offset: 3px; }
+.footer__mark { font-family: var(--font-display); font-size: 318px; line-height: 0.84; letter-spacing: -0.01em; text-align: center; white-space: nowrap; }
+.footer__bottom { display: flex; align-items: flex-start; justify-content: space-between; color: var(--color-muted-dark); font-size: 13px; white-space: nowrap; }
+.footer__legal { display: flex; gap: 24px; line-height: 1.65; }
+.footer__legal a:hover { color: var(--color-white); }
+
+/* ---------- 16. Top 専用: イベントパス（ヒーロー） ---------- */
+/* 1枚絵の構図なので、900px の箱の中だけ絶対配置にしている */
+.pass-hero { position: relative; height: 900px; overflow: hidden; background: var(--color-surface); }
+.pass-hero__stage { position: relative; width: 1440px; height: 900px; left: 50%; margin-left: -720px; }
+.pass-hero__bg { position: absolute; left: calc(50% - 641px); top: 579px; margin: 0; font-family: var(--font-condensed); font-weight: 800; font-size: 317px; line-height: 0.9; letter-spacing: -0.01em; color: var(--color-ink); white-space: nowrap; user-select: none; pointer-events: none; }
+.pass-hero__straps { position: absolute; left: 600px; top: -30px; width: 240px; height: 330px; }
+.pass-hero__clip { position: absolute; left: 712px; top: 282px; width: 16px; height: 34px; border: 3px solid var(--color-subtle); border-radius: 6px; background: var(--color-line); z-index: 2; }
+.pass-holder { position: absolute; left: 560px; top: 300px; width: 320px; height: 467px; overflow: hidden; border: 1.5px solid var(--color-line-strong); border-radius: 14px; background: rgba(250, 250, 250, 0.8); box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1), 0 22px 44px rgba(0, 0, 0, 0.16); z-index: 1; }
+.pass-holder__hole { position: absolute; top: 10.5px; width: 18px; height: 18px; }
+.pass-holder__hole--l { left: 34.3px; }
+.pass-holder__hole--r { left: 264.7px; }
+.pass-holder__slot { position: absolute; left: 135.5px; top: 10.5px; width: 46px; height: 18px; border: 1.5px solid rgba(0, 0, 0, 0.2); border-radius: 9px; background: var(--color-surface); }
+.pass-holder__seam { position: absolute; left: 10.5px; top: 37px; width: 296px; height: 1.5px; }
+.pass-card { position: absolute; left: 8.5px; top: 46.5px; width: 300px; height: 409px; overflow: hidden; border-radius: 4px; background: #f5f5f5; font-family: var(--font-condensed); color: var(--color-ink); }
+.pass-card__band { position: absolute; left: 0; top: 0; width: 300px; height: 8px; background: var(--color-coral); }
+.pass-card__org { position: absolute; left: 23px; top: 31px; font-weight: 700; font-size: 13.5px; line-height: normal; white-space: nowrap; }
+.pass-card__rule { position: absolute; left: 23px; top: 52px; width: 19px; height: 2.5px; background: var(--color-coral); }
+.pass-card__name { position: absolute; left: 23px; font-weight: 800; font-size: 96px; line-height: 88.32px; white-space: nowrap; }
+.pass-card__name--1 { top: 94.34px; }
+.pass-card__name--2 { top: 182.66px; color: var(--color-coral); }
+.pass-card__rule-bottom { position: absolute; left: 23px; top: 365px; width: 253px; height: 1px; background: #e5e5e5; }
+.pass-card__label { position: absolute; left: 23px; top: 379px; font-weight: 700; font-size: 12px; line-height: normal; color: var(--color-muted); white-space: nowrap; }
+.pass-namefield { position: absolute; left: 1128px; top: 32px; width: 280px; height: 40px; border-bottom: 2px solid var(--color-ink); z-index: 3; }
+.pass-namefield input { width: 100%; height: 100%; border: 0; outline: 0; background: transparent; padding: 4px 0 0; text-align: right; font-family: var(--font-condensed); font-weight: 700; font-size: 22px; line-height: normal; letter-spacing: 0.04em; color: var(--color-ink); vertical-align: top; }
+.pass-namefield input::placeholder { color: var(--color-subtle); }
+
+/* Top 専用: 検索エリア */
+.top-search { padding-top: 36px; padding-bottom: 36px; display: flex; flex-direction: column; gap: 24px; }
+
+/* ---------- 17. 補助 ---------- */
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }

@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>イベント（カレンダー）｜NEXT MOVE TICKETS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Zen+Kaku+Gothic+New:wght@400;500;700;900&family=DM+Mono:wght@400;500&family=Instrument+Serif:ital@1&family=Barlow+Condensed:wght@700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="events.css">
+<script src="common.js" defer></script>
+</head>
+<body>
+
+<div data-header="v2" data-active="events"></div>
+
+<main>
+  <!-- PageHead -->
+  <div class="wrap page-head page-head--cal">
+    <div class="page-head__titles">
+      <h1 class="page-head__en">EVENTS</h1>
+      <div class="page-head__sub">
+        <p class="page-head__ja">イベントをさがす</p>
+        <p class="page-head__count">11月の開催 64件</p>
+      </div>
+    </div>
+    <nav class="view-toggle view-toggle--cal" aria-label="表示切替">
+      <a class="view-toggle__item" href="events-list.html">リスト</a>
+      <a class="view-toggle__item" href="events.html">カード</a>
+      <a class="view-toggle__item is-active" href="calendar.html" aria-current="page">カレンダー</a>
+    </nav>
+  </div>
+
+  <!-- ジャンル絞り込み＋凡例 -->
+  <div class="wrap filter-row filter-row--cal">
+    <div class="chip-row" role="group" aria-label="ジャンル">
+      <button class="chip is-active" type="button" aria-pressed="true">すべて</button>
+      <button class="chip" type="button" aria-pressed="false">音楽</button>
+      <button class="chip" type="button" aria-pressed="false">スポーツ</button>
+      <button class="chip" type="button" aria-pressed="false">学び</button>
+      <button class="chip" type="button" aria-pressed="false">交流会</button>
+      <button class="chip" type="button" aria-pressed="false">アート</button>
+      <button class="chip" type="button" aria-pressed="false">キャリア</button>
+    </div>
+    <ul class="cal-legend" aria-label="色の凡例">
+      <li class="cal-legend__item"><span class="cal-legend__swatch g-music"></span>音楽</li>
+      <li class="cal-legend__item"><span class="cal-legend__swatch g-sports"></span>スポーツ</li>
+      <li class="cal-legend__item"><span class="cal-legend__swatch g-study"></span>学び</li>
+      <li class="cal-legend__item"><span class="cal-legend__swatch g-party"></span>交流会</li>
+      <li class="cal-legend__item"><span class="cal-legend__swatch g-other"></span>その他</li>
+    </ul>
+  </div>
+
+  <div class="wrap cal-layout">
+    <!-- Month -->
+    <section class="cal-month" aria-label="2026年11月のカレンダー">
+      <div class="cal-month__head">
+        <h2 class="cal-month__title"><span class="cal-month__en">NOV 2026</span><span class="cal-month__ja">2026年11月</span></h2>
+        <div class="cal-month__nav">
+          <button class="cal-navbtn" type="button" aria-label="前の月">←</button>
+          <button class="cal-navbtn" type="button">今月</button>
+          <button class="cal-navbtn" type="button" aria-label="次の月">→</button>
+        </div>
+      </div>
+      <div class="cal-grid">
+        <div class="cal-grid__wd">月</div>
+        <div class="cal-grid__wd">火</div>
+        <div class="cal-grid__wd">水</div>
+        <div class="cal-grid__wd">木</div>
+        <div class="cal-grid__wd">金</div>
+        <div class="cal-grid__wd">土</div>
+        <div class="cal-grid__wd">日</div>
+        <div class="cal-day cal-day--out"><span class="cal-day__num">27</span></div>
+        <div class="cal-day cal-day--out"><span class="cal-day__num">28</span></div>
+        <div class="cal-day cal-day--out"><span class="cal-day__num">29</span></div>
+        <div class="cal-day cal-day--out"><span class="cal-day__num">30<span class="cal-today">今日</span></span></div>
+        <div class="cal-day cal-day--out"><span class="cal-day__num">31</span></div>
+        <div class="cal-day is-selected" aria-current="date"><span class="cal-day__num">1</span><a class="cal-tag g-music" href="#">アコースティック</a><a class="cal-tag g-party" href="#">ハロウィン</a><a class="cal-more" href="#">+1件</a></div>
+        <div class="cal-day"><span class="cal-day__num">2</span><a class="cal-tag g-sports" href="#">朝ラン</a><a class="cal-tag g-party" href="#">ZINEフェア</a></div>
+        <div class="cal-day"><span class="cal-day__num">3</span></div>
+        <div class="cal-day"><span class="cal-day__num">4</span><a class="cal-tag g-study" href="#">読書会</a></div>
+        <div class="cal-day"><span class="cal-day__num">5</span></div>
+        <div class="cal-day"><span class="cal-day__num">6</span><a class="cal-tag g-party" href="#">国際交流</a></div>
+        <div class="cal-day"><span class="cal-day__num">7</span><a class="cal-tag g-music" href="#">DJナイト</a><a class="cal-tag g-sports" href="#">フットサル</a></div>
+        <div class="cal-day"><span class="cal-day__num">8</span><a class="cal-tag g-music" href="#">バンド対抗</a><a class="cal-tag g-party" href="#">交流会</a><a class="cal-more" href="#">+3件</a></div>
+        <div class="cal-day"><span class="cal-day__num">9</span></div>
+        <div class="cal-day"><span class="cal-day__num">10</span></div>
+        <div class="cal-day"><span class="cal-day__num">11</span><a class="cal-tag g-study" href="#">勉強会</a></div>
+        <div class="cal-day"><span class="cal-day__num">12</span></div>
+        <div class="cal-day"><span class="cal-day__num">13</span><a class="cal-tag g-party" href="#">新歓</a></div>
+        <div class="cal-day"><span class="cal-day__num">14</span><a class="cal-tag g-music" href="#">ライブ</a><a class="cal-tag g-other" href="#">古着市</a></div>
+        <div class="cal-day"><span class="cal-day__num">15</span><a class="cal-tag g-sports" href="#">駅伝観戦</a><a class="cal-tag g-study" href="#">LT会</a></div>
+        <div class="cal-day"><span class="cal-day__num">16</span></div>
+        <div class="cal-day"><span class="cal-day__num">17</span></div>
+        <div class="cal-day"><span class="cal-day__num">18</span><a class="cal-tag g-other" href="#">映画会</a></div>
+        <div class="cal-day"><span class="cal-day__num">19</span></div>
+        <div class="cal-day"><span class="cal-day__num">20</span></div>
+        <div class="cal-day"><span class="cal-day__num">21</span><a class="cal-tag g-music" href="#">学園祭</a><a class="cal-tag g-party" href="#">後夜祭</a><a class="cal-more" href="#">+1件</a></div>
+        <div class="cal-day"><span class="cal-day__num">22</span><a class="cal-tag g-music" href="#">学園祭</a><a class="cal-tag g-sports" href="#">模擬店</a></div>
+        <div class="cal-day"><span class="cal-day__num">23</span><a class="cal-tag g-music" href="#">学園祭</a></div>
+        <div class="cal-day"><span class="cal-day__num">24</span></div>
+        <div class="cal-day"><span class="cal-day__num">25</span></div>
+        <div class="cal-day"><span class="cal-day__num">26</span></div>
+        <div class="cal-day"><span class="cal-day__num">27</span><a class="cal-tag g-study" href="#">キャリア</a></div>
+        <div class="cal-day"><span class="cal-day__num">28</span><a class="cal-tag g-party" href="#">鍋会</a><a class="cal-tag g-music" href="#">弾き語り</a></div>
+        <div class="cal-day"><span class="cal-day__num">29</span><a class="cal-tag g-sports" href="#">登山</a></div>
+        <div class="cal-day"><span class="cal-day__num">30</span></div>
+      </div>
+    </section>
+
+    <!-- DayPanel -->
+    <section class="day-panel" aria-label="11月1日のイベント">
+      <div class="day-panel__head"><span class="day-panel__date">11.01</span><span class="day-panel__label">（土）のイベント 3件</span></div>
+      <a class="day-item" href="#">
+        <img class="day-item__thumb" src="assets/flyer-hackathon.jpg" alt="">
+        <div class="day-item__body">
+          <span class="day-item__time">10:00</span>
+          <h3 class="day-item__title">24時間ハッカソン「つくって、見せて、寝る」</h3>
+          <p class="day-item__venue">東京大学 本郷キャンパス</p>
+          <div class="day-item__bottom"><span class="price">¥1,000</span><span class="pill pill--few">残り4枚</span></div>
+        </div>
+      </a>
+      <a class="day-item" href="#">
+        <img class="day-item__thumb" src="assets/flyer-acoustic.jpg" alt="">
+        <div class="day-item__body">
+          <span class="day-item__time">17:00</span>
+          <h3 class="day-item__title">アコースティック・ナイト 秋の弾き語り12組</h3>
+          <p class="day-item__venue">下北沢 lown</p>
+          <div class="day-item__bottom"><span class="price">¥1,200〜</span><span class="pill pill--upcoming">11/1 正午から</span></div>
+        </div>
+      </a>
+      <a class="day-item" href="#">
+        <img class="day-item__thumb" src="assets/flyer-halloween.jpg" alt="">
+        <div class="day-item__body">
+          <span class="day-item__time">21:00</span>
+          <h3 class="day-item__title">渋谷ハロウィン・アフターパーティ 2026</h3>
+          <p class="day-item__venue">渋谷 WOMB</p>
+          <div class="day-item__bottom"><span class="price">¥2,000〜</span><span class="pill pill--few">残り12枚</span></div>
+        </div>
+      </a>
+      <div class="day-panel__link"><a class="link-arrow" href="events-list.html">この日のイベントを一覧で見る<img class="icon" src="assets/icon-arrow-up-right.svg" alt=""></a></div>
+      <p class="day-panel__hint">ヒント：カレンダーの色はジャンル。日付を選ぶと、その日のイベントがここに出ます。絞り込みは一覧と共通です。</p>
+    </section>
+  </div>
+</main>
+
+<div data-footer></div>
+
+</body>
+</html>

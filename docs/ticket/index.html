@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NEXT MOVE TICKETS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Zen+Kaku+Gothic+New:wght@400;500;700;900&family=DM+Mono:wght@400;500&family=Instrument+Serif:ital@1&family=Barlow+Condensed:wght@700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script src="common.js" defer></script>
+</head>
+<body>
+
+<div data-header="default"></div>
+
+<main>
+  <!-- Home / PC: イベントパス -->
+  <section class="pass-hero" aria-label="NEXT MOVE">
+    <div class="pass-hero__stage">
+      <p class="pass-hero__bg" aria-hidden="true">NEXT MOVE</p>
+      <img class="pass-hero__straps" src="assets/pass-straps.svg" alt="">
+      <span class="pass-hero__clip"></span>
+      <div class="pass-holder">
+        <img class="pass-holder__hole pass-holder__hole--l" src="assets/pass-hole.svg" alt="">
+        <img class="pass-holder__hole pass-holder__hole--r" src="assets/pass-hole.svg" alt="">
+        <span class="pass-holder__slot"></span>
+        <img class="pass-holder__seam" src="assets/pass-seam.svg" alt="">
+        <div class="pass-card">
+          <span class="pass-card__band"></span>
+          <p class="pass-card__org">NEXT MOVE JAPAN</p>
+          <span class="pass-card__rule"></span>
+          <p class="pass-card__name pass-card__name--1">NEXT</p>
+          <p class="pass-card__name pass-card__name--2">MOVER</p>
+          <span class="pass-card__rule-bottom"></span>
+          <p class="pass-card__label">EVENT PASS</p>
+        </div>
+      </div>
+      <div class="pass-namefield">
+        <input type="text" name="name" maxlength="40" autocomplete="off" placeholder="your name" aria-label="名前（ローマ字）">
+      </div>
+    </div>
+  </section>
+
+  <!-- Hero: 検索 -->
+  <section class="wrap top-search" aria-label="イベントを探す">
+    <form class="searchbox" action="events.html" role="search">
+      <label class="searchbox__field searchbox__field--grow">
+        <img class="icon" src="assets/icon-search.svg" alt="">
+        <input class="searchbox__input" type="search" name="q" placeholder="イベント名・団体名・会場">
+      </label>
+      <div class="searchbox__field">
+        <span class="searchbox__label">日付</span>
+        <span class="searchbox__value">今週末</span>
+        <img class="icon icon--14" src="assets/icon-chevron-down.svg" alt="">
+      </div>
+      <div class="searchbox__field">
+        <span class="searchbox__label">エリア</span>
+        <span class="searchbox__value">東京都</span>
+        <img class="icon icon--14" src="assets/icon-chevron-down.svg" alt="">
+      </div>
+      <button class="btn btn--coral" type="submit">探す<img class="icon" src="assets/icon-arrow-btn.svg" alt=""></button>
+    </form>
+    <div class="chip-row">
+      <span class="chip-row__label">よく使う条件</span>
+      <a class="chip" href="events.html">今日</a>
+      <a class="chip" href="events.html">今週末</a>
+      <a class="chip" href="events.html">無料</a>
+      <a class="chip" href="events.html">学生割あり</a>
+      <a class="chip" href="events.html">オンライン</a>
+    </div>
+  </section>
+
+  <!-- ThisWeekend -->
+  <section class="wrap section">
+    <div class="sec-head">
+      <div class="sec-head__titles">
+        <h2 class="sec-head__en">THIS WEEKEND</h2>
+        <p class="sec-head__ja">今週末のイベント（24件）</p>
+      </div>
+      <a class="link-arrow" href="events.html">すべて見る<img class="icon" src="assets/icon-arrow-up-right.svg" alt=""></a>
+    </div>
+    <div class="event-grid">
+      <a class="event-card" href="#">
+        <img class="event-card__flyer" src="assets/flyer-halloween.jpg" alt="渋谷ハロウィン・アフターパーティ 2026 のフライヤー">
+        <p class="event-card__date">11/1（土）21:00</p>
+        <h3 class="event-card__title">渋谷ハロウィン・アフターパーティ 2026</h3>
+        <p class="event-card__venue">渋谷 WOMB</p>
+        <p class="event-card__org">青学イベントサークル Link</p>
+        <div class="event-card__bottom"><span class="price">¥2,000〜</span><span class="pill pill--few">残り12枚</span></div>
+      </a>
+      <a class="event-card" href="#">
+        <img class="event-card__flyer" src="assets/flyer-morning-run.jpg" alt="朝の代々木公園ランニング＆モーニング のフライヤー">
+        <p class="event-card__date">11/2（日）7:30</p>
+        <h3 class="event-card__title">朝の代々木公園ランニング＆モーニング</h3>
+        <p class="event-card__venue">代々木公園 原宿門</p>
+        <p class="event-card__org">RUN TOKYO CAMPUS</p>
+        <div class="event-card__bottom"><span class="price price--free">無料</span><span class="pill pill--open">受付中</span></div>
+      </a>
+      <a class="event-card" href="#">
+        <img class="event-card__flyer" src="assets/flyer-hackathon.jpg" alt="24時間ハッカソン のフライヤー">
+        <p class="event-card__date">11/1（土）10:00</p>
+        <h3 class="event-card__title">24時間ハッカソン「つくって、見せて、寝る」</h3>
+        <p class="event-card__venue">東京大学 本郷キャンパス</p>
+        <p class="event-card__org">UT Hack</p>
+        <div class="event-card__bottom"><span class="price">¥1,000</span><span class="pill pill--soldout">売り切れ</span></div>
+      </a>
+      <a class="event-card" href="#">
+        <img class="event-card__flyer" src="assets/flyer-zine-fair.jpg" alt="学生ZINEフェア のフライヤー">
+        <p class="event-card__date">11/2（日）12:00</p>
+        <h3 class="event-card__title">学生ZINEフェア — 刷って、並べて、交換する</h3>
+        <p class="event-card__venue">吉祥寺 Art Center Ongoing</p>
+        <p class="event-card__org">武蔵美ZINE部</p>
+        <div class="event-card__bottom"><span class="price">¥300</span><span class="pill pill--open">受付中</span></div>
+      </a>
+    </div>
+  </section>
+
+  <!-- Genres -->
+  <section class="wrap section section--flush-top">
+    <div class="sec-head">
+      <div class="sec-head__titles">
+        <h2 class="sec-head__en">GENRES</h2>
+        <p class="sec-head__ja">ジャンルから探す</p>
+      </div>
+    </div>
+    <div class="genre-grid">
+      <a class="genre-card genre-card--coral" href="events.html">
+        <div class="genre-card__top"><span>音楽・ライブ</span><img class="icon" src="assets/icon-arrow-up-right.svg" alt=""></div>
+        <div class="genre-card__bottom"><span class="genre-card__en">MUSIC</span><span class="genre-card__count">42件</span></div>
+      </a>
+      <a class="genre-card genre-card--mint" href="events.html">
+        <div class="genre-card__top"><span>スポーツ</span><img class="icon" src="assets/icon-arrow-up-right.svg" alt=""></div>
+        <div class="genre-card__bottom"><span class="genre-card__en">SPORTS</span><span class="genre-card__count">27件</span></div>
+      </a>
+      <a class="genre-card genre-card--lavender" href="events.html">
+        <div class="genre-card__top"><span>学び・勉強会</span><img class="icon" src="assets/icon-arrow-up-right.svg" alt=""></div>
+        <div class="genre-card__bottom"><span class="genre-card__en">STUDY</span><span class="genre-card__count">35件</span></div>
+      </a>
+      <a class="genre-card genre-card--pink" href="events.html">
+        <div class="genre-card__top"><span>交流会・パーティ</span><img class="icon" src="assets/icon-arrow-up-right.svg" alt=""></div>
+        <div class="genre-card__bottom"><span class="genre-card__en">PARTY</span><span class="genre-card__count">58件</span></div>
+      </a>
+      <a class="genre-card genre-card--gray" href="events.html">
+        <div class="genre-card__top"><span>アート・展示</span><img class="icon" src="assets/icon-arrow-up-right.svg" alt=""></div>
+        <div class="genre-card__bottom"><span class="genre-card__en">ART</span><span class="genre-card__count">19件</span></div>
+      </a>
+      <a class="genre-card genre-card--white" href="events.html">
+        <div class="genre-card__top"><span>キャリア</span><img class="icon" src="assets/icon-arrow-up-right.svg" alt=""></div>
+        <div class="genre-card__bottom"><span class="genre-card__en">CAREER</span><span class="genre-card__count">21件</span></div>
+      </a>
+    </div>
+  </section>
+
+  <!-- Journal -->
+  <section class="section section--gray">
+    <div class="wrap">
+      <div class="sec-head">
+        <div class="sec-head__titles">
+          <h2 class="sec-head__en">JOURNAL</h2>
+          <p class="sec-head__ja">読みもの — 行く前に読みたい</p>
+        </div>
+        <a class="link-arrow" href="media.html">記事をすべて見る<img class="icon" src="assets/icon-arrow-up-right.svg" alt=""></a>
+      </div>
+      <div class="article-grid">
+        <a class="article-card" href="article.html">
+          <img class="article-card__img" src="assets/article-guide.jpg" alt="">
+          <p class="article-card__cat">ガイド</p>
+          <h3 class="article-card__title">「はじめまして」が苦手な人のための、イベントの楽しみ方</h3>
+          <p class="article-card__meta">10.24｜読了 8分</p>
+        </a>
+        <a class="article-card" href="article.html">
+          <img class="article-card__img" src="assets/article-interview.jpg" alt="">
+          <p class="article-card__cat">インタビュー</p>
+          <h3 class="article-card__title">主催者に聞く：100人規模の交流会を3週間でつくるまで</h3>
+          <p class="article-card__meta">10.20｜読了 10分</p>
+        </a>
+        <a class="article-card" href="article.html">
+          <img class="article-card__img" src="assets/flyer-halloween.jpg" alt="">
+          <p class="article-card__cat">スポット</p>
+          <h3 class="article-card__title">渋谷で学生が集まる、夜のイベントスペース5選</h3>
+          <p class="article-card__meta">10.16｜読了 4分</p>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ForOrganizers -->
+  <section class="cta-band">
+    <div class="wrap cta-band__inner">
+      <div class="cta-band__text">
+        <h2 class="t-h2">イベントを主催する学生団体の方へ</h2>
+        <p class="t-body">掲載は無料。告知・申込・当日の受付までここで完結します（手数料はチケットが売れたときだけ5%）。</p>
+      </div>
+      <a class="btn btn--black" href="organizer.html">イベントを掲載する<img class="icon" src="assets/icon-arrow-btn-white.svg" alt=""></a>
+    </div>
+  </section>
+</main>
+
+<div data-footer></div>
+
+</body>
+</html>

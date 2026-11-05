@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>メディア｜NEXT MOVE TICKETS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Zen+Kaku+Gothic+New:wght@400;500;700;900&family=DM+Mono:wght@400;500&family=Instrument+Serif:ital@1&family=Barlow+Condensed:wght@700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="media.css">
+<script src="common.js" defer></script>
+</head>
+<body>
+
+<div data-header="v2" data-active="media"></div>
+
+<main>
+  <!-- 見出し -->
+  <div class="wrap m-head">
+    <h1 class="m-head__en">MEDIA</h1>
+    <div class="m-head__ja">
+      <p class="m-head__title">読みもの</p>
+      <p class="m-head__lead">学生イベントの“いま”と、行く前に知りたいこと。</p>
+    </div>
+  </div>
+
+  <!-- カテゴリ絞り込み -->
+  <div class="wrap chip-row m-filter" role="group" aria-label="カテゴリで絞り込む" data-filter>
+    <button class="chip is-active" type="button" data-cat="all" aria-pressed="true">すべて</button>
+    <button class="chip" type="button" data-cat="新歓ガイド" aria-pressed="false">新歓ガイド</button>
+    <button class="chip" type="button" data-cat="インタビュー" aria-pressed="false">インタビュー</button>
+    <button class="chip" type="button" data-cat="ノウハウ" aria-pressed="false">ノウハウ</button>
+    <button class="chip" type="button" data-cat="学園祭" aria-pressed="false">学園祭</button>
+    <button class="chip" type="button" data-cat="スポット" aria-pressed="false">スポット</button>
+  </div>
+
+  <!-- Feature -->
+  <section class="wrap m-feature" aria-label="特集" data-filter-group>
+    <a class="m-feature__main" href="article.html" data-item="新歓ガイド">
+      <img class="m-feature__img" src="assets/flyer-morning-run.jpg" alt="">
+      <div class="m-feature__meta"><span class="tag tag--coral">特集</span><span>新歓ガイド · 読了 8分 · 2026.10.24</span></div>
+      <h2 class="m-feature__title">新歓 2026 完全ガイド：サークル選びで後悔しない、5つの視点</h2>
+      <p class="m-feature__desc">雰囲気・お金・時間・人数・続け方。先輩30人に聞いた「入ってから気づいたこと」から、見学で確かめるべきポイントをまとめました。</p>
+    </a>
+    <div class="m-feature__side">
+      <a class="m-card" href="article.html" data-item="インタビュー">
+        <img class="m-card__img m-card__img--l" src="assets/article-interview.jpg" alt="">
+        <p class="m-card__meta">インタビュー · 読了 10分</p>
+        <h3 class="m-card__title m-card__title--l">主催者に聞く：100人規模の交流会を3週間でつくるまで</h3>
+      </a>
+      <a class="m-card" href="article.html" data-item="ノウハウ">
+        <img class="m-card__img m-card__img--l" src="assets/flyer-zine-fair.jpg" alt="">
+        <p class="m-card__meta">ノウハウ · 読了 7分</p>
+        <h3 class="m-card__title m-card__title--l">代替わりで団体を引き継ぐコツ — 引き継ぎ資料のテンプレ付き</h3>
+      </a>
+    </div>
+  </section>
+
+  <!-- Latest ＋ Ranking -->
+  <section class="m-latest">
+    <div class="wrap m-latest__inner">
+      <div class="m-latest__main">
+        <div class="headline headline--stack">
+          <h2 class="headline__en">LATEST</h2>
+          <p class="headline__ja">新着の記事</p>
+        </div>
+        <div class="m-latest__grid" data-filter-group>
+          <a class="m-card" href="article.html" data-item="新歓ガイド">
+            <img class="m-card__img" src="assets/article-guide.jpg" alt="">
+            <p class="m-card__meta">ガイド · 10.24 · 8分</p>
+            <h3 class="m-card__title">「はじめまして」が苦手な人のための、イベントの楽しみ方</h3>
+          </a>
+          <a class="m-card" href="article.html" data-item="スポット">
+            <img class="m-card__img" src="assets/flyer-halloween.jpg" alt="">
+            <p class="m-card__meta">スポット · 10.16 · 4分</p>
+            <h3 class="m-card__title">渋谷で学生が集まる、夜のイベントスペース5選</h3>
+          </a>
+          <a class="m-card" href="article.html" data-item="インタビュー">
+            <img class="m-card__img" src="assets/flyer-hackathon.jpg" alt="">
+            <p class="m-card__meta">インタビュー · 10.12 · 6分</p>
+            <h3 class="m-card__title">24時間で何がつくれる？ ハッカソン常連の4年生に聞く</h3>
+          </a>
+          <a class="m-card" href="article.html" data-item="学園祭">
+            <img class="m-card__img" src="assets/flyer-acoustic.jpg" alt="">
+            <p class="m-card__meta">学園祭 · 10.08 · 5分</p>
+            <h3 class="m-card__title">学園祭ライブの裏側：PA担当がいちばん緊張する瞬間</h3>
+          </a>
+          <a class="m-card" href="article.html" data-item="ノウハウ">
+            <img class="m-card__img" src="assets/flyer-band-battle.jpg" alt="">
+            <p class="m-card__meta">ノウハウ · 10.02 · 7分</p>
+            <h3 class="m-card__title">ライブハウスを借りる前に確認したい7つのこと</h3>
+          </a>
+          <a class="m-card" href="article.html" data-item="ノウハウ">
+            <img class="m-card__img" src="assets/article-interview.jpg" alt="">
+            <p class="m-card__meta">ノウハウ · 09.28 · 6分</p>
+            <h3 class="m-card__title">イベント告知文の書き方：申込が伸びた3つの例</h3>
+          </a>
+        </div>
+        <p class="m-empty" data-empty hidden>このカテゴリの記事はまだありません。</p>
+        <button class="btn btn--outline" type="button">もっと読み込む</button>
+      </div>
+
+      <aside class="m-ranking" aria-label="よく読まれている記事">
+        <div class="headline headline--stack">
+          <h2 class="headline__en">RANKING</h2>
+          <p class="headline__ja">よく読まれている記事</p>
+        </div>
+        <ol>
+          <li><a class="m-rank" href="article.html"><span class="m-rank__no">1</span><span class="m-rank__title">新歓 2026 完全ガイド：サークル選びの5つの視点</span></a></li>
+          <li><a class="m-rank" href="article.html"><span class="m-rank__no">2</span><span class="m-rank__title">ひとりでも浮かない、交流会の選び方</span></a></li>
+          <li><a class="m-rank" href="article.html"><span class="m-rank__no">3</span><span class="m-rank__title">学祭シーズンのおすすめ週末イベント</span></a></li>
+          <li><a class="m-rank" href="article.html"><span class="m-rank__no">4</span><span class="m-rank__title">代替わりで団体を引き継ぐコツ</span></a></li>
+          <li><a class="m-rank" href="article.html"><span class="m-rank__no">5</span><span class="m-rank__title">はじめてのライブハウス、持ち物リスト</span></a></li>
+        </ol>
+      </aside>
+    </div>
+  </section>
+</main>
+
+<script>
+/* カテゴリチップで特集・新着の記事を絞り込む */
+(function () {
+  var chips = document.querySelectorAll('[data-filter] .chip');
+  var items = document.querySelectorAll('[data-item]');
+  var empty = document.querySelector('[data-empty]');
+  var side = document.querySelector('.m-feature__side');
+  var feature = document.querySelector('.m-feature');
+  function apply(cat) {
+    var shownLatest = 0;
+    for (var i = 0; i < items.length; i++) {
+      var on = cat === 'all' || items[i].getAttribute('data-item') === cat;
+      items[i].hidden = !on;
+      if (on && items[i].closest('.m-latest__grid')) shownLatest++;
+    }
+    var mainOn = !feature.querySelector('.m-feature__main').hidden;
+    var sideOn = side.querySelectorAll('[data-item]:not([hidden])').length > 0;
+    side.hidden = !sideOn;
+    feature.hidden = !mainOn && !sideOn;
+    empty.hidden = shownLatest > 0;
+  }
+  for (var i = 0; i < chips.length; i++) {
+    chips[i].addEventListener('click', function () {
+      for (var j = 0; j < chips.length; j++) {
+        chips[j].classList.toggle('is-active', chips[j] === this);
+        chips[j].setAttribute('aria-pressed', chips[j] === this ? 'true' : 'false');
+      }
+      apply(this.getAttribute('data-cat'));
+    });
+  }
+})();
+</script>
+</body>
+</html>

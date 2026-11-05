@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ダッシュボード｜NEXT MOVE TICKETS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Zen+Kaku+Gothic+New:wght@400;500;700;900&family=DM+Mono:wght@400;500&family=Instrument+Serif:ital@1&family=Barlow+Condensed:wght@700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="org.css">
+<script src="common.js" defer></script>
+</head>
+<body class="org-page">
+<div data-header="org" data-active="dashboard"></div>
+<main>
+  <!-- 団体の見出し（Figma 1774:10552） -->
+  <section class="wrap dash-head">
+    <div class="dash-org">
+      <span class="dash-org__swatch" aria-hidden="true"></span>
+      <div class="dash-org__text">
+        <h1 class="dash-org__name">慶應軽音サークル</h1>
+        <p class="dash-org__meta">@keio-lightmusic · <a href="organizer.html">公開ページを見る</a></p>
+      </div>
+    </div>
+    <a class="btn btn--black" href="event-create.html">＋ イベントを作成</a>
+  </section>
+
+  <!-- 数字（Figma 1774:10562） -->
+  <section class="wrap dash-stats" aria-label="サマリー">
+    <div class="org-card dash-stat">
+      <p class="dash-stat__label">フォロワー</p>
+      <p class="dash-stat__num">234</p>
+      <p class="dash-stat__sub">今月 +12</p>
+    </div>
+    <div class="org-card dash-stat">
+      <p class="dash-stat__label">公開中のイベント</p>
+      <p class="dash-stat__num">3</p>
+      <p class="dash-stat__sub">下書き 1</p>
+    </div>
+    <div class="org-card dash-stat">
+      <p class="dash-stat__label">今月の申込</p>
+      <p class="dash-stat__num">42</p>
+      <p class="dash-stat__sub">先月 +18</p>
+    </div>
+    <div class="org-card dash-stat">
+      <p class="dash-stat__label">保存された回数</p>
+      <p class="dash-stat__num">38</p>
+      <p class="dash-stat__sub">春の新歓ミーティング</p>
+    </div>
+  </section>
+
+  <!-- 本体（Figma 1774:10579） -->
+  <div class="wrap dash-body">
+    <div class="dash-main">
+      <section class="org-card dash-published">
+        <h2 class="org-card__title">公開中のイベント</h2>
+        <div class="dash-event">
+          <img class="dash-event__flyer" src="assets/flyer-band-battle.jpg" alt="インカレ・バンド対抗ライブ vol.4 のフライヤー">
+          <div class="dash-event__body">
+            <div class="dash-event__meta">
+              <span class="pill pill--open">受付中</span>
+              <span>11/8（土）17:30 · 下北沢 SHELTER</span>
+            </div>
+            <h3 class="dash-event__title"><a href="#">インカレ・バンド対抗ライブ vol.4</a></h3>
+            <ul class="dash-quota" aria-label="参加枠の申込状況">
+              <li class="dash-quota__row">
+                <span class="dash-quota__name">学生</span>
+                <span class="dash-quota__bar"><span class="dash-quota__fill" style="width:62.5%"></span></span>
+                <span class="dash-quota__count">25 / 40</span>
+              </li>
+              <li class="dash-quota__row">
+                <span class="dash-quota__name">一般</span>
+                <span class="dash-quota__bar"><span class="dash-quota__fill dash-quota__fill--full" style="width:100%"></span></span>
+                <span class="dash-quota__count">10 / 10<span class="dash-full">満席</span></span>
+              </li>
+              <li class="dash-quota__row">
+                <span class="dash-quota__name">早割（学生）</span>
+                <span class="dash-quota__bar"><span class="dash-quota__fill dash-quota__fill--full" style="width:100%"></span></span>
+                <span class="dash-quota__count">20 / 20<span class="dash-full">満席</span></span>
+              </li>
+              <li class="dash-quota__row dash-quota__row--total">
+                <span class="dash-quota__name">全体</span>
+                <span class="dash-quota__bar"><span class="dash-quota__fill dash-quota__fill--total" style="width:78.6%"></span></span>
+                <span class="dash-quota__count">55 / 70</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div class="dash-actions">
+          <a class="org-btn org-btn--black" href="#">参加者・受付</a>
+          <a class="org-btn" href="#">QR で受付</a>
+          <a class="org-btn" href="#">告知を送る</a>
+          <a class="org-btn" href="event-create.html">編集</a>
+          <a class="org-btn" href="event-create.html">複製</a>
+          <span class="dash-actions__spacer"></span>
+          <button class="org-btn org-btn--plain" type="button">移管</button>
+          <button class="org-btn org-btn--plain" type="button">中止</button>
+        </div>
+      </section>
+
+      <div class="dash-pair">
+        <section class="org-card dash-list">
+          <h2 class="org-card__title">下書き</h2>
+          <div class="dash-list__item">
+            <div class="dash-list__text">
+              <p class="dash-list__name">追いコン 2026</p>
+              <p class="dash-list__sub">更新 3日前 · 枠・質問が未設定</p>
+            </div>
+            <a class="org-btn" href="event-create.html">編集</a>
+            <button class="org-btn org-btn--black" type="button">公開する</button>
+          </div>
+        </section>
+        <section class="org-card dash-list">
+          <h2 class="org-card__title">過去のイベント</h2>
+          <div class="dash-list__item">
+            <div class="dash-list__text">
+              <p class="dash-list__name">冬合宿 2026</p>
+              <p class="dash-list__sub">2/20 · 参加 32人</p>
+            </div>
+            <a class="org-btn" href="event-create.html">複製して作成</a>
+          </div>
+          <div class="dash-list__item">
+            <div class="dash-list__text">
+              <p class="dash-list__name">卒業ライブ 2026</p>
+              <p class="dash-list__sub">3/14 · 参加 120人</p>
+            </div>
+            <a class="org-btn" href="event-create.html">複製して作成</a>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <aside class="dash-side">
+      <section class="dash-notice">
+        <h2 class="dash-notice__title">お知らせ</h2>
+        <p class="dash-notice__text">「冬合宿 2026」の申込時の回答は、7日後（11/6）に自動で削除されます。必要なら今のうちに控えを取ってください。</p>
+        <button class="org-btn org-btn--black" type="button">CSV で控えを取る</button>
+      </section>
+
+      <section class="org-card dash-recent">
+        <div class="dash-recent__head">
+          <h2 class="dash-recent__title">最近の申込</h2>
+          <a class="dash-recent__all" href="#">すべて →</a>
+        </div>
+        <ul>
+          <li class="dash-recent__item">
+            <span class="dash-recent__avatar dash-recent__avatar--pink" aria-hidden="true"></span>
+            <div class="dash-recent__text">
+              <p class="dash-recent__name">みお</p>
+              <p class="dash-recent__sub">学生 × 1</p>
+            </div>
+            <span class="dash-recent__time">15分前</span>
+          </li>
+          <li class="dash-recent__item">
+            <span class="dash-recent__avatar dash-recent__avatar--mint" aria-hidden="true"></span>
+            <div class="dash-recent__text">
+              <p class="dash-recent__name">たける</p>
+              <p class="dash-recent__sub">学生 × 1 ＋ 早割</p>
+            </div>
+            <span class="dash-recent__time">1時間前</span>
+          </li>
+          <li class="dash-recent__item">
+            <span class="dash-recent__avatar dash-recent__avatar--coral" aria-hidden="true"></span>
+            <div class="dash-recent__text">
+              <p class="dash-recent__name">さき</p>
+              <p class="dash-recent__sub">一般 × 2</p>
+            </div>
+            <span class="dash-recent__time">2時間前</span>
+          </li>
+          <li class="dash-recent__item">
+            <span class="dash-recent__avatar dash-recent__avatar--lavender" aria-hidden="true"></span>
+            <div class="dash-recent__text">
+              <p class="dash-recent__name">ゆうと</p>
+              <p class="dash-recent__sub">学生 × 1</p>
+            </div>
+            <span class="dash-recent__time">3時間前</span>
+          </li>
+        </ul>
+      </section>
+    </aside>
+  </div>
+</main>
+</body>
+</html>

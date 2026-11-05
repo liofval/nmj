@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>イベント（リスト表示）｜NEXT MOVE TICKETS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Zen+Kaku+Gothic+New:wght@400;500;700;900&family=DM+Mono:wght@400;500&family=Instrument+Serif:ital@1&family=Barlow+Condensed:wght@700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="events.css">
+<script src="common.js" defer></script>
+</head>
+<body>
+
+<div data-header="default"></div>
+
+<main>
+  <!-- PageHead -->
+  <div class="wrap page-head">
+    <div class="page-head__titles">
+      <h1 class="page-head__en">EVENTS</h1>
+      <div class="page-head__sub">
+        <p class="page-head__ja">イベントをさがす</p>
+        <p class="page-head__count">全128件</p>
+      </div>
+    </div>
+    <nav class="view-toggle" aria-label="表示切替">
+        <a class="view-toggle__item" href="events.html">カード</a>
+        <a class="view-toggle__item is-active" href="events-list.html" aria-current="page">リスト</a>
+    </nav>
+  </div>
+
+  <!-- FilterBar -->
+  <div class="wrap">
+    <form class="searchbox filterbar" role="search" onsubmit="return false">
+      <label class="searchbox__field searchbox__field--grow">
+        <img class="icon" src="assets/icon-search.svg" alt="">
+        <input class="searchbox__input" type="search" name="q" placeholder="キーワード" aria-label="キーワード">
+      </label>
+      <div class="searchbox__field">
+        <span class="searchbox__label">日付</span>
+        <span class="searchbox__value">今週末（11/1–11/2）</span>
+        <img class="icon icon--14" src="assets/icon-chevron-down.svg" alt="">
+      </div>
+      <div class="searchbox__field">
+        <span class="searchbox__label">エリア</span>
+        <span class="searchbox__value">東京都</span>
+        <img class="icon icon--14" src="assets/icon-chevron-down.svg" alt="">
+      </div>
+      <div class="searchbox__field">
+        <span class="searchbox__label">ジャンル</span>
+        <span class="searchbox__value">すべて</span>
+        <img class="icon icon--14" src="assets/icon-chevron-down.svg" alt="">
+      </div>
+      <div class="searchbox__field">
+        <span class="searchbox__label">価格</span>
+        <span class="searchbox__value">指定なし</span>
+        <img class="icon icon--14" src="assets/icon-chevron-down.svg" alt="">
+      </div>
+    </form>
+  </div>
+
+  <!-- ChipRow -->
+  <div class="wrap filter-row">
+    <div class="chip-row" role="group" aria-label="よく使う条件">
+      <button class="chip" type="button" aria-pressed="false">今日</button>
+      <button class="chip is-active" type="button" aria-pressed="true">今週末</button>
+      <button class="chip" type="button" aria-pressed="false">無料</button>
+      <button class="chip" type="button" aria-pressed="false">学生割あり</button>
+      <button class="chip" type="button" aria-pressed="false">オンライン</button>
+      <button class="chip" type="button" aria-pressed="false">初参加歓迎</button>
+      <button class="chip is-active" type="button" aria-pressed="true">売り切れを除く</button>
+    </div>
+    <button class="sort" type="button">
+      <span class="sort__label">並び順</span>
+      <span class="sort__value">開催日が近い順</span>
+      <img class="icon icon--14" src="assets/icon-chevron-down.svg" alt="">
+    </button>
+  </div>
+
+  <!-- List -->
+  <section class="wrap events-results" aria-label="検索結果">
+    <h2 class="result-head">今週末・東京都のイベント 24件（売り切れを除く）</h2>
+    <div class="day-head"><h3 class="day-head__date">11/1（土）</h3><span class="day-head__count">4件</span></div>
+    <a class="event-row" href="#">
+      <div class="event-row__date"><span class="event-row__day">11.01</span><span class="event-row__time">土 10:00</span></div>
+      <img class="event-row__thumb" src="assets/flyer-hackathon.jpg" alt="">
+      <div class="event-row__body">
+        <p class="event-row__genre">学び・勉強会</p>
+        <h3 class="event-row__title">24時間ハッカソン「つくって、見せて、寝る」</h3>
+        <p class="event-row__meta">東京大学 本郷キャンパス｜UT Hack</p>
+      </div>
+      <span class="event-row__price"><span class="price">¥1,000</span></span>
+      <span class="pill pill--few">残り4枚</span>
+      <span class="event-row__arrow"><img class="icon" src="assets/icon-arrow-up-right.svg" alt=""></span>
+    </a>
+    <a class="event-row" href="#">
+      <div class="event-row__date"><span class="event-row__day">11.01</span><span class="event-row__time">土 13:00</span></div>
+      <img class="event-row__thumb" src="assets/article-interview.jpg" alt="">
+      <div class="event-row__body">
+        <p class="event-row__genre">キャリア</p>
+        <h3 class="event-row__title">先輩に聞く、はじめてのインターン選び</h3>
+        <p class="event-row__meta">オンライン｜Next Career Lab</p>
+      </div>
+      <span class="event-row__price"><span class="price price--free">無料</span></span>
+      <span class="pill pill--open">受付中</span>
+      <span class="event-row__arrow"><img class="icon" src="assets/icon-arrow-up-right.svg" alt=""></span>
+    </a>
+    <a class="event-row" href="#">
+      <div class="event-row__date"><span class="event-row__day">11.01</span><span class="event-row__time">土 18:00</span></div>
+      <img class="event-row__thumb" src="assets/article-guide.jpg" alt="">
+      <div class="event-row__body">
+        <p class="event-row__genre">交流会</p>
+        <h3 class="event-row__title">国際交流ボードゲームナイト</h3>
+        <p class="event-row__meta">高田馬場 JAM Café｜Waseda Global</p>
+      </div>
+      <span class="event-row__price"><span class="price">¥500</span></span>
+      <span class="pill pill--open">受付中</span>
+      <span class="event-row__arrow"><img class="icon" src="assets/icon-arrow-up-right.svg" alt=""></span>
+    </a>
+    <a class="event-row" href="#">
+      <div class="event-row__date"><span class="event-row__day">11.01</span><span class="event-row__time">土 21:00</span></div>
+      <img class="event-row__thumb" src="assets/flyer-halloween.jpg" alt="">
+      <div class="event-row__body">
+        <p class="event-row__genre">パーティ</p>
+        <h3 class="event-row__title">渋谷ハロウィン・アフターパーティ 2026</h3>
+        <p class="event-row__meta">渋谷 WOMB｜青学イベントサークル Link</p>
+      </div>
+      <span class="event-row__price"><span class="price">¥2,000〜</span></span>
+      <span class="pill pill--few">残り12枚</span>
+      <span class="event-row__arrow"><img class="icon" src="assets/icon-arrow-up-right.svg" alt=""></span>
+    </a>
+    <div class="day-head"><h3 class="day-head__date">11/2（日）</h3><span class="day-head__count">3件</span></div>
+    <a class="event-row" href="#">
+      <div class="event-row__date"><span class="event-row__day">11.02</span><span class="event-row__time">日 7:30</span></div>
+      <img class="event-row__thumb" src="assets/flyer-morning-run.jpg" alt="">
+      <div class="event-row__body">
+        <p class="event-row__genre">スポーツ</p>
+        <h3 class="event-row__title">朝の代々木公園ランニング＆モーニング</h3>
+        <p class="event-row__meta">代々木公園 原宿門｜RUN TOKYO CAMPUS</p>
+      </div>
+      <span class="event-row__price"><span class="price price--free">無料</span></span>
+      <span class="pill pill--open">受付中</span>
+      <span class="event-row__arrow"><img class="icon" src="assets/icon-arrow-up-right.svg" alt=""></span>
+    </a>
+    <a class="event-row" href="#">
+      <div class="event-row__date"><span class="event-row__day">11.02</span><span class="event-row__time">日 12:00</span></div>
+      <img class="event-row__thumb" src="assets/flyer-zine-fair.jpg" alt="">
+      <div class="event-row__body">
+        <p class="event-row__genre">アート・展示</p>
+        <h3 class="event-row__title">学生ZINEフェア — 刷って、並べて、交換する</h3>
+        <p class="event-row__meta">吉祥寺 Art Center Ongoing｜武蔵美ZINE部</p>
+      </div>
+      <span class="event-row__price"><span class="price">¥300</span></span>
+      <span class="pill pill--open">受付中</span>
+      <span class="event-row__arrow"><img class="icon" src="assets/icon-arrow-up-right.svg" alt=""></span>
+    </a>
+    <a class="event-row" href="#">
+      <div class="event-row__date"><span class="event-row__day">11.02</span><span class="event-row__time">日 17:00</span></div>
+      <img class="event-row__thumb" src="assets/flyer-acoustic.jpg" alt="">
+      <div class="event-row__body">
+        <p class="event-row__genre">音楽・ライブ</p>
+        <h3 class="event-row__title">アコースティック・ナイト 秋の弾き語り12組</h3>
+        <p class="event-row__meta">下北沢 lown｜明治大学フォークソング部</p>
+      </div>
+      <span class="event-row__price"><span class="price">¥1,200〜</span></span>
+      <span class="pill pill--upcoming">11/1 正午から</span>
+      <span class="event-row__arrow"><img class="icon" src="assets/icon-arrow-up-right.svg" alt=""></span>
+    </a>
+  </section>
+
+  <!-- More -->
+  <div class="wrap more">
+    <a class="btn btn--outline" href="#">もっと見る（残り17件）</a>
+  </div>
+</main>
+
+<div data-footer></div>
+
+</body>
+</html>
