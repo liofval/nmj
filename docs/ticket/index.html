@@ -15,31 +15,9 @@
 <div data-header="default"></div>
 
 <main>
-  <!-- Home / PC: イベントパス -->
-  <section class="pass-hero" aria-label="NEXT MOVE">
-    <div class="pass-hero__stage">
-      <p class="pass-hero__bg" aria-hidden="true">NEXT MOVE</p>
-      <img class="pass-hero__straps" src="assets/pass-straps.svg" alt="">
-      <span class="pass-hero__clip"></span>
-      <div class="pass-holder">
-        <img class="pass-holder__hole pass-holder__hole--l" src="assets/pass-hole.svg" alt="">
-        <img class="pass-holder__hole pass-holder__hole--r" src="assets/pass-hole.svg" alt="">
-        <span class="pass-holder__slot"></span>
-        <img class="pass-holder__seam" src="assets/pass-seam.svg" alt="">
-        <div class="pass-card">
-          <span class="pass-card__band"></span>
-          <p class="pass-card__org">NEXT MOVE JAPAN</p>
-          <span class="pass-card__rule"></span>
-          <p class="pass-card__name pass-card__name--1">NEXT</p>
-          <p class="pass-card__name pass-card__name--2">MOVER</p>
-          <span class="pass-card__rule-bottom"></span>
-          <p class="pass-card__label">EVENT PASS</p>
-        </div>
-      </div>
-      <div class="pass-namefield">
-        <input type="text" name="name" maxlength="40" autocomplete="off" placeholder="your name" aria-label="名前（ローマ字）">
-      </div>
-    </div>
+  <!-- Home / PC: イベントパス（動く名札。docs/badge.html をそのまま埋め込む） -->
+  <section class="pass-hero" aria-label="NEXT MOVE イベントパス">
+    <iframe class="pass-hero__frame" src="../badge.html" title="イベントパス（ドラッグで揺れる名札。右上に名前を入力できます）"></iframe>
   </section>
 
   <!-- Hero: 検索 -->

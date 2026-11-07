@@ -85,12 +85,11 @@ Figma「NMJ Ticket｜PC」(fileKey `M83Df5IlWnEOvGhXWqIeKW` / page `1743:7675`) 
 | ジャンルカード | `.genre-grid` > `.genre-card` ＋ `--coral/--mint/--lavender/--pink/--gray/--white` |
 | 記事カード | `.article-grid`（3列・gap32）> `.article-card` > `__img` `__cat` `__title` `__meta` |
 | 主催者向け帯 | `.cta-band` > `.wrap.cta-band__inner` > `.cta-band__text` ＋ ボタン |
-| Top 専用 | `.pass-hero` 一式（イベントパス）、`.top-search` |
+| Top 専用 | `.pass-hero`（イベントパス。`../badge.html` を iframe で埋め込み）、`.top-search` |
 
 ## アセット（`assets/`）
 
 - アイコン: `icon-search.svg` `icon-chevron-down.svg` `icon-arrow-up-right.svg`（リンク用）`icon-arrow-btn.svg`（黒・ボタン用）`icon-arrow-btn-white.svg`（白・黒ボタン用）`avatar.svg`
-- イベントパス: `pass-straps.svg` `pass-hole.svg` `pass-seam.svg`
 - フライヤー（800×1200 を 4:5 で cover）: `flyer-halloween.jpg` `flyer-morning-run.jpg` `flyer-hackathon.jpg` `flyer-zine-fair.jpg`
 - 記事画像（432×288 で cover）: `article-guide.jpg` `article-interview.jpg`（3枚目は `flyer-halloween.jpg` を流用＝Figma と同じ画像）
 
