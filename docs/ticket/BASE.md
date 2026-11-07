@@ -39,7 +39,7 @@ Figma「NMJ Ticket｜PC」(fileKey `M83Df5IlWnEOvGhXWqIeKW` / page `1743:7675`) 
 <title>〇〇｜NEXT MOVE TICKETS</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Anton&family=Zen+Kaku+Gothic+New:wght@400;500;700;900&family=DM+Mono:wght@400;500&family=Instrument+Serif:ital@1&family=Barlow+Condensed:wght@700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Noto+Sans+JP:wght@400;500;700;900&family=DM+Mono:wght@400;500&family=Instrument+Serif:ital@1&family=Barlow+Condensed:wght@700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 <script src="common.js" defer></script>
 </head>
@@ -64,7 +64,7 @@ Figma「NMJ Ticket｜PC」(fileKey `M83Df5IlWnEOvGhXWqIeKW` / page `1743:7675`) 
 ## トークン（CSS カスタムプロパティ）
 
 - 色: `--color-black / white / ink / surface / line / line-strong / subtle / muted / muted-dark / gray-100 / coral / mint / lavender / pink`
-- 書体: `--font-jp`（Zen Kaku Gothic New）/ `--font-display`（Anton）/ `--font-mono`（DM Mono）/ `--font-serif`（Instrument Serif・My Tickets のみ）/ `--font-condensed`（Barlow Condensed・Top のイベントパスのみ）
+- 書体: `--font-jp`（Noto Sans JP）/ `--font-display`（Anton）/ `--font-mono`（DM Mono）/ `--font-serif`（Instrument Serif・My Tickets のみ）/ `--font-condensed`（Barlow Condensed・Top のイベントパスのみ）
 - 余白: `--page-max: 1440px` / `--page-pad: 40px` / `--gap-section: 96px`
 
 ## 共通クラス
