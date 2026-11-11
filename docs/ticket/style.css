@@ -30,9 +30,12 @@
   --font-condensed: "Barlow Condensed", sans-serif; /* Top のイベントパス専用 */
 
   /* layout */
+  /* 可変値は 1440 幅で Figma の px と一致し、狭い画面ほど小さくなる（最大値＝Figma の値） */
   --page-max: 1440px;
-  --page-pad: 40px;
-  --gap-section: 96px;
+  --page-pad: clamp(16px, 2.8vw, 40px);
+  --gap-section: clamp(56px, 6.7vw, 96px);
+  --display-m: clamp(32px, 3.1vw, 44px);
+  --h2: clamp(18px, 1.55vw, 22px);
 }
 
 /* ---------- 2. ベース ---------- */
@@ -54,8 +57,8 @@ ul, ol { list-style: none; }
 button, input, select { font: inherit; color: inherit; }
 
 /* ---------- 3. タイポ（Figma テキストスタイル） ---------- */
-.t-display-m { font-family: var(--font-display); font-weight: 400; font-size: 44px; line-height: 1; }  /* Ticket/Display/M */
-.t-h2 { font-weight: 700; font-size: 22px; line-height: 1.45; }                                         /* Ticket/JP/H2 */
+.t-display-m { font-family: var(--font-display); font-weight: 400; font-size: var(--display-m); line-height: 1; }  /* Ticket/Display/M */
+.t-h2 { font-weight: 700; font-size: var(--h2); line-height: 1.45; }                                         /* Ticket/JP/H2 */
 .t-h3 { font-weight: 700; font-size: 17px; line-height: 1.55; }                                         /* Ticket/JP/H3 */
 .t-body { font-weight: 400; font-size: 15px; line-height: 1.85; }                                       /* Ticket/JP/Body */
 .t-small { font-weight: 400; font-size: 13px; line-height: 1.65; }                                      /* Ticket/JP/Small */
@@ -65,17 +68,17 @@ button, input, select { font: inherit; color: inherit; }
 .t-muted { color: var(--color-muted); }
 
 /* ---------- 4. レイアウト ---------- */
-.wrap { max-width: var(--page-max); margin: 0 auto; padding-left: var(--page-pad); padding-right: var(--page-pad); }
-.section { padding-top: 48px; padding-bottom: var(--gap-section); }
+.wrap { width: 100%; max-width: var(--page-max); margin: 0 auto; padding-left: var(--page-pad); padding-right: var(--page-pad); }
+.section { padding-top: clamp(32px, 3.34vw, 48px); padding-bottom: var(--gap-section); }
 .section--gray { background: var(--color-gray-100); padding-top: var(--gap-section); }
 .section--pink { background: var(--color-pink); }
 .section--flush-top { padding-top: 0; }
 
 /* セクション見出し（英字 Display ＋ 和文 H2 ＋ 右に「すべて見る」） */
-.sec-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; margin-bottom: 32px; }
+.sec-head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 24px; margin-bottom: 32px; }
 .sec-head__titles { display: flex; flex-direction: column; gap: 6px; white-space: nowrap; }
-.sec-head__en { font-family: var(--font-display); font-weight: 400; font-size: 44px; line-height: 1; }
-.sec-head__ja { font-weight: 700; font-size: 22px; line-height: 1.45; }
+.sec-head__en { font-family: var(--font-display); font-weight: 400; font-size: var(--display-m); line-height: 1; }
+.sec-head__ja { font-weight: 700; font-size: var(--h2); line-height: 1.45; }
 
 /* テキスト＋矢印のリンク（すべて見る →） */
 .link-arrow { display: inline-flex; align-items: center; gap: 10px; font-size: 15px; line-height: 1.85; white-space: nowrap; }
@@ -139,11 +142,11 @@ button, input, select { font: inherit; color: inherit; }
 .event-card:hover .event-card__title { text-decoration: underline; text-underline-offset: 3px; }
 
 /* ---------- 11. ジャンルカード ---------- */
-.genre-grid { display: flex; gap: 16px; }
-.genre-card { flex: 1 1 0; min-width: 0; height: 168px; padding: 20px; display: flex; flex-direction: column; justify-content: space-between; color: var(--color-black); }
+.genre-grid { display: flex; flex-wrap: wrap; gap: 16px; }
+.genre-card { flex: 1 1 0; min-width: 0; height: clamp(120px, 11.7vw, 168px); padding: 20px; display: flex; flex-direction: column; justify-content: space-between; color: var(--color-black); }
 .genre-card__top { display: flex; align-items: flex-start; justify-content: space-between; font-size: 13px; line-height: 1.65; }
 .genre-card__bottom { display: flex; align-items: flex-end; justify-content: space-between; white-space: nowrap; }
-.genre-card__en { font-family: var(--font-display); font-size: 44px; line-height: 1; }
+.genre-card__en { font-family: var(--font-display); font-size: var(--display-m); line-height: 1; }
 .genre-card__count { font-size: 13px; line-height: 1.65; }
 .genre-card--coral { background: var(--color-coral); }
 .genre-card--mint { background: var(--color-mint); }
@@ -158,13 +161,13 @@ button, input, select { font: inherit; color: inherit; }
 .article-card { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
 .article-card__img { width: 100%; aspect-ratio: 432 / 288; object-fit: cover; background: var(--color-line); }
 .article-card__cat { font-size: 13px; line-height: 1.65; }
-.article-card__title { font-weight: 700; font-size: 22px; line-height: 1.45; }
+.article-card__title { font-weight: 700; font-size: var(--h2); line-height: 1.45; }
 .article-card__meta { font-size: 13px; line-height: 1.65; color: var(--color-muted); }
 .article-card:hover .article-card__title { text-decoration: underline; text-underline-offset: 4px; }
 
 /* ---------- 13. 主催者向け帯（CTA バンド） ---------- */
 .cta-band { background: var(--color-pink); }
-.cta-band__inner { display: flex; align-items: center; justify-content: space-between; gap: 32px; padding-top: 56px; padding-bottom: 56px; }
+.cta-band__inner { display: flex; align-items: center; justify-content: space-between; gap: 32px; padding-top: clamp(40px, 3.9vw, 56px); padding-bottom: clamp(40px, 3.9vw, 56px); }
 .cta-band__text { display: flex; flex-direction: column; gap: 10px; }
 
 /* ---------- 14. ヘッダー（3種） ---------- */
@@ -208,25 +211,75 @@ button, input, select { font: inherit; color: inherit; }
 
 /* ---------- 15. フッター（Footer v2） ---------- */
 .footer { background: var(--color-black); color: var(--color-white); overflow: hidden; }
-.footer__inner { display: flex; flex-direction: column; gap: 48px; padding-top: 80px; padding-bottom: 36px; }
+.footer__inner { display: flex; flex-direction: column; gap: clamp(32px, 3.34vw, 48px); padding-top: clamp(48px, 5.6vw, 80px); padding-bottom: 36px; }
 .footer__top { display: flex; justify-content: flex-end; }
 .footer__cols { display: flex; gap: 64px; white-space: nowrap; }
 .footer__col { display: flex; flex-direction: column; gap: 12px; }
 .footer__col-title { color: var(--color-muted-dark); }
 .footer__col a { font-size: 13px; line-height: 1.65; }
 .footer__col a:hover { text-decoration: underline; text-underline-offset: 3px; }
-.footer__mark { font-family: var(--font-display); font-size: 318px; line-height: 0.84; letter-spacing: -0.01em; text-align: center; white-space: nowrap; }
+.footer__mark { font-family: var(--font-display); font-size: min(318px, 22.1vw); line-height: 0.84; letter-spacing: -0.01em; text-align: center; white-space: nowrap; }
 .footer__bottom { display: flex; align-items: flex-start; justify-content: space-between; color: var(--color-muted-dark); font-size: 13px; white-space: nowrap; }
 .footer__legal { display: flex; gap: 24px; line-height: 1.65; }
 .footer__legal a:hover { color: var(--color-white); }
 
 /* ---------- 16. Top 専用: イベントパス（ヒーロー） ---------- */
-/* 1枚絵の構図なので、900px の箱の中だけ絶対配置にしている */
-.pass-hero { position: relative; height: 900px; overflow: hidden; background: var(--color-surface); }
+/* 画面の高さに合わせる（最大 900px＝Figma の Home / PC）。名札は iframe の中で自分の幅・高さに合わせて描く */
+.pass-hero { position: relative; height: clamp(480px, 100svh, 900px); overflow: hidden; background: var(--color-surface); }
 .pass-hero__frame { display: block; width: 100%; height: 100%; border: 0; }
 
 /* Top 専用: 検索エリア */
-.top-search { padding-top: 36px; padding-bottom: 36px; display: flex; flex-direction: column; gap: 24px; }
+.top-search { padding-top: clamp(24px, 2.51vw, 36px); padding-bottom: clamp(24px, 2.51vw, 36px); display: flex; flex-direction: column; gap: 24px; }
 
-/* ---------- 17. 補助 ---------- */
+/* ---------- 17. レスポンシブ（Figma に SP 版は無い。以下はプロトタイプ用の独自レイアウト） ---------- */
+/* タブレット: 〜1023px */
+@media (max-width: 1023px) {
+  .event-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .genre-card { flex: 1 1 calc((100% - 32px) / 3); }
+  .article-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+  .searchbox { flex-wrap: wrap; max-width: 100%; }
+  .searchbox__field--grow { flex-basis: 100%; border-bottom: 1px solid var(--color-line); }
+  .searchbox__field--grow + .searchbox__field { border-left: 0; }
+  .searchbox__field:not(.searchbox__field--grow) { flex: 1 1 0; }
+  .searchbox .btn { margin: 0; }
+
+  /* ヘッダー: ナビを2段目に回し、はみ出す分は横スクロール */
+  .header__inner, .header-v2__inner, .header-org__inner { flex-wrap: wrap; row-gap: 8px; }
+  .header__inner { min-height: 0; padding-top: 16px; padding-bottom: 12px; }
+  .header__logo { font-size: clamp(22px, 3.3vw, 34px); }
+  .header__nav { order: 3; width: 100%; gap: 24px; overflow-x: auto; }
+  .header-v2__inner { height: auto; padding-top: 12px; }
+  .header-v2__left { display: contents; }
+  .header-v2__logo { font-size: clamp(22px, 3.1vw, 32px); }
+  .header-v2__tabs { order: 3; width: 100%; height: auto; overflow-x: auto; }
+  .header-v2__tab { padding: 8px 0 10px; }
+  .header-org__inner { min-height: 0; padding-top: 12px; padding-bottom: 12px; }
+  .header-org__left { flex-wrap: wrap; gap: 12px 16px; }
+  .header-org__nav { width: 100%; overflow-x: auto; }
+}
+/* SP: 〜767px */
+@media (max-width: 767px) {
+  body { font-size: 14px; }
+  .event-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px 12px; }
+  .event-card__title { font-size: 15px; }
+  .event-card__flyer { margin-bottom: 6px; }
+  .genre-grid { gap: 10px; }
+  .genre-card { flex-basis: calc((100% - 10px) / 2); padding: 14px; }
+  .article-grid { grid-template-columns: minmax(0, 1fr); }
+  .searchbox__field { padding: 14px 16px; }
+  .searchbox .btn { flex-basis: 100%; justify-content: center; }
+  .chip-row { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 4px; }
+  .cta-band__inner { flex-direction: column; align-items: flex-start; }
+  .btn { padding: 16px 20px; gap: 16px; }
+  .btn--outline { padding: 16px 20px; }
+  .header__right, .header-v2__right { gap: 12px; }
+  .header .mytickets, .header-v2 .mytickets { padding: 6px 12px; font-size: 16px; }
+  .header-org__switch { font-size: 12px; }
+  .footer__cols { flex-wrap: wrap; gap: 32px 40px; }
+  .footer__top { justify-content: flex-start; }
+  .footer__bottom { flex-direction: column; gap: 12px; white-space: normal; }
+  .footer__legal { flex-wrap: wrap; gap: 8px 16px; }
+}
+
+/* ---------- 18. 補助 ---------- */
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
