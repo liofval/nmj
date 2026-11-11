@@ -1,32 +1,44 @@
-# NEXT MOVE TICKETS 静的 HTML の共通基盤
+# NEXT MOVE TICKETS プロトタイプ（静的 HTML・ビルドなし）
 
-Figma「NMJ Ticket｜PC」(fileKey `M83Df5IlWnEOvGhXWqIeKW` / page `1743:7675`) から起こした PC 1440 幅の静的モック。ビルドなし。
+Figma「NMJ Ticket｜PC」(fileKey `M83Df5IlWnEOvGhXWqIeKW` / page `1743:7675`) の見た目で、`docs/wireframes.html`（v0.4）の画面構成を、`docs/schema.prisma`（v0.4・10/8 定例の決定）のデータで動かすプロトタイプ。Figma にある10画面は 1440 幅で Figma どおり、Figma に無い画面は同じ部品で組む。
+
+- 動かし方: `docs/ticket/index.html` をブラウザで開く（file:// でも可）。状態はブラウザの localStorage（`nmt:db:v1`）に残る。右下の DEMO バーでログイン中の人の切り替えとリセット
+- デモの「いま」は 2026-10-29（木）10:00。開いてから最大6時間だけ進む（決済の確保期限 30 分を試すため）
+- テスト: `node --test tests/`（`data.js` のルール）
 
 ## ファイル
 
 | パス | 中身 |
 |---|---|
-| `style.css` | トークン（Figma 変数）＋共通部品＋ Top 専用部品 |
-| `common.js` | ヘッダー3種・フッターの差し込み（fetch なし。file:// で直接開いて動く） |
-| `index.html` | 01 Top（見本として読むとよい） |
-| `assets/` | Figma から落とした画像・SVG。全ページ同階層なので `assets/xxx` で参照 |
+| `data.js` | モック DB。テーブル・列・enum は `schema.prisma` と同じ名前。seed と操作（申込・決済・受付・告知・通報・移管…）。`window.NMT.db` |
+| `common.js` | ヘッダー3種・フッター・DEMO バーの差し込みと画面部品 `window.NMT.ui`（カード・モーダル・確認・トースト・通報・リンクコピー・QR） |
+| `style.css` | トークン＋共通部品＋プロトタイプ共通部品（16b）＋レスポンシブ（17） |
+| `events.css` `flow.css` `media.css` `org.css` `manage.css` | ページ群ごとの CSS（下表） |
+| `assets/` | 画像・SVG |
 
-## ページのファイル名（ナビのリンク先もこれ）
+## 画面（wireframes.html の画面一覧と同じ）
 
-| 画面 | ファイル | ヘッダー |
-|---|---|---|
-| 01 Top | `index.html` | `default` |
-| 02 Events カード | `events.html` | `v2` active=events |
-| 02 Events リスト | `events-list.html` | `v2` active=events |
-| 03 Calendar | `calendar.html` | `v2`（Figma 1771:10220） |
-| 06 Media | `media.html` | `v2` active=media |
-| 07 Article | `article.html` | `v2` active=media |
-| 08 Organizer | `organizer.html` | `v2`（Figma 1773:10376。高さ71でタブ違いの可能性あり、着手時に instance を確認） |
-| 12 My page | `mypage.html` | `v2`（Figma 1773:10547。高さ71、同上） |
-| 14 Dashboard | `dashboard.html` | `org` active=dashboard（Figma 1774:10538） |
-| 17 Event create | `event-create.html` | `org`（Figma 1775:10554） |
+| 区分 | 画面 | ファイル | URL の引数 | CSS |
+|---|---|---|---|---|
+| 公開 | Home（Figma 01） | `index.html` | | events |
+| 公開 | Events カード／リスト（Figma 02）・検索 | `events.html` `events-list.html` | `?q= &genre= &area= &kind= &when=today\|weekend\|month &free=1` | events |
+| 公開 | カレンダー（Figma 03） | `calendar.html` | `?ym=2026-11 &day=` | events |
+| 公開 | イベント詳細（状態違い） | `event.html` | `?id=` | flow |
+| 公開 | Media・記事（Figma 06/07） | `media.html` `article.html` | `?cat=` / `?slug=` | media |
+| 公開 | 主催者ページ（団体・個人。Figma 08） | `organizer.html` | `?slug=` | media |
+| 参加者 | ログイン・初回設定 | `login.html` | `?next=` | flow |
+| 参加者 | 申込 ①枠 → ②質問 → ③確認 → 完了 | `apply.html` | `?id=` | flow |
+| 参加者 | モック決済 → 確認中 → 完了／失敗 | `checkout.html` | `?payment=` | flow |
+| 参加者 | マイページ（Figma 12）・QR チケット・プロフィール編集 | `mypage.html` `ticket.html` `profile.html` | `?id=`（チケット） | media |
+| 参加者 | フォロー中・保存したイベント | `following.html` `saved.html` | | media |
+| 主催 | ダッシュボード（Figma 14） | `dashboard.html` | `?org=`（slug） | org |
+| 主催 | 団体作成・団体の設定 | `group-new.html` `group-settings.html` | `?org=` | org |
+| 主催 | イベント作成・編集（Figma 17） | `event-create.html` | `?org=` / `?id=` | org |
+| 主催 | 参加者リスト・受付／QR で受付 | `attendees.html` `checkin.html` | `?id=` | manage |
+| 主催 | 告知配信・イベント移管 | `announce.html` `transfer.html` | `?id=` | manage |
+| 運営 | 通報の確認 | `admin-reports.html` | | manage |
 
-存在しないページ（イベント詳細・ガイド・ニュース・カテゴリ・規約など）へのリンクは `#`。リンク先の対応表は `common.js` 冒頭の `PAGES`。
+リンクは `NMT.ui.url('event', { id: e.id })` のように作る（ファイル名の対応は `common.js` の `PAGES`）。
 
 ## ページの雛形
 
@@ -41,17 +53,35 @@ Figma「NMJ Ticket｜PC」(fileKey `M83Df5IlWnEOvGhXWqIeKW` / page `1743:7675`) 
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Noto+Sans+JP:wght@400;500;700;900&family=DM+Mono:wght@400;500&family=Instrument+Serif:ital@1&family=Barlow+Condensed:wght@700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="flow.css">
+<script src="data.js" defer></script>
 <script src="common.js" defer></script>
 </head>
 <body>
 <div data-header="v2" data-active="events"></div>
-<main>
-  <section class="wrap section"> … </section>
-</main>
+<main id="main"> … </main>
 <div data-footer></div>
+<script>
+NMT.ready(function (db, ui) {
+  // ここに画面の処理。db = NMT.db（data.js）、ui = NMT.ui（common.js）
+});
+</script>
 </body>
 </html>
 ```
+
+`NMT.ready` はヘッダー差し込みの後に呼ばれる（`<script>` を本文末に直接書くと data.js より先に走るので、必ずこの中に書く）。中で投げた Error はトーストで出る。
+
+## データ（data.js の主な関数）
+
+- 参照: `eventById` `slotsOf` `questionsFor(eventId, slotIds)` `organizerBySlug` `profileOf(userId)`（あだ名・@ユーザーネーム）`genreById` `articleBySlug` `followerCount` `savedCount` `membersOf`
+- 一覧: `searchEvents({ q, genre, area, kind, free, from, to, status:'upcoming'|'past'|'all', organizerId, includeDraft, sort })` `weekendRange()` `eventBadge(id)`（`{kind,label}` → `ui.pill`）`priceRange(id)` `slotState(slotId)`（open/full/before/closed）`slotRemaining` `eventRemaining`
+- ログイン: `currentUser()` `login(userId)` `logout()` `createUser()` `isAdmin()` `isOwner(orgId)` `managedOrganizers()` `validateSlug()` `updateProfile()` `setEmailPreference()`
+- 参加者: `apply(eventId, slotIds, answers)` → `{kind:'confirmed', ticketId}` か `{kind:'payment', paymentId}` ／ `completePayment(paymentId, success)` `retryPayment` `cancelPayment` `paymentById` `cancelRegistration(regId)` `myTickets()` `pendingPayments()` `toggleSave` `isSaved` `savedOf` `toggleFollow` `isFollowing` `followingOf` `setFollowNotify` `notificationsOf` `markRead` `report(type, id, reason, detail)`
+- 主催: `createGroup` `similarGroups(name)` `requestJoin` `decideJoin` `updateGroup` `createInvitation` `leaveGroup` `createEvent(orgId, …)` `updateEvent` `addSlot` `updateSlot` `removeSlot` `addQuestion` `removeQuestion` `publishErrors` `publishEvent` `duplicateEvent` `cancelEvent(id, reason)` `transferEvent(id, toOrgId)` `attendees(eventId)` `recentRegistrations(orgId)` `setCheckin(ticketId, status, 'MANUAL')` `checkinByToken(token, eventId)` `checkinSummary` `exportCsv(eventId, includeAnswers)` `announceAudience` `sendAnnouncement` `announcementsOf`
+- 運営: `resolveReport(id, 'RESOLVED'|'DISMISSED'|'OPEN', resolution)` `reportTargetLabel(report)`
+- 表示: `NMT.fmt.card(iso)`（11/8（日）17:30）`md` `wd` `hm` `ymd` `yen` `priceLabel` `ago(iso, db.now())` `days` `localInput` `fromLocalInput`、ラベルは `NMT.LABEL.SlotKind` など、エリアは `NMT.AREAS`
+- 失敗はすべて `Error`（日本語のメッセージ）で投げる。画面では try/catch してメッセージをそのまま出す
 
 ### ヘッダー／フッターの入れ方
 
@@ -97,6 +127,9 @@ Figma「NMJ Ticket｜PC」(fileKey `M83Df5IlWnEOvGhXWqIeKW` / page `1743:7675`) 
 
 ## 決まり
 
-- 絶対配置は使わない（flex / grid）。例外は Top のイベントパス（1枚絵）だけ。
-- 色・書体は直書きせずトークンを使う。ページ固有のスタイルは、そのページでしか使わないものだけ `style.css` 末尾にページ名のコメントを付けて足す。
-- SP 対応は対象外。狭い幅でも横スクロールが出ないことだけ守る（巨大文字は親で `overflow:hidden`）。
+- 絶対配置は使わない（flex / grid）。例外は Top のイベントパス（1枚絵）とモーダル・DEMO バー。
+- 色・書体は直書きせずトークンを使う。ページ群の CSS に入れるのは、その群でしか使わないものだけ。
+- レスポンシブ: 幅・余白・見出しは `%`・`vw`・`vh`・`clamp()`・`min()`・`fr` で書き、1440 幅で Figma の px になるようにする（clamp の最大値＝Figma の値）。ブレークポイントは `@media (max-width: 1023px)`（タブレット）と `(max-width: 767px)`（SP）の2つ。表は `.table-scroll` に入れる。1px の線・アイコン・15px 以下の文字は px のまま。
+- 画面に出る人名はあだ名と @ユーザーネームだけ。本名・連絡先（申込の回答）は主催者の参加者リストと本人にだけ出す。
+- 1タップで戻せる操作（フォロー・保存）は確認を出さない。破壊的操作は `ui.confirm({ danger:true })`（キャンセルが左）。
+- `innerHTML` に入れる値は必ず `ui.esc()` を通す。
