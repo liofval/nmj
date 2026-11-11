@@ -1,0 +1,5 @@
+# TASKS
+
+| # | 内容 | 出典 |
+| --- | --- | --- |
+| 1 | 〔担当:nanase-shigeta〕HP方向性の提案資料（Canva修正版）について、太田智也さんのnote・Instagram・既存資料を踏まえて要件整理しFBする（追加:nanase-shigeta） | 2026-11-12 Slack（提案者からのレビュー依頼）／ユーザー依頼 |
