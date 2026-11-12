@@ -195,6 +195,15 @@ NMT.ready(function (db, ui) {
                 (hasPi ? '<dt>Purpose</dt><dd>利用目的：' + esc(e.dataUsePurpose || '（未設定）') + '</dd>' : '') +
               '</dl></div>' +
             '</section>' +
+            (function () {
+              // 参加者のあだ名を公開する設定のイベントだけ（10/8：既定は主催者のみ）
+              var pa = db.publicAttendees(e.id);
+              if (!pa) return '';
+              return '<section class="flow-sec"><h2 class="flow-h">参加予定の人（' + pa.length + '人）</h2>' +
+                (pa.length ? '<ul class="cluster" style="--cluster-gap:8px">' + pa.slice(0, 40).map(function (p) { return '<li><a class="pill pill--line" href="' + ui.url('organizer', { slug: p.slug }) + '">' + esc(p.displayName) + '</a></li>'; }).join('') + '</ul>' +
+                  (pa.length > 40 ? '<p class="t-small t-muted" style="margin-top:8px">ほか ' + (pa.length - 40) + ' 人</p>' : '') : '<p class="t-small t-muted">まだいません</p>') +
+              '</section>';
+            })() +
             '<section class="flow-sec"><h2 class="flow-h">主催者</h2>' +
               '<div class="ev-orgcard"><span class="ev-orgcard__icon" aria-hidden="true"></span><div class="ev-orgcard__body">' +
                 '<a class="t-h3" href="' + ui.url('organizer', { slug: o.slug }) + '">' + esc(o.displayName) + '</a> <span class="tag">' + (o.type === 'GROUP' ? '団体' : '個人') + '</span>' +

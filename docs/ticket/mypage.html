@@ -130,7 +130,20 @@ NMT.ready(function (db, ui) {
   }
   $('[data-notices]').addEventListener('click', function (ev) {
     var a = ev.target.closest('[data-nid]');
-    if (a) { db.markRead(a.getAttribute('data-nid')); return; }
+    if (a) {
+      var nid = a.getAttribute('data-nid');
+      db.markRead(nid);
+      var n = db.t.notifications.find(function (x) { return x.id === nid; });
+      var an = n && n.announcementId && db.announcementById(n.announcementId);
+      if (an) {
+        // 主催者からの告知は本文をその場で読めるようにする
+        ev.preventDefault();
+        var href = a.getAttribute('href');
+        ui.modal({ title: an.subject, html: '<div class="stack"><p class="t-small t-muted">' + esc(db.eventById(an.eventId).title) + ' · ' + f.ymd(an.sentAt) + ' ' + f.hm(an.sentAt) + '</p><p style="white-space:pre-wrap">' + esc(an.body) + '</p></div>',
+          actions: [{ label: '閉じる', kind: 'outline', value: false }, { label: 'イベントを見る', value: true }] }).then(function (go) { if (go) location.href = href; else renderNotices(); });
+      }
+      return;
+    }
     if (ev.target.closest('.my-notice-more')) { showAllNotices = !showAllNotices; renderNotices(); }
   });
 
@@ -202,7 +215,7 @@ NMT.ready(function (db, ui) {
         '<div><p class="field__label">参加枠</p><ul class="my-detail__slots">' + rows + '</ul></div>' +
         (m.paidYen ? '<p class="t-small">お支払い：' + f.yen(m.paidYen) + '（' + (e.status === 'CANCELLED' ? '返金済み' : '支払い済み') + '）</p>' : '') +
         (qa ? '<dl class="my-detail__qa">' + qa + '</dl>' : '') +
-        '<p class="notice notice--gray t-small">回答は主催者の運営メンバーだけが見られます。' + f.ymd(del) + ' に自動で削除されます。</p></div>',
+        '<p class="notice notice--gray t-small">' + (db.answersExpired(e.id) ? '回答は保存期間（' + e.answerRetentionDays + '日）を過ぎたため ' + f.ymd(del) + ' に削除しました。' : '回答は主催者の運営メンバーだけが見られます。' + f.ymd(del) + ' に自動で削除されます。') + '</p></div>',
       actions: [{ label: '閉じる', kind: 'outline' }]
     });
   }

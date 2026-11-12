@@ -26,7 +26,15 @@ NMT.ready(function (db, ui) {
   // next は同じフォルダのページ名＋クエリだけ受け付ける（外のサイトへ飛ばさない）
   var raw = ui.param('next') || '';
   var next = /^[a-z][a-z0-9-]*\.html(\?[^#]*)?$/.test(raw) ? raw : ui.url('top');
-  function goNext() { location.replace(next); }
+  // 招待リンク（?invite=）から来たら、ログイン後に招待を受けて団体のダッシュボードへ
+  var invite = ui.param('invite');
+  function goNext() {
+    if (invite && db.currentUser()) {
+      try { var o = db.acceptInvitation(invite); location.replace(ui.url('dashboard', { org: o.slug })); return; }
+      catch (err) { ui.toast(err.message); }
+    }
+    location.replace(next);
+  }
 
   function head(en, ja, lead) {
     return '<div class="p-head" style="justify-content:center;text-align:center"><div><p class="p-head__en">' + en + '</p><h1 class="p-head__ja">' + ja + '</h1>' +
@@ -38,7 +46,7 @@ NMT.ready(function (db, ui) {
     var u = db.currentUser();
     box.innerHTML = head('LOGIN', 'ようこそ', '学生イベントの告知と参加登録の場所です') +
       '<div class="login-box">' +
-        (u ? '<div class="notice notice--gray"><div>いま <b>' + esc(db.profileOf(u.id).displayName) + '</b>（@' + esc(db.profileOf(u.id).slug) + '）でログインしています。<br><a class="textlink" href="' + esc(next) + '">このまま続ける</a> ／ <button class="textlink" type="button" data-act="logout">ログアウト</button></div></div>' : '') +
+        (u ? '<div class="notice notice--gray"><div>いま <b>' + esc(db.profileOf(u.id).displayName) + '</b>（@' + esc(db.profileOf(u.id).slug) + '）でログインしています。<br><button class="textlink" type="button" data-act="continue">' + (invite ? 'このアカウントで招待を受ける' : 'このまま続ける') + '</button> ／ <button class="textlink" type="button" data-act="logout">ログアウト</button></div></div>' : '') +
         '<button class="google-btn" type="button" data-act="google"><span class="google-btn__g" aria-hidden="true">G</span>Google で続ける</button>' +
         '<p class="t-small t-muted" style="text-align:center">続けると <a class="textlink" href="' + ui.url('media') + '">利用規約</a> と <a class="textlink" href="' + ui.url('media') + '">プライバシーポリシー</a> に同意したことになります</p>' +
         '<p class="t-small t-muted" style="text-align:center">このプロトタイプの Google ログインは模擬です。次の画面でデモのアカウントを選びます。</p>' +
@@ -122,6 +130,7 @@ NMT.ready(function (db, ui) {
     else if (act === 'signup') onboarding();
     else if (act === 'back') welcome();
     else if (act === 'logout') { db.logout(); location.reload(); }
+    else if (act === 'continue') goNext();
   });
 
   welcome();

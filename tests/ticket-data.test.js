@@ -259,3 +259,169 @@ test('UC-1 一本線: 団体作成 → イベント作成・公開 → 参加者
   assert.equal(db.checkinByToken(tk.token, e.id).ticket.checkinStatus, 'CHECKED_IN');
   assert.equal(db.attendees(e.id)[0].answers[allergy.id], 'なし');
 });
+
+// ---- R1 レビュー指摘の再発防止 ----
+function paidSetup(db) {
+  const e = paidEvent(db); const slot = db.slotsOf(e.id).find(s => s.priceYen > 0 && db.slotRemaining(s.id) > 1);
+  return { e, slot, ans: requiredAnswers(db, e.id, [slot.id]) };
+}
+
+test('F1 別タブ（同じ storage の別インスタンス）の古い状態で上書きしない', () => {
+  const storage = memStorage();
+  const a = createDb({ storage }); const b = createDb({ storage });
+  a.login('u-p160');
+  const e = freeEvent(a); const slot = a.slotsOf(e.id).find(s => a.slotRemaining(s.id) > 0);
+  const r = a.apply(e.id, [slot.id], requiredAnswers(a, e.id, [slot.id]));
+  b.login('u-p161'); b.toggleSave(e.id);
+  const c = createDb({ storage });
+  assert.ok(c.ticketById(r.ticketId), 'A のチケットが残る');
+  assert.ok(c.t.savedEvents.some(s => s.userId === 'u-p161' && s.eventId === e.id), 'B の保存も残る');
+});
+
+test('F2 中止したイベントの確保中の決済は完了できず、中止で確保を解放する', () => {
+  const db = fresh(); const uid = newUser(db); db.login(uid);
+  const { e, slot, ans } = paidSetup(db);
+  const r = db.apply(e.id, [slot.id], ans);
+  db.login(db.membersOf(e.organizerId)[0].userId);
+  db.cancelEvent(e.id, '会場の都合');
+  db.login(uid);
+  assert.notEqual(db.paymentById(r.paymentId).status, 'PENDING');
+  assert.throws(() => db.completePayment(r.paymentId, true));
+  assert.equal(db.t.registrations.filter(x => x.userId === uid && db.slotById(x.slotId).eventId === e.id).length, 0);
+});
+
+test('F3 中止したイベントのチケットは無効になり、受付できない', () => {
+  const db = fresh(); db.login('u-yamada');
+  const e = db.eventById('e-bandbattle');
+  const tk = db.t.tickets.find(x => x.eventId === e.id && !x.revokedAt);
+  db.cancelEvent(e.id, '中止');
+  assert.ok(db.ticketById(tk.id).revokedAt);
+  assert.throws(() => db.checkinByToken(tk.token, e.id), /キャンセル|中止/);
+});
+
+test('F4 枠の定員・全体上限は 参加予定＋確保中 を下回れない', () => {
+  const db = fresh(); db.login('u-p163');
+  const { e, slot, ans } = paidSetup(db);
+  db.apply(e.id, [slot.id], ans);
+  db.login(db.membersOf(e.organizerId)[0].userId);
+  assert.throws(() => db.updateSlot(slot.id, { capacity: db.slotTaken(slot.id) - 1 }), /下回|少なく/);
+  assert.throws(() => db.updateEvent(e.id, { capacity: 1 }), /下回|少なく/);
+});
+
+test('F5 保存期間を過ぎた回答は削除される（本人の申込内容からも消える）', () => {
+  const db = fresh();
+  const regIds = new Set(db.t.registrations.filter(r => db.slotById(r.slotId).eventId === 'e-gasshuku').map(r => r.id));
+  assert.equal(db.t.answers.filter(a => regIds.has(a.registrationId)).length, 0);
+});
+
+test('F6 他人の決済はやり直し・取り消しできない', () => {
+  const db = fresh(); db.login('u-p164');
+  const { e, slot, ans } = paidSetup(db);
+  const r = db.apply(e.id, [slot.id], ans);
+  db.completePayment(r.paymentId, false);
+  db.login('u-p165');
+  assert.throws(() => db.retryPayment(r.paymentId), /権限/);
+  db.login('u-p164');
+  const r2 = db.retryPayment(r.paymentId);
+  db.logout();
+  assert.throws(() => db.cancelPayment(r2.paymentId));
+  db.login('u-p165');
+  assert.throws(() => db.cancelPayment(r2.paymentId), /権限/);
+});
+
+test('F7 CSV の先頭が = + - @ のセルは数式にならないようにする', () => {
+  const db = fresh(); const uid = newUser(db); db.login(uid);
+  db.updateProfile({ displayName: '=1+1' });
+  const e = db.eventById('e-intern');
+  const slot = db.slotsOf(e.id)[0];
+  db.apply(e.id, [slot.id], requiredAnswers(db, e.id, [slot.id]));
+  db.login('u-p003');
+  const csv = db.exportCsv(e.id, false);
+  assert.ok(!/(^|,)=1\+1/m.test(csv));
+  assert.ok(csv.includes("'=1+1"));
+});
+
+test('F8 一部の枠だけ取り消しても、残った申込に共通の回答が残る', () => {
+  const db = fresh(); db.login('u-p167');
+  const e = db.eventById('e-clean');
+  const slots = db.slotsOf(e.id).filter(s => s.kind !== 'ADULT').map(s => s.id); // 学生＋芋煮
+  let r = db.apply(e.id, slots, requiredAnswers(db, e.id, slots));
+  if (r.kind === 'payment') r = db.completePayment(r.paymentId, true);
+  const regs = db.registrationsOfTicket(r.ticketId);
+  db.cancelRegistration(regs[0].id);
+  const rest = db.registrationsOfTicket(r.ticketId);
+  const nameQ = db.questionsOf(e.id).find(q => q.commonKey === 'NAME');
+  assert.ok(rest.some(x => db.answersOf(x.id).some(a => a.questionId === nameQ.id)));
+});
+
+test('F9 F10 F11 価格・定員の検証、同じ枠の重複指定、同じイベントの確保中は1件', () => {
+  const db = fresh(); db.login('u-yamada');
+  const e = db.eventById('e-winter');
+  assert.throws(() => db.addSlot(e.id, { name: 'x', capacity: 10, priceYen: -100 }), /価格/);
+  assert.throws(() => db.updateSlot('e-winter-s1', { priceYen: -1 }), /価格/);
+  db.login('u-p168');
+  const f = freeEvent(db); const s = db.slotsOf(f.id).find(x => db.slotRemaining(x.id) > 0);
+  assert.throws(() => db.apply(f.id, [s.id, s.id], requiredAnswers(db, f.id, [s.id])), /重複/);
+  const bb = db.eventById('e-clean');
+  db.login('u-p169');
+  const potato = db.slotsOf(bb.id).find(x => x.priceYen > 0);
+  db.apply(bb.id, [potato.id], requiredAnswers(db, bb.id, [potato.id]));
+  const other = db.slotsOf(bb.id).find(x => x.priceYen === 0);
+  assert.throws(() => db.apply(bb.id, [other.id], requiredAnswers(db, bb.id, [other.id])), /支払いの途中/);
+});
+
+test('F12 F17 更新が失敗したら何も変えない。公開中は公開の条件を満たさない変更を拒否', () => {
+  const db = fresh(); db.login('u-yamada');
+  const e = db.eventById('e-bandbattle'); const end0 = e.endAt;
+  assert.throws(() => db.updateEvent(e.id, { endAt: '2026-11-08T10:00:00+09:00' }), /終了/);
+  assert.equal(db.eventById(e.id).endAt, end0);
+  assert.throws(() => db.updateEvent(e.id, { venueName: '' }), /会場/);
+  assert.equal(db.eventById(e.id).venueName, '下北沢 SHELTER');
+});
+
+test('F13 招待リンクで団体の owner になれる（期限切れ・取り消し済みは不可）', () => {
+  const db = fresh(); db.login('u-yamada');
+  const inv = db.createInvitation('o-keio');
+  db.login('u-p170');
+  db.acceptInvitation(inv.token);
+  assert.ok(db.isOwner('o-keio'));
+  assert.ok(db.t.invitations.find(i => i.id === inv.id).acceptedAt);
+  db.login('u-p171');
+  assert.throws(() => db.acceptInvitation(inv.token), /使用済み|無効/);
+});
+
+test('F14 QR 受付は owner と NMJ 運営', () => {
+  const db = fresh();
+  db.login('u-admin'); assert.equal(db.canCheckin('e-bandbattle'), true);
+  db.login('u-p172'); assert.equal(db.canCheckin('e-bandbattle'), false);
+});
+
+test('F15 複製しても質問の対象枠を引き継ぐ', () => {
+  const db = fresh(); db.login('u-yamada');
+  const copy = db.duplicateEvent('e-bandbattle');
+  const q = db.questionsOf(copy.id).find(x => x.label === '食物アレルギー');
+  const party = db.slotsOf(copy.id).find(s => s.kind === 'PARTY');
+  assert.deepEqual(q.slotIds, [party.id]);
+});
+
+test('F16 参加者のあだ名を公開する設定なら、公開ページ用の一覧が返る', () => {
+  const db = fresh(); db.login('u-yamada');
+  assert.equal(db.publicAttendees('e-bandbattle'), null);
+  db.updateEvent('e-bandbattle', { attendeeListVisibility: 'PUBLIC_NICKNAME' });
+  db.logout();
+  const list = db.publicAttendees('e-bandbattle');
+  assert.ok(list.length > 0 && list.every(p => p.displayName && p.slug && !('answers' in p)));
+});
+
+test('F18 通報の理由が「その他」なら詳細が必須', () => {
+  const db = fresh(); db.login('u-p173');
+  assert.throws(() => db.report('EVENT', 'e-run', 'OTHER', ''), /詳細/);
+  assert.ok(db.report('EVENT', 'e-run', 'OTHER', '日付が違う'));
+});
+
+test('F19 告知のお知らせから本文を引ける', () => {
+  const db = fresh(); db.login('u-yamada');
+  const an = db.sendAnnouncement('e-bandbattle', { subject: '集合場所変更', body: '西門に集合', audiences: ['ATTENDEES'] });
+  const n = db.notificationsOf().find(x => x.announcementId === an.id);
+  assert.equal(db.announcementById(n.announcementId).body, '西門に集合');
+});

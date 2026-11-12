@@ -271,12 +271,13 @@
         html: '<div class="stack"><p class="t-small t-muted">通報は NMJ 運営だけが見ます。主催者に通報者は伝わりません。</p>' +
           '<fieldset class="stack" style="border:0;padding:0;margin:0;--stack-gap:10px"><legend class="field__label">理由 <span class="req">必須</span></legend>' +
           Object.keys(L).map(function (k) { return '<label class="check"><input type="radio" name="reason" value="' + k + '">' + esc(L[k]) + '</label>'; }).join('') + '</fieldset>' +
-          '<label class="field"><span class="field__label">詳しく（任意）</span><textarea class="textarea" name="detail" maxlength="1000"></textarea></label><p class="field__error" hidden data-err></p></div>',
+          '<label class="field"><span class="field__label">詳しく（「その他」は必須）</span><textarea class="textarea" name="detail" maxlength="1000"></textarea></label><p class="field__error" hidden data-err></p></div>',
         actions: [{ label: 'やめる', value: false, kind: 'outline' }, { label: '通報する', kind: 'black', onClick: function (w) {
           var r = w.querySelector('input[name=reason]:checked');
           var err = w.querySelector('[data-err]');
           if (!r) { err.textContent = '理由を選んでください'; err.hidden = false; return false; }
-          db().report(type, targetId, r.value, w.querySelector('textarea').value);
+          try { db().report(type, targetId, r.value, w.querySelector('textarea').value); }
+          catch (e2) { err.textContent = e2.message; err.hidden = false; return false; }
         } }]
       }).then(function (v) { if (v) ui.toast('通報を受け付けました。運営が確認します'); return v; });
     },
@@ -338,6 +339,10 @@
   window.NMT.pages = PAGES;
   window.NMT.ui = ui;
   window.NMT.currentOrg = currentOrg;
+  // 別のタブで変わったら読み直す（古い状態のまま書き込まないため。画面は次の操作か再読み込みで新しくなる）
+  window.addEventListener('storage', function (ev) {
+    if (ev.key === (window.NMT.data && window.NMT.data.KEY) && db() && db().sync()) ui.toast('別のタブでの変更を読み込みました');
+  });
   window.NMT.ready = function (fn) { if (started) run(fn); else readyFns.push(fn); };
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', render);

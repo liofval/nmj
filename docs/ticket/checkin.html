@@ -28,7 +28,7 @@ NMT.ready(function (db, ui) {
     root.innerHTML = '<div class="box mg-gate"><p class="mg-gate__title">' + ui.esc(title) + '</p><p class="t-small">' + ui.esc(body) + '</p><div class="cluster">' + (actions || '') + '</div></div>';
   }
   function pickEvent() {
-    var mine = db.t.events.filter(function (e) { return db.canManageEvent(e.id) && e.status !== 'DRAFT'; }).sort(function (a, b) { return Date.parse(a.startAt) - Date.parse(b.startAt); });
+    var mine = db.t.events.filter(function (e) { return db.canCheckin(e.id) && e.status !== 'DRAFT'; }).sort(function (a, b) { return Date.parse(a.startAt) - Date.parse(b.startAt); });
     if (!mine.length) return gateBox('管理しているイベントがありません', 'あなたが owner の団体（または個人）のイベントがここに出ます。', '<a class="btn btn--black" href="' + ui.url('dashboard', { org: org && org.slug }) + '">ダッシュボードへ</a>');
     root.innerHTML = '<div class="mg-head"><div class="p-head"><div><p class="p-head__en">' + EN + '</p><h1 class="p-head__ja">' + ui.esc(JA) + '：イベントを選ぶ</h1></div></div></div>' +
       '<div class="box"><div class="stack" style="--stack-gap:0">' + mine.map(function (e) {
@@ -51,7 +51,7 @@ NMT.ready(function (db, ui) {
   if (!id) return pickEvent();
   var e = db.eventById(id);
   if (!e) return gateBox('イベントがありません', 'URL が正しいか確かめてください。', '<a class="btn btn--black" href="' + ui.url(PAGE) + '">イベントを選ぶ</a>');
-  if (!db.canManageEvent(id)) return gateBox('このページを見る権限がありません', DENY, '<a class="btn btn--outline" href="' + ui.url('event', { id: id }) + '">公開ページへ</a>');
+  if (!db.canCheckin(id)) return gateBox('このページを見る権限がありません', DENY, '<a class="btn btn--outline" href="' + ui.url('event', { id: id }) + '">公開ページへ</a>');
 
   // ---- QR で受付 ----
   var last = null; // 直前に受付した ticketId（取り消し用）

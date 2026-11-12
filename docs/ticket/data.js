@@ -276,7 +276,18 @@
     if (!t.meta.clockStartedAt) t.meta.clockStartedAt = Date.now();
     var clock = opts.clock || function () { return DEMO_NOW + Math.min(Math.max(Date.now() - t.meta.clockStartedAt, 0), CLOCK_CAP_MS); };
 
-    function save() { if (storage) storage.setItem(KEY, JSON.stringify(t)); }
+    // 別タブの変更を古い状態で上書きしないよう、書き込みの前に storage の版（meta.rev）を見て読み直す
+    if (t.meta.rev == null) t.meta.rev = 0;
+    function replaceAll(n) { Object.keys(t).forEach(function (k) { delete t[k]; }); Object.assign(t, n); }
+    function sync() {
+      if (!storage) return false;
+      var raw; try { raw = storage.getItem(KEY); } catch (e) { return false; }
+      if (!raw) return false;
+      var n; try { n = JSON.parse(raw); } catch (e) { return false; }
+      if (!n || !n.meta || n.meta.rev === t.meta.rev) return false;
+      replaceAll(n); return true;
+    }
+    function save() { t.meta.rev = (t.meta.rev || 0) + 1; if (storage) storage.setItem(KEY, JSON.stringify(t)); }
     function nowIso() { return new Date(clock()).toISOString(); }
     function id(p) { t.meta.seq += 1; return p + '-' + t.meta.seq.toString(36); }
     function fail(msg) { throw new Error(msg); }
@@ -286,7 +297,8 @@
     var db = { t: t, KEY: KEY, DEMO_NOW: DEMO_NOW, HOLD_MIN: HOLD_MIN };
     db.now = function () { return clock(); };
     db.save = save;
-    db.reset = function () { if (storage) storage.removeItem(KEY); var n = buildSeed(); Object.keys(t).forEach(function (k) { delete t[k]; }); Object.assign(t, n); t.meta.clockStartedAt = Date.now(); save(); };
+    db.sync = sync;
+    db.reset = function () { var rev = t.meta.rev || 0; if (storage) storage.removeItem(KEY); replaceAll(buildSeed()); t.meta.clockStartedAt = Date.now(); t.meta.rev = rev; purgeExpiredAnswers(); save(); };
 
     // ---- 参照 ----
     db.userById = function (uid) { return by('users', 'id', uid); };
@@ -316,6 +328,7 @@
     // ---- 定員 ----
     function expireHolds() {
       var n = clock(), changed = false;
+      if (t.payments.some(function (p) { return p.status === 'PENDING' && Date.parse(p.holdExpiresAt) < n; })) sync();
       t.payments.forEach(function (p) { if (p.status === 'PENDING' && Date.parse(p.holdExpiresAt) < n) { p.status = 'EXPIRED'; p.answersDraft = null; changed = true; } });
       if (changed) save();
     }
@@ -487,6 +500,8 @@
       if (e.status !== 'PUBLISHED') fail('このイベントは申し込めません');
       if (db.isStarted(e)) fail('開始後は申し込めません');
       if (!slotIds.length) fail('参加枠を選んでください');
+      if (new Set(slotIds).size !== slotIds.length) fail('同じ参加枠が重複しています');
+      if (t.payments.some(function (p) { return p.status === 'PENDING' && p.userId === uid && p.eventId === e.id; })) fail('このイベントは支払いの途中です。先に支払いを済ませるか、やめてください');
       var slots = slotIds.map(function (sid) { var s = need(db.slotById(sid), '枠がありません'); if (s.eventId !== e.id) fail('枠がイベントと合いません'); return s; });
       slots.forEach(function (s) {
         var st = slotOpenState(s);
@@ -546,9 +561,10 @@
       if (p.status === 'PAID') return { kind: 'confirmed', ticketId: (t.tickets.find(function (x) { return x.eventId === p.eventId && x.userId === p.userId; }) || {}).id };
       if (p.status === 'EXPIRED') fail('支払いの期限が切れました。もう一度申し込んでください');
       if (p.status !== 'PENDING') fail('この決済はすでに終わっています');
+      var e = db.eventById(p.eventId);
+      if (e.status !== 'PUBLISHED') { p.status = 'EXPIRED'; p.answersDraft = null; save(); fail('このイベントは中止されたため、支払いを受け付けられません'); }
       if (!success) { p.status = 'FAILED'; p.failureReason = reason || 'カードが承認されませんでした'; save(); return { kind: 'failed' }; }
       p.status = 'PAID'; p.paidAt = nowIso();
-      var e = db.eventById(p.eventId);
       var tk = confirm(p.userId, e, p.slotIds.map(db.slotById), p.answersDraft || {}, p.id);
       p.answersDraft = null; save();
       return { kind: 'confirmed', ticketId: tk.id };
@@ -556,17 +572,31 @@
     // 失敗した決済をやり直す（回答は引き継ぐ）
     db.retryPayment = function (pid) {
       var p = need(by('payments', 'id', pid), '決済が見つかりません');
+      if (p.userId !== me().id) fail('権限がありません');
       if (p.status !== 'FAILED') fail('やり直せる決済ではありません');
       return db.apply(p.eventId, p.slotIds, p.answersDraft || {});
     };
-    db.cancelPayment = function (pid) { var p = by('payments', 'id', pid); if (p && p.status === 'PENDING') { p.status = 'EXPIRED'; p.answersDraft = null; save(); } };
+    db.cancelPayment = function (pid) {
+      var u = me(), p = need(by('payments', 'id', pid), '決済が見つかりません');
+      if (p.userId !== u.id) fail('権限がありません');
+      if (p.status === 'PENDING') { p.status = 'EXPIRED'; p.answersDraft = null; save(); }
+    };
     db.cancelRegistration = function (regId) {
       var u = me(), r = need(by('registrations', 'id', regId), '申込がありません');
       if (r.userId !== u.id) fail('権限がありません');
       var e = db.eventById(db.slotById(r.slotId).eventId);
       if (db.isStarted(e)) fail('開始後はキャンセルできません');
       r.status = 'CANCELLED'; r.cancelledAt = nowIso();
-      if (!db.registrationsOfTicket(r.ticketId).length) db.ticketById(r.ticketId).revokedAt = nowIso();
+      var rest = db.registrationsOfTicket(r.ticketId);
+      if (!rest.length) db.ticketById(r.ticketId).revokedAt = nowIso();
+      else {
+        // 全枠共通の回答は残った申込へ移す（対象枠つきの回答は取り消した枠と一緒に残す）
+        t.answers.forEach(function (a) {
+          if (a.registrationId !== r.id) return;
+          var q = by('questions', 'id', a.questionId);
+          if (q && !q.slotIds.length) a.registrationId = rest[0].id;
+        });
+      }
       save(); return r;
     };
     // マイページ用: 自分のチケット（イベント・枠・支払いをまとめたもの）
@@ -621,6 +651,16 @@
       var inv = { id: id('inv'), organizerId: oid, role: 'OWNER', token: tokenFrom(oid + nowIso() + t.meta.seq), expiresAt: new Date(clock() + 7 * 86400e3).toISOString(), createdById: me().id, acceptedById: null, acceptedAt: null, revokedAt: null, createdAt: nowIso() };
       t.invitations.push(inv); save(); return inv;
     };
+    db.invitationByToken = function (token) { return by('invitations', 'token', token); };
+    db.acceptInvitation = function (token) {
+      var u = me(), inv = by('invitations', 'token', token);
+      if (!inv || inv.revokedAt) fail('この招待リンクは無効です');
+      if (inv.acceptedAt) fail('この招待リンクは使用済みです');
+      if (Date.parse(inv.expiresAt) < clock()) fail('この招待リンクは期限切れです');
+      if (!t.organizerMembers.some(function (m) { return m.organizerId === inv.organizerId && m.userId === u.id; })) t.organizerMembers.push({ organizerId: inv.organizerId, userId: u.id, role: inv.role, invitedAt: inv.createdAt, joinedAt: nowIso() });
+      inv.acceptedById = u.id; inv.acceptedAt = nowIso();
+      save(); return db.organizerById(inv.organizerId);
+    };
     db.leaveGroup = function (oid) {
       var u = me();
       var owners = db.membersOf(oid).filter(function (m) { return m.role === 'OWNER'; });
@@ -641,24 +681,42 @@
       });
       save(); return db.eventById(eid);
     };
+    // 変更は写しで検証してから反映する（失敗したら何も変えない）
     db.updateEvent = function (eid, patch) {
-      var e = ownerOf(eid);
+      var e = ownerOf(eid), next = Object.assign({}, e);
       ['title', 'body', 'genreId', 'area', 'capacity', 'startAt', 'endAt', 'venueType', 'venueName', 'address', 'onlineUrl', 'coverUrl', 'attendeeListVisibility', 'answerRetentionDays', 'dataUsePurpose'].forEach(function (k) {
-        if (patch[k] !== undefined) e[k] = (k === 'startAt' || k === 'endAt') && patch[k] ? iso(patch[k]) : patch[k];
+        if (patch[k] !== undefined) next[k] = (k === 'startAt' || k === 'endAt') && patch[k] ? iso(patch[k]) : patch[k];
       });
-      if ([30, 90, 365].indexOf(Number(e.answerRetentionDays)) < 0) fail('回答の保存期間は 30 / 90 / 365 日から選んでください');
-      if (Date.parse(e.endAt) < Date.parse(e.startAt)) fail('終了は開始より後にしてください');
-      e.updatedAt = nowIso(); save(); return e;
+      if (next.capacity === '' || next.capacity === 0) next.capacity = null;
+      if (next.capacity != null) {
+        next.capacity = Number(next.capacity);
+        if (!(next.capacity >= 1) || Math.floor(next.capacity) !== next.capacity) fail('参加者の上限は1以上の整数にしてください');
+        if (next.capacity < db.eventTaken(eid)) fail('参加者の上限は参加予定と支払い中の人数（' + db.eventTaken(eid) + '）を下回れません');
+      }
+      next.answerRetentionDays = Number(next.answerRetentionDays);
+      if ([30, 90, 365].indexOf(next.answerRetentionDays) < 0) fail('回答の保存期間は 30 / 90 / 365 日から選んでください');
+      if (Date.parse(next.endAt) < Date.parse(next.startAt)) fail('終了は開始より後にしてください');
+      if (next.status === 'PUBLISHED') {
+        var errs = publishErrorsOf(next).filter(function (m) { return m.indexOf('開始日時') < 0; });
+        if (errs.length) fail('公開中のイベントです：' + errs.join(' / '));
+      }
+      Object.assign(e, next); e.updatedAt = nowIso(); save(); return e;
     };
+    function checkSlotValues(name, capacity, price) {
+      if (!name || !String(name).trim()) fail('枠名を入れてください');
+      if (!(Number(capacity) >= 1) || Math.floor(Number(capacity)) !== Number(capacity)) fail('定員は1以上の整数にしてください');
+      if (!(Number(price) >= 0) || Math.floor(Number(price)) !== Number(price)) fail('価格は0円以上の整数にしてください');
+    }
     db.addSlot = function (eid, s) {
       ownerOf(eid);
-      if (!s.name || !(s.capacity > 0)) fail('枠名と定員を入れてください');
+      checkSlotValues(s.name, s.capacity, s.priceYen || 0);
       var slot = { id: id('s'), eventId: eid, kind: s.kind || 'STUDENT', name: s.name, description: s.description || null, capacity: Number(s.capacity), priceYen: Number(s.priceYen || 0), opensAt: s.opensAt || null, closesAt: s.closesAt || null, sortOrder: db.slotsOf(eid).length };
       t.slots.push(slot); save(); return slot;
     };
     db.updateSlot = function (sid, patch) {
       var s = need(db.slotById(sid), '枠がありません'); ownerOf(s.eventId);
-      if (patch.capacity != null && Number(patch.capacity) < t.registrations.filter(function (r) { return r.slotId === sid && r.status === 'CONFIRMED'; }).length) fail('定員は申込済みの人数より少なくできません');
+      checkSlotValues(patch.name !== undefined ? patch.name : s.name, patch.capacity != null ? patch.capacity : s.capacity, patch.priceYen != null ? patch.priceYen : s.priceYen);
+      if (patch.capacity != null && Number(patch.capacity) < db.slotTaken(sid)) fail('定員は参加予定と支払い中の人数（' + db.slotTaken(sid) + '）を下回れません');
       ['kind', 'name', 'description', 'capacity', 'priceYen', 'opensAt', 'closesAt'].forEach(function (k) { if (patch[k] !== undefined) s[k] = (k === 'capacity' || k === 'priceYen') ? Number(patch[k]) : patch[k]; });
       save(); return s;
     };
@@ -680,8 +738,9 @@
       if (e.status !== 'DRAFT') fail('公開後は質問を削除できません');
       t.questions = t.questions.filter(function (x) { return x.id !== qid; }); db.t = t; save();
     };
-    db.publishErrors = function (eid) {
-      var e = db.eventById(eid), errs = [];
+    db.publishErrors = function (eid) { return publishErrorsOf(db.eventById(eid)); };
+    function publishErrorsOf(e) {
+      var eid = e.id, errs = [];
       if (!e.title || !e.title.trim()) errs.push('タイトルを入れてください');
       if (!db.slotsOf(eid).length) errs.push('参加枠を1つ以上作ってください');
       if (e.venueType === 'OFFLINE' && !e.venueName) errs.push('会場を入れてください');
@@ -689,7 +748,7 @@
       if (db.questionsOf(eid).some(function (q) { return q.isPersonalData; }) && !(e.dataUsePurpose && e.dataUsePurpose.trim())) errs.push('個人情報の利用目的を入れてください');
       if (Date.parse(e.startAt) <= clock()) errs.push('開始日時を未来にしてください');
       return errs;
-    };
+    }
     db.publishEvent = function (eid) {
       var e = ownerOf(eid), errs = db.publishErrors(eid);
       if (errs.length) fail(errs.join(' / '));
@@ -706,8 +765,9 @@
     db.duplicateEvent = function (eid) {
       var src = ownerOf(eid);
       var e = db.createEvent(src.organizerId, { title: src.title + '（コピー）', genreId: src.genreId, area: src.area, capacity: src.capacity, body: src.body, venueType: src.venueType, venueName: src.venueName, address: src.address, coverUrl: src.coverUrl, dataUsePurpose: src.dataUsePurpose, answerRetentionDays: src.answerRetentionDays });
-      db.slotsOf(eid).forEach(function (s) { db.addSlot(e.id, { kind: s.kind, name: s.name, description: s.description, capacity: s.capacity, priceYen: s.priceYen }); });
-      db.questionsOf(eid).filter(function (q) { return !q.commonKey; }).forEach(function (q) { db.addQuestion(e.id, { label: q.label, helpText: q.helpText, type: q.type, options: q.options, required: q.required, isPersonalData: q.isPersonalData }); });
+      var map = {};
+      db.slotsOf(eid).forEach(function (s) { map[s.id] = db.addSlot(e.id, { kind: s.kind, name: s.name, description: s.description, capacity: s.capacity, priceYen: s.priceYen }).id; });
+      db.questionsOf(eid).filter(function (q) { return !q.commonKey; }).forEach(function (q) { db.addQuestion(e.id, { label: q.label, helpText: q.helpText, type: q.type, options: q.options, required: q.required, isPersonalData: q.isPersonalData, slotIds: q.slotIds.map(function (x) { return map[x]; }).filter(Boolean) }); });
       return e;
     };
     db.cancelEvent = function (eid, reason) {
@@ -719,6 +779,8 @@
         t.notifications.push({ id: id('n'), userId: x.userId, toEmail: u.email, type: 'EVENT_CANCELLED', title: e.title + ' は中止になりました', readAt: null, status: 'SENT', eventId: eid, registrationId: null, announcementId: null, createdAt: nowIso(), sentAt: nowIso() });
       });
       t.payments.filter(function (p) { return p.eventId === eid && p.status === 'PAID'; }).forEach(function (p) { p.status = 'REFUNDED'; p.refundedAt = nowIso(); });
+      t.payments.filter(function (p) { return p.eventId === eid && p.status === 'PENDING'; }).forEach(function (p) { p.status = 'EXPIRED'; p.answersDraft = null; });
+      t.tickets.filter(function (x) { return x.eventId === eid && !x.revokedAt; }).forEach(function (x) { x.revokedAt = nowIso(); });
       save(); return e;
     };
     db.canTransfer = function (eid) {
@@ -736,6 +798,15 @@
     };
     db.answersDeleteAt = function (eid) { var e = db.eventById(eid); return new Date(Date.parse(e.endAt) + e.answerRetentionDays * 86400e3).toISOString(); };
     db.answersExpired = function (eid) { return Date.parse(db.answersDeleteAt(eid)) <= clock(); };
+    // 保存期間を過ぎた回答を消す（本番は Cron。プロトタイプは読み込み時）
+    function purgeExpiredAnswers() {
+      var dead = {};
+      t.events.forEach(function (e) { if (db.answersExpired(e.id)) dead[e.id] = 1; });
+      var regEvent = {}; t.slots.forEach(function (s) { regEvent[s.id] = s.eventId; });
+      var before = t.answers.length;
+      t.answers = t.answers.filter(function (a) { var r = by('registrations', 'id', a.registrationId); return !(r && dead[regEvent[r.slotId]]); });
+      return before !== t.answers.length;
+    }
     db.checkinLogsOf = function (eid) {
       var ids = {}; t.tickets.forEach(function (x) { if (x.eventId === eid) ids[x.id] = 1; });
       return t.checkinLogs.filter(function (l) { return ids[l.ticketId]; }).sort(function (a, b) { return Date.parse(b.changedAt) - Date.parse(a.changedAt); });
@@ -773,11 +844,13 @@
       x.checkinStatus = status; x.checkedInAt = status === 'CHECKED_IN' ? nowIso() : null;
       save(); return x;
     };
+    db.canCheckin = function (eid) { var e = db.eventById(eid); return !!e && (db.isOwner(e.organizerId) || db.isAdmin()); };
     // QR 読み取り: { ticket, already } を返す
     db.checkinByToken = function (token, eventId) {
       var x = t.tickets.find(function (k) { return k.token === String(token).trim(); });
       if (!x) fail('このイベントのチケットではありません');
       if (eventId && x.eventId !== eventId) fail('別のイベントのチケットです');
+      if (db.eventById(x.eventId).status === 'CANCELLED') fail('中止したイベントのチケットです');
       if (x.revokedAt) fail('キャンセル済みのチケットです');
       var already = x.checkinStatus === 'CHECKED_IN';
       if (!already) db.setCheckin(x.id, 'CHECKED_IN', 'QR');
@@ -797,7 +870,8 @@
       });
       t.exportLogs.push({ id: id('ex'), eventId: e.id, userId: me().id, includeAnswers: !!includeAnswers, includeWaitlist: false, exportedAt: nowIso() });
       save();
-      return rows.map(function (r) { return r.map(function (c) { c = String(c); return /[",\n]/.test(c) ? '"' + c.replace(/"/g, '""') + '"' : c; }).join(','); }).join('\n');
+      // 表計算ソフトで数式にならないよう、= + - @ タブ 改行 で始まるセルは ' を付ける（OWASP CSV Injection）
+      return rows.map(function (r) { return r.map(function (c) { c = String(c); if (/^[=+\-@\t\r]/.test(c)) c = "'" + c; return /[",\n\r]/.test(c) ? '"' + c.replace(/"/g, '""') + '"' : c; }).join(','); }).join('\n');
     };
     db.announceAudience = function (eid, audiences) {
       var to = {};
@@ -820,6 +894,13 @@
       });
       save(); return an;
     };
+    db.announcementById = function (aid) { return by('announcements', 'id', aid); };
+    // 参加者のあだ名を公開する設定のときだけ、公開ページ用の一覧（あだ名と @ だけ）。非公開なら null
+    db.publicAttendees = function (eid) {
+      var e = db.eventById(eid);
+      if (!e || e.attendeeListVisibility !== 'PUBLIC_NICKNAME') return null;
+      return t.tickets.filter(function (x) { return x.eventId === eid && !x.revokedAt; }).map(function (x) { var o = db.personalOrganizer(x.userId); return { displayName: o.displayName, slug: o.slug }; });
+    };
     db.announcementsOf = function (eid) { return t.announcements.filter(function (a) { return a.eventId === eid; }).sort(function (a, b) { return Date.parse(b.sentAt) - Date.parse(a.sentAt); }); };
 
     // ---- お知らせ ----
@@ -830,6 +911,7 @@
     db.report = function (type, targetId, reason, detail) {
       var u = me();
       if (['FRAUD', 'INAPPROPRIATE', 'PERSONAL_DATA_ABUSE', 'OTHER'].indexOf(reason) < 0) fail('通報の理由を選んでください');
+      if (reason === 'OTHER' && !(detail && String(detail).trim())) fail('「その他」の場合は詳細を書いてください');
       if (type === 'EVENT') need(db.eventById(targetId), '対象がありません'); else need(db.organizerById(targetId), '対象がありません');
       var r = { id: id('rp'), reporterUserId: u.id, targetType: type, targetId: targetId, reason: reason, detail: detail || null, status: 'OPEN', createdAt: nowIso(), resolvedAt: null, resolvedById: null, resolution: null };
       t.reports.push(r);
@@ -851,6 +933,15 @@
       var o = db.organizerById(r.targetId); return o ? o.displayName + ' @' + o.slug : '（削除済み）';
     };
 
+    // 書き込む操作は、先に別タブの変更を読み直す
+    ['login', 'logout', 'createUser', 'updateProfile', 'setEmailPreference', 'toggleFollow', 'setFollowNotify', 'toggleSave', 'apply', 'completePayment', 'retryPayment', 'cancelPayment', 'cancelRegistration',
+     'createGroup', 'requestJoin', 'decideJoin', 'updateGroup', 'createInvitation', 'acceptInvitation', 'leaveGroup', 'createEvent', 'updateEvent', 'addSlot', 'updateSlot', 'removeSlot', 'addQuestion', 'removeQuestion',
+     'publishEvent', 'duplicateEvent', 'cancelEvent', 'transferEvent', 'setCheckin', 'checkinByToken', 'exportCsv', 'sendAnnouncement', 'markRead', 'report', 'resolveReport'].forEach(function (name) {
+      var f = db[name];
+      db[name] = function () { sync(); return f.apply(db, arguments); };
+    });
+
+    purgeExpiredAnswers();
     expireHolds();
     save();
     return db;
