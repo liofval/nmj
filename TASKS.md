@@ -7,3 +7,4 @@
 | 3 | 〔担当:nanase-shigeta〕Figma「NMJ Ticket｜PC」の全10画面を HTML のチケットサイトにする（`docs/ticket/`）。Gonmura 関連は一切使わない（追加:nanase-shigeta）（ユーザー待ち: push の可否） | 2026-11-05 ユーザー依頼 |
 | 4 | ~~〔担当:nanase-shigeta〕チケットサイト全ページのプロトタイプを作る。wireframes の画面構成・schema.prisma の DB を土台に、見た目は Figma に寄せ、HTML で動く形・%/vh 中心のレスポンシブに（追加:nanase-shigeta）~~ → **`docs/ticket/` 25画面・data.js（テスト45件）・review 合格（2026-11-12）。push はユーザー待ち** | 2026-11-09・11-12 ユーザー依頼 |
 | 5 | ~~〔担当:nanase-shigeta〕ブランド構造図（創業者の理念／ブランドの人格〈便益・属性〉／態度・期待）に合わせて NMJ を整理・言語化する（追加:nanase-shigeta）~~ → **整理案を作成（2026-11-12・価値観と属性の数字は太田さん確認待ち）** | 2026-11-12 ユーザー依頼（図の共有） |
+| 6 | 〔担当:nanase-shigeta〕NMJ の自由企画「365日の日記の本」（1日1人・時代や年齢を超えて、誰かの人生のある1日の日記を集める）を grill-me で詰め、企画書にする（追加:nanase-shigeta） | 2026-11-12 ユーザー依頼 |
