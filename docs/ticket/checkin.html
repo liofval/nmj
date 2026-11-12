@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>QR で受付｜NEXT MOVE TICKETS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Noto+Sans+JP:wght@400;500;700;900&family=DM+Mono:wght@400;500&family=Instrument+Serif:ital@1&family=Barlow+Condensed:wght@700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="org.css">
+<link rel="stylesheet" href="manage.css">
+<script src="data.js"></script>
+<script src="common.js"></script>
+</head>
+<body class="org-page ci-page">
+<div data-header="org" data-active="events"></div>
+<main id="main"><div class="wrap" id="root"></div></main>
+<div data-footer></div>
+<script>
+NMT.ready(function (db, ui) {
+  var f = NMT.fmt, L = NMT.LABEL, root = document.getElementById('root');
+  var id = ui.param('id'), org = NMT.currentOrg();
+  var PAGE = 'checkin', EN = 'CHECK-IN', JA = 'QR で受付', DENY = 'このイベントの主催者（owner）だけが受付できます。';
+
+  // ---- 共通: 見出し・権限 ----
+  function gateBox(title, body, actions) {
+    root.innerHTML = '<div class="box mg-gate"><p class="mg-gate__title">' + ui.esc(title) + '</p><p class="t-small">' + ui.esc(body) + '</p><div class="cluster">' + (actions || '') + '</div></div>';
+  }
+  function pickEvent() {
+    var mine = db.t.events.filter(function (e) { return db.canManageEvent(e.id) && e.status !== 'DRAFT'; }).sort(function (a, b) { return Date.parse(a.startAt) - Date.parse(b.startAt); });
+    if (!mine.length) return gateBox('管理しているイベントがありません', 'あなたが owner の団体（または個人）のイベントがここに出ます。', '<a class="btn btn--black" href="' + ui.url('dashboard', { org: org && org.slug }) + '">ダッシュボードへ</a>');
+    root.innerHTML = '<div class="mg-head"><div class="p-head"><div><p class="p-head__en">' + EN + '</p><h1 class="p-head__ja">' + ui.esc(JA) + '：イベントを選ぶ</h1></div></div></div>' +
+      '<div class="box"><div class="stack" style="--stack-gap:0">' + mine.map(function (e) {
+        return '<a class="an-item" href="' + ui.url(PAGE, { id: e.id }) + '"><span class="an-item__subject">' + ui.esc(e.title) + '</span><span class="an-item__meta">' + f.card(e.startAt) + ' · ' + ui.esc(db.organizerById(e.organizerId).displayName) + '</span></a>';
+      }).join('') + '</div></div>';
+  }
+  function head(e, compact) {
+    var o = db.organizerById(e.organizerId);
+    var tabs = [['attendees', '参加者・受付'], ['checkin', 'QR で受付'], ['announce', '告知'], ['transfer', '移管']];
+    return '<div class="mg-head">' +
+      '<a class="p-back" href="' + ui.url('dashboard', { org: o.slug }) + '">← ダッシュボード</a>' +
+      (compact ? '' : '<div class="p-head"><div><p class="p-head__en">' + EN + '</p><h1 class="p-head__ja">' + ui.esc(JA) + '</h1></div></div>') +
+      '<div class="mg-event"><p class="mg-event__title">' + ui.esc(e.title) + '</p><p class="mg-event__meta">' + f.card(e.startAt) + ' · ' + ui.esc(e.venueName || 'オンライン') + ' · ' + ui.esc(o.displayName) + (e.status === 'CANCELLED' ? ' · 中止' : '') + '</p></div>' +
+      '</div>' +
+      '<nav class="tabs mg-tabs" aria-label="イベントの管理">' + tabs.map(function (t) {
+        return '<a class="tabs__item' + (t[0] === PAGE ? ' is-active' : '') + '" href="' + ui.url(t[0], { id: e.id }) + '"' + (t[0] === PAGE ? ' aria-current="page"' : '') + '>' + t[1] + '</a>';
+      }).join('') + '<a class="tabs__item" href="' + ui.url('event', { id: e.id }) + '">公開ページ</a></nav>';
+  }
+  if (!ui.requireLogin()) return;
+  if (!id) return pickEvent();
+  var e = db.eventById(id);
+  if (!e) return gateBox('イベントがありません', 'URL が正しいか確かめてください。', '<a class="btn btn--black" href="' + ui.url(PAGE) + '">イベントを選ぶ</a>');
+  if (!db.canManageEvent(id)) return gateBox('このページを見る権限がありません', DENY, '<a class="btn btn--outline" href="' + ui.url('event', { id: id }) + '">公開ページへ</a>');
+
+  // ---- QR で受付 ----
+  var last = null; // 直前に受付した ticketId（取り消し用）
+  function who(tk) {
+    var p = db.profileOf(tk.userId);
+    var slots = db.registrationsOfTicket(tk.id).map(function (r) { return db.slotById(r.slotId).name; }).join('＋');
+    return { name: p.displayName, slug: p.slug, slots: slots };
+  }
+  function show(kind, title, sub, tk, actions) {
+    var w = tk ? who(tk) : null;
+    document.getElementById('ci-result').className = 'ci-result' + (kind ? ' ci-result--' + kind : '');
+    document.getElementById('ci-result').innerHTML =
+      '<p class="ci-result__label">' + ({ ok: 'CHECKED IN', warn: 'ALREADY', ng: 'ERROR' }[kind] || 'READY') + '</p>' +
+      '<p class="ci-result__title">' + ui.esc(title) + '</p>' +
+      (w ? '<p class="ci-result__who">' + ui.esc(w.name) + ' <span class="t-small">@' + ui.esc(w.slug) + '</span></p><p class="ci-result__sub">' + ui.esc(w.slots) + '</p>' : '') +
+      (sub ? '<p class="ci-result__sub">' + ui.esc(sub) + '</p>' : '') +
+      (actions || '');
+  }
+  function read(token) {
+    if (!String(token || '').trim()) { show('ng', 'token を入れてください', 'QR の下に出ている英数字、または読み取った文字列を貼り付けます。'); return; }
+    try {
+      var r = db.checkinByToken(token, id);
+      if (r.already) { last = null; show('warn', '受付済みです', f.hm(r.ticket.checkedInAt || db.now()) + ' に受付済み', r.ticket); }
+      else {
+        last = r.ticket.id;
+        show('ok', '受付しました', f.hm(r.ticket.checkedInAt) + ' に受付', r.ticket,
+          '<div class="cluster"><button type="button" class="btn btn--outline btn--sm" data-undo>取り消す</button><button type="button" class="btn btn--black btn--sm" data-next>次を読む</button></div>');
+      }
+    } catch (err) {
+      last = null;
+      show('ng', err.message, /別のイベント/.test(err.message) ? 'このイベントの QR チケットか確かめてください。' : /キャンセル/.test(err.message) ? '申込がキャンセルされたチケットです。参加者に申込の状態を確かめてもらってください。' : 'QR を読み直すか、参加者リストで受付してください。');
+    }
+    document.getElementById('ci-token').value = '';
+    refresh();
+  }
+  function refresh() {
+    var s = db.checkinSummary(id);
+    document.getElementById('ci-stats').innerHTML =
+      '<div class="mg-stat mg-stat--mint"><p class="mg-stat__label">受付済</p><p class="mg-stat__num">' + s.CHECKED_IN + '<small>/ ' + s.total + '</small></p></div>' +
+      '<div class="mg-stat"><p class="mg-stat__label">未受付</p><p class="mg-stat__num">' + s.NOT_CHECKED_IN + '</p></div>' +
+      '<div class="mg-stat"><p class="mg-stat__label">欠席</p><p class="mg-stat__num">' + s.ABSENT + '</p></div>';
+    var logs = db.t.checkinLogs.filter(function (l) { var tk = db.ticketById(l.ticketId); return tk && tk.eventId === id; })
+      .sort(function (a, b) { return Date.parse(b.changedAt) - Date.parse(a.changedAt); }).slice(0, 8);
+    document.getElementById('ci-log').innerHTML = logs.length ? logs.map(function (l) {
+      var p = db.profileOf(db.ticketById(l.ticketId).userId);
+      return '<div class="ci-log__item"><span class="ci-log__who">' + ui.esc(p.displayName) + ' <span class="t-small t-muted">@' + ui.esc(p.slug) + '</span></span>' +
+        '<span class="ci-log__sub">' + L.CheckinStatus[l.fromStatus] + ' → ' + L.CheckinStatus[l.toStatus] + ' · ' + (l.method === 'QR' ? 'QR' : 'リスト') + ' · ' + f.hm(l.changedAt) + '</span></div>';
+    }).join('') : '<p class="t-small t-muted" style="padding:12px 0">まだ受付の記録がありません</p>';
+    document.getElementById('ci-demo').disabled = !db.attendees(id).some(function (a) { return a.ticket.checkinStatus === 'NOT_CHECKED_IN'; });
+  }
+
+  root.innerHTML = head(e, true) +
+    '<div class="ci">' +
+      '<div class="ci-result" id="ci-result" aria-live="polite"></div>' +
+      '<form class="ci-form" id="ci-form" autocomplete="off"><label class="sr-only" for="ci-token">QR の token</label>' +
+        '<input class="input" id="ci-token" placeholder="QR の token を入力／貼り付け" inputmode="latin" autocapitalize="off" spellcheck="false">' +
+        '<button type="submit" class="btn btn--black">受付する</button></form>' +
+      '<button type="button" class="btn btn--coral ci-demo" id="ci-demo">デモ：未受付の人の QR を読んだことにする</button>' +
+      '<p class="t-small t-muted">本番はスマホのカメラで QR を読み取ります。読めないときは <a class="textlink" href="' + ui.url('attendees', { id: id }) + '">参加者リストで受付</a> してください。</p>' +
+      '<div class="mg-stats" id="ci-stats" aria-label="受付の集計"></div>' +
+      '<div><p class="box__title" style="margin-bottom:8px">直近の受付</p><div class="ci-log" id="ci-log"></div></div>' +
+    '</div>';
+  show('', 'QR を読み取ってください', '受付すると、ここに結果が大きく出ます。');
+  refresh();
+
+  document.getElementById('ci-form').addEventListener('submit', function (ev) { ev.preventDefault(); read(document.getElementById('ci-token').value); });
+  document.getElementById('ci-demo').addEventListener('click', function () {
+    var a = db.attendees(id).filter(function (x) { return x.ticket.checkinStatus === 'NOT_CHECKED_IN'; }).pop();
+    if (a) read(a.ticket.token);
+  });
+  root.addEventListener('click', function (ev) {
+    if (ev.target.closest('[data-undo]') && last) {
+      try { var tk = db.setCheckin(last, 'NOT_CHECKED_IN', 'MANUAL'); show('', '取り消しました', '未受付に戻しました', tk); ui.toast('未受付に戻しました'); last = null; } catch (err) { ui.toast(err.message); }
+      refresh();
+    }
+    if (ev.target.closest('[data-next]')) { show('', 'QR を読み取ってください', ''); document.getElementById('ci-token').focus(); }
+  });
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,122 @@
+/* =========================================================
+   NEXT MOVE TICKETS — 当日の受付・告知・移管・運営（18 参加者リスト / 18b QR で受付 / 19 告知 / 20 移管 / 22 通報）
+   style.css・org.css の後に読み込む。トークンは style.css のものを使う。
+   ========================================================= */
+
+/* ---------- 共通: イベントの見出しとサブナビ ---------- */
+.mg-head { display: flex; flex-direction: column; gap: 8px; padding-top: clamp(20px, 2.2vw, 32px); }
+.mg-head .p-head { padding-top: 4px; }
+.mg-event { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.mg-event__title { font-weight: 900; font-size: clamp(20px, 2.2vw, 32px); line-height: 1.35; overflow-wrap: anywhere; }
+.mg-event__meta { font-size: 13px; line-height: 1.6; color: var(--color-muted); }
+.mg-tabs { margin-bottom: clamp(20px, 2.2vw, 32px); }
+.mg-tabs .tabs__item { color: var(--color-black); }
+.mg-body { display: flex; flex-direction: column; gap: clamp(16px, 1.7vw, 24px); }
+
+/* 権限なし・対象なし */
+.mg-gate { display: flex; flex-direction: column; align-items: flex-start; gap: 16px; margin-top: clamp(32px, 4vw, 56px); }
+.mg-gate__title { font-weight: 700; font-size: var(--h2); line-height: 1.45; }
+
+/* 数字の並び（受付の集計など） */
+.mg-stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+.mg-stat { display: flex; flex-direction: column; gap: 6px; padding: clamp(14px, 1.4vw, 20px) clamp(16px, 1.7vw, 24px); background: var(--color-white); min-width: 0; }
+.mg-stat__label { font-weight: 700; font-size: 13px; line-height: normal; }
+.mg-stat__num { font-family: var(--font-display); font-size: clamp(32px, 3.9vw, 56px); line-height: 1; }
+.mg-stat__num small { font-size: .45em; margin-left: 4px; }
+.mg-stat--mint { background: var(--color-mint); }
+.mg-stat--coral { background: var(--color-coral); }
+
+/* ---------- 18 参加者リスト ---------- */
+.att-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.att-tools .input { flex: 1 1 280px; min-width: 0; }
+.att-tools .select { width: auto; flex: 0 1 220px; min-width: 0; }
+.att-meta { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 16px; font-size: 13px; }
+.att-meta__count { font-weight: 700; font-size: 15px; }
+.att-list { background: var(--color-white); }
+.att-table td { vertical-align: top; }
+.att-table tr.is-open td { background: var(--color-gray-100); }
+.att-name { font-weight: 700; }
+.att-slug { font-size: 12px; color: var(--color-muted); }
+.att-open { font-size: 13px; }
+.att-answers { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 6px 20px; font-size: 13px; line-height: 1.6; padding: 4px 0 8px; white-space: normal; }
+.att-answers dt { color: var(--color-muted); }
+.att-answers dd { margin: 0; overflow-wrap: anywhere; }
+.att-cards { display: none; }
+.att-card { display: flex; flex-direction: column; gap: 10px; padding: 16px; border-top: 1px solid var(--color-line); }
+.att-card:first-child { border-top: 0; }
+.att-card.is-checked { background: var(--color-gray-100); }
+.att-card__top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.att-card__sub { font-size: 12px; line-height: 1.6; color: var(--color-muted); }
+.att-card__row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; }
+
+/* ---------- 18b QR で受付（スマホ前提） ---------- */
+.ci-page main { min-height: 100vh; min-height: 100svh; }
+.ci { display: flex; flex-direction: column; gap: 16px; width: min(720px, 100%); margin: 0 auto; }
+.ci-result {
+  display: flex; flex-direction: column; justify-content: center; gap: 8px;
+  min-height: clamp(200px, 34vh, 360px); padding: clamp(20px, 3vw, 36px);
+  border: 1.5px solid var(--color-black); background: var(--color-white);
+}
+.ci-result__label { font-family: var(--font-mono); font-size: 12px; letter-spacing: .06em; text-transform: uppercase; }
+.ci-result__title { font-weight: 900; font-size: clamp(28px, 7.5vw, 48px); line-height: 1.2; }
+.ci-result__who { font-weight: 700; font-size: clamp(18px, 4.5vw, 24px); line-height: 1.4; overflow-wrap: anywhere; }
+.ci-result__sub { font-size: 14px; line-height: 1.6; }
+.ci-result--ok { background: var(--color-mint); }
+.ci-result--warn { background: var(--color-pink); }
+.ci-result--ng { background: var(--color-coral); }
+.ci-result .cluster { margin-top: 8px; }
+.ci-form { display: flex; gap: 8px; }
+.ci-form .input { flex: 1 1 auto; min-width: 0; font-family: var(--font-mono); font-size: 16px; }
+.ci-form .input::placeholder { font-family: var(--font-jp); font-size: 14px; }
+.ci-form .btn { flex-shrink: 0; padding: 0 20px; }
+.ci-demo { width: 100%; justify-content: center; min-height: 56px; }
+.ci .mg-stats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.ci-log { background: var(--color-white); padding: 4px 16px; }
+.ci-log__item { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 0; border-top: 1px solid var(--color-line); font-size: 14px; line-height: 1.5; }
+.ci-log__item:first-child { border-top: 0; }
+.ci-log__who { font-weight: 700; min-width: 0; overflow-wrap: anywhere; }
+.ci-log__sub { font-size: 12px; color: var(--color-muted); white-space: nowrap; }
+
+/* ---------- 19 告知配信 ---------- */
+.an-history { display: flex; flex-direction: column; }
+.an-item { display: flex; flex-direction: column; gap: 4px; padding: 14px 0; border-top: 1px solid var(--color-line); }
+.an-item:first-child { border-top: 0; padding-top: 0; }
+.an-item__subject { font-weight: 700; font-size: 15px; line-height: 1.5; overflow-wrap: anywhere; }
+.an-item__meta { font-size: 12px; line-height: 1.6; color: var(--color-muted); }
+.an-item__body { font-size: 13px; line-height: 1.7; white-space: pre-wrap; overflow-wrap: anywhere; }
+.an-preview { padding: 16px; background: var(--color-gray-100); white-space: pre-wrap; overflow-wrap: anywhere; font-size: 14px; line-height: 1.7; }
+
+/* ---------- 20 移管 ---------- */
+.tr-current { display: flex; align-items: center; gap: 10px; font-weight: 700; }
+.tr-swatch { width: 28px; height: 28px; border-radius: 50%; background: var(--color-lavender); flex-shrink: 0; }
+.tr-points { display: flex; flex-direction: column; gap: 6px; font-size: 14px; line-height: 1.6; }
+.tr-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.tr-actions__spacer { flex: 1 1 0; }
+
+/* ---------- 22 通報（運営） ---------- */
+.rp-table td.wrap-ok { max-width: 360px; }
+.rp-status { display: inline-flex; padding: 3px 10px; border-radius: 999px; font-size: 12px; font-weight: 700; white-space: nowrap; }
+.rp-status--OPEN { background: var(--color-coral); }
+.rp-status--RESOLVED { background: var(--color-mint); }
+.rp-status--DISMISSED { background: var(--color-gray-100); border: 1px solid var(--color-line-strong); }
+.rp-target { text-decoration: underline; text-underline-offset: 3px; }
+.rp-dl { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 8px 20px; font-size: 14px; line-height: 1.6; }
+.rp-dl dt { color: var(--color-muted); }
+.rp-dl dd { margin: 0; overflow-wrap: anywhere; }
+
+/* ---------- レスポンシブ ---------- */
+@media (max-width: 1023px) {
+  .mg-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .ci .mg-stats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 767px) {
+  .att-table-wrap { display: none; }
+  .att-cards { display: block; }
+  .att-tools .select { flex: 1 1 calc(50% - 6px); }
+  .ci-form .btn { padding: 0 16px; }
+  .mg-stat { padding: 12px; }
+  .rp-dl, .att-answers { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+  .rp-dl dd, .att-answers dd { margin-bottom: 8px; }
+  .tr-actions .btn { flex: 1 1 100%; justify-content: center; }
+  .tr-actions__spacer { display: none; }
+}

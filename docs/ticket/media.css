@@ -250,3 +250,122 @@
 .my-follow__stack .dot { width: 44px; height: 44px; border: 3px solid var(--color-white); }
 .my-follow__stack .dot + .dot { margin-left: -10px; }
 .my-follow__more { font-weight: 700; font-size: 13px; line-height: normal; }
+
+/* ---------- データ化で足した小部品（4ページ共通・Figma の寸法は変えない） ---------- */
+button.my-ticket__cancel, button.org-report { border: 0; background: none; padding: 0; cursor: pointer; }
+.my-ticket__title:hover { text-decoration: underline; text-underline-offset: 3px; }
+.my-pending { align-items: center; justify-content: space-between; flex-wrap: wrap; margin-bottom: 0; }
+.my-notice-more { align-self: flex-start; margin-top: 12px; font-size: 13px; }
+.my-empty-line { padding: 14px 0; font-size: 14px; color: var(--color-muted); }
+.my-detail__slots { display: flex; flex-direction: column; gap: 4px; font-size: 14px; }
+.my-detail__qa { display: grid; grid-template-columns: minmax(0, 9em) minmax(0, 1fr); gap: 6px 16px; margin: 0; font-size: 14px; line-height: 1.6; }
+.my-detail__qa dt { color: var(--color-muted); }
+.my-detail__qa dd { margin: 0; overflow-wrap: anywhere; }
+.org-profile__avatar--user { border-radius: 50%; background: var(--color-mint); }
+.org-profile--user { padding-top: clamp(24px, 2.8vw, 40px); }
+a.org-member:hover .org-member__name { text-decoration: underline; }
+
+/* ---------- 参加者の新しいページ（プロフィール編集・フォロー中・保存） ---------- */
+.me-page { padding-top: clamp(20px, 2.23vw, 32px); padding-bottom: var(--gap-section); }
+.me-note { margin-bottom: clamp(16px, 1.67vw, 24px); }
+.me-form { --stack-gap: clamp(20px, 2.23vw, 32px); }
+.me-avatar { display: flex; align-items: center; gap: 16px; }
+.me-avatar .dot { width: 64px; height: 64px; }
+.me-slug { display: flex; align-items: stretch; }
+.me-slug__at { display: inline-flex; align-items: center; padding: 0 12px; border: 1.5px solid var(--color-black); border-right: 0; background: var(--color-gray-100); font-weight: 700; }
+.me-actions { --cluster-gap: 24px; }
+.me-logout { display: flex; flex-direction: column; align-items: flex-start; gap: 16px; margin-top: clamp(32px, 3.4vw, 48px); }
+.me-logout .divider { width: 100%; }
+
+.me-row { display: flex; align-items: center; gap: clamp(14px, 1.4vw, 20px); padding: clamp(16px, 1.4vw, 20px); border: 1.5px solid var(--color-black); }
+.me-row--removed { border-style: dashed; border-color: var(--color-line-strong); justify-content: space-between; }
+.me-row__dot { width: 56px; height: 56px; }
+.me-row__main { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; gap: 4px; line-height: 1.5; }
+.me-row__name { font-weight: 700; font-size: 17px; }
+.me-row__name:hover { text-decoration: underline; text-underline-offset: 3px; }
+.me-row__meta { font-size: 12px; color: var(--color-muted); }
+.me-row__next { font-size: 13px; }
+.me-row__actions { display: flex; align-items: center; gap: 16px; flex-shrink: 0; }
+.me-row__mail { font-size: 13px; white-space: nowrap; }
+.me-row__text { font-size: 14px; }
+
+.me-saved { padding-top: clamp(24px, 2.23vw, 32px); }
+.me-saved__item { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.me-saved__unsave { align-self: flex-start; }
+
+/* ---------- レスポンシブ（Figma に SP 版は無い。プロトタイプ用） ---------- */
+/* 1024〜1440 で記事の左余白と本文幅を縮める（1440 では Figma の値） */
+.ar-layout { padding-left: clamp(40px, 11.12vw, 160px); gap: clamp(40px, 5.56vw, 80px); }
+.ar-body { flex: 0 1 760px; width: auto; }
+
+@media (max-width: 1023px) {
+  .m-head__en { font-size: clamp(48px, 8vw, 88px); }
+  .m-feature, .m-latest__inner, .org-content, .my-content { flex-direction: column; align-items: stretch; }
+  .m-feature__side { width: 100%; flex-direction: row; gap: 24px; }
+  .m-feature__side .m-card { flex: 1 1 0; }
+  .m-feature__img { height: clamp(220px, 50vw, 520px); }
+  .m-feature__title { font-size: clamp(24px, 3.6vw, 36px); }
+  .m-ranking, .org-about, .my-side { width: 100%; }
+  .ar-layout { flex-direction: column; align-items: stretch; padding: 32px var(--page-pad) 72px; }
+  .ar-body { flex: none; width: min(760px, 100%); margin: 0 auto; }
+  .ar-hero { width: 100%; height: clamp(200px, 50vw, 430px); }
+  .ar-side { position: static; width: min(760px, 100%); margin: 0 auto; }
+  .org-cover { height: clamp(160px, 28vw, 300px); }
+  .org-profile { flex-wrap: wrap; align-items: flex-end; gap: 16px 24px; }
+  .org-profile__avatar { width: clamp(88px, 13vw, 140px); height: clamp(88px, 13vw, 140px); }
+  .org-profile__name { font-size: clamp(26px, 3.9vw, 40px); white-space: normal; }
+  .org-profile__stats { flex-wrap: wrap; gap: 8px 20px; }
+  .org-profile__actions { width: 100%; flex-wrap: wrap; }
+  .org-main .event-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .my-saved .event-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .my-ticket { flex-wrap: wrap; }
+  .my-ticket__body { flex-basis: 40%; }
+  .my-ticket__actions { width: 100%; flex-wrap: wrap; }
+}
+@media (max-width: 767px) {
+  .m-head { flex-wrap: wrap; white-space: normal; gap: 4px 16px; padding-top: 24px; }
+  .m-filter { padding-bottom: 24px; }
+  .m-feature { padding-bottom: 48px; }
+  .m-feature__side { flex-direction: column; }
+  .m-card__img--l { height: clamp(160px, 50vw, 236px); }
+  .m-latest__inner { padding-top: 40px; padding-bottom: 64px; }
+  .m-latest__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px 12px; }
+  .m-card__img { height: clamp(110px, 30vw, 200px); }
+  .headline { flex-wrap: wrap; white-space: normal; gap: 4px 12px; }
+  .headline__en { font-size: 36px; }
+  .ar-title { font-size: 26px; }
+  .ar-quote__text { font-size: 19px; }
+  .ar-embed { flex-wrap: wrap; }
+  .ar-embed .btn { width: 100%; justify-content: center; }
+  .ar-org { flex-wrap: wrap; }
+  .ar-org__text { white-space: normal; }
+  .ar-share { flex-wrap: wrap; }
+  .org-profile { flex-direction: column; align-items: flex-start; padding-top: 20px; }
+  .org-profile__info { padding-top: 0; width: 100%; }
+  .org-profile__name-row { flex-wrap: wrap; gap: 8px; }
+  .org-profile__actions { gap: 8px; }
+  .org-profile__actions .btn--plain { padding: 14px 18px; }
+  .org-main .event-grid, .my-saved .event-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .org-year__list li { flex-direction: column; gap: 0; }
+  .org-member, .my-host__row, .my-block__head, .my-follow__head, .my-profile__info { white-space: normal; }
+  .my-profile { flex-wrap: wrap; gap: 16px; padding-top: 28px; padding-bottom: 28px; }
+  .my-profile .dot { width: 64px; height: 64px; }
+  .my-profile__name { font-size: 26px; }
+  .my-profile__links { flex-wrap: wrap; gap: 4px 16px; }
+  .my-profile .btn { width: 100%; justify-content: center; }
+  .my-block__head { flex-wrap: wrap; gap: 4px 12px; }
+  .my-ticket { gap: 12px 14px; padding: 16px; }
+  .my-ticket__date { flex-direction: row; align-items: baseline; gap: 8px; width: 100%; }
+  .my-ticket__day { font-size: 28px; }
+  .my-ticket__img { width: 56px; height: 70px; }
+  .my-ticket__body { flex-basis: 0; }
+  .my-ticket__title { font-size: 15px; }
+  .my-tab { font-size: 16px; }
+  .my-tab.is-active { font-size: 19px; }
+  .me-row { flex-wrap: wrap; }
+  .me-row__dot { width: 44px; height: 44px; }
+  .me-row__actions { width: 100%; justify-content: space-between; flex-wrap: wrap; gap: 8px 16px; }
+  .me-row__mail { white-space: normal; }
+  .me-avatar { align-items: flex-start; }
+  .me-avatar .dot { width: 48px; height: 48px; }
+}

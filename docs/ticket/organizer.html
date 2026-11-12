@@ -3,185 +3,150 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>慶應軽音サークル｜NEXT MOVE TICKETS</title>
+<title>主催者｜NEXT MOVE TICKETS</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Noto+Sans+JP:wght@400;500;700;900&family=DM+Mono:wght@400;500&family=Instrument+Serif:ital@1&family=Barlow+Condensed:wght@700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 <link rel="stylesheet" href="media.css">
-<script src="data.js" defer></script>
-<script src="common.js" defer></script>
+<script src="data.js"></script>
+<script src="common.js"></script>
 </head>
 <body>
 
 <div data-header="v2" data-active="none"></div>
 
-<main>
-  <img class="org-cover" src="assets/flyer-band-battle.jpg" alt="">
-
-  <!-- Profile -->
-  <section class="wrap org-profile" aria-label="団体プロフィール">
-    <div class="org-profile__avatar" role="img" aria-label="慶應軽音サークルのアイコン"></div>
-    <div class="org-profile__info">
-      <div class="org-profile__name-row">
-        <h1 class="org-profile__name">慶應軽音サークル</h1>
-        <span class="tag tag--outline">団体</span>
-      </div>
-      <div class="org-profile__stats">
-        <span class="org-profile__handle">@keio-lightmusic</span>
-        <span class="org-stat"><span class="org-stat__num" data-follower-count>234</span><span class="org-stat__label">フォロワー</span></span>
-        <span class="org-stat"><span class="org-stat__num">18</span><span class="org-stat__label">イベント</span></span>
-        <a class="chip-sm chip-sm--xs" href="#">X</a>
-        <a class="chip-sm chip-sm--xs" href="#">Instagram</a>
-      </div>
-    </div>
-    <div class="org-profile__actions">
-      <button class="btn btn--black btn--plain" type="button" data-follow aria-pressed="false">＋ フォローする</button>
-      <button class="btn-sm" type="button" data-copy>リンク</button>
-      <button class="btn-sm" type="button" aria-label="その他の操作">…</button>
-    </div>
-  </section>
-
-  <!-- タブ -->
-  <div class="org-tabs-wrap">
-    <div class="wrap ptabs org-tabs" role="tablist" aria-label="団体ページ">
-      <button class="ptab is-active" type="button" role="tab" aria-selected="true" aria-controls="panel-events" id="tab-events">イベント</button>
-      <button class="ptab" type="button" role="tab" aria-selected="false" aria-controls="panel-about" id="tab-about">紹介</button>
-    </div>
-  </div>
-
-  <div class="wrap org-content">
-    <!-- イベント -->
-    <div class="org-main" role="tabpanel" id="panel-events" aria-labelledby="tab-events">
-      <div class="headline">
-        <h2 class="headline__en">UPCOMING</h2>
-        <p class="headline__ja">今後のイベント 3件</p>
-      </div>
-      <div class="event-grid">
-        <a class="event-card" href="#">
-          <img class="event-card__flyer" src="assets/flyer-band-battle.jpg" alt="インカレ・バンド対抗ライブ vol.4 のフライヤー">
-          <p class="event-card__date">11/8（土）17:30</p>
-          <h3 class="event-card__title">インカレ・バンド対抗ライブ vol.4</h3>
-          <p class="event-card__venue">下北沢 SHELTER</p>
-          <p class="event-card__org">慶應軽音サークル</p>
-          <div class="event-card__bottom"><span class="price">¥1,500〜</span><span class="pill pill--few">残り23枚</span></div>
-        </a>
-        <a class="event-card" href="#">
-          <img class="event-card__flyer" src="assets/flyer-acoustic.jpg" alt="冬の弾き語りナイト のフライヤー">
-          <p class="event-card__date">11/28（土）18:00</p>
-          <h3 class="event-card__title">冬の弾き語りナイト</h3>
-          <p class="event-card__venue">三田 Live house Re:</p>
-          <p class="event-card__org">慶應軽音サークル</p>
-          <div class="event-card__bottom"><span class="price">¥1,000</span><span class="pill pill--soon">11/10 から</span></div>
-        </a>
-        <a class="event-card" href="#">
-          <img class="event-card__flyer" src="assets/flyer-halloween.jpg" alt="追いコン 2026 のフライヤー">
-          <p class="event-card__date">12/20（日）19:00</p>
-          <h3 class="event-card__title">追いコン 2026 — 4年生を送る夜</h3>
-          <p class="event-card__venue">渋谷 club asia</p>
-          <p class="event-card__org">慶應軽音サークル</p>
-          <div class="event-card__bottom"><span class="price">¥2,500</span><span class="pill pill--soon">12/1 から</span></div>
-        </a>
-      </div>
-
-      <div class="headline org-archive-head">
-        <h2 class="headline__en">ARCHIVE</h2>
-        <p class="headline__ja">過去のイベント</p>
-      </div>
-      <div class="org-year">
-          <button class="org-year__btn" type="button" aria-expanded="false" aria-controls="year-2025">
-            <span class="org-year__label"><span class="org-year__caret" aria-hidden="true">▶</span><span class="org-year__title">2025年</span></span>
-            <span class="org-year__count">12件</span>
-          </button>
-          <ul class="org-year__list" id="year-2025" hidden>
-            <li><time>2025.12.20</time><a href="#">追いコン 2025</a></li>
-            <li><time>2025.11.22</time><a href="#">三田祭 野外ステージ</a></li>
-            <li><time>2025.07.12</time><a href="#">夏の定期ライブ</a></li>
-          </ul>
-        </div>
-        <div class="org-year">
-          <button class="org-year__btn" type="button" aria-expanded="false" aria-controls="year-2024">
-            <span class="org-year__label"><span class="org-year__caret" aria-hidden="true">▶</span><span class="org-year__title">2024年</span></span>
-            <span class="org-year__count">6件</span>
-          </button>
-          <ul class="org-year__list" id="year-2024" hidden>
-            <li><time>2024.12.21</time><a href="#">追いコン 2024</a></li>
-            <li><time>2024.10.05</time><a href="#">インカレ・バンド対抗ライブ vol.3</a></li>
-          </ul>
-        </div>
-    </div>
-
-    <!-- 紹介 -->
-    <div class="org-main" role="tabpanel" id="panel-about" aria-labelledby="tab-about" hidden>
-      <div class="headline">
-        <h2 class="headline__en">ABOUT</h2>
-        <p class="headline__ja">紹介</p>
-      </div>
-      <div class="org-intro">
-        <p>1987年から続く、慶應義塾大学の軽音楽サークルです。年4回の定期ライブと、他大学との対抗ライブを開催しています。初心者歓迎、楽器の貸し出しあり。</p>
-      </div>
-    </div>
-
-    <!-- About（右） -->
-    <aside class="org-about">
-      <div class="org-about__box">
-        <p class="org-about__title">紹介</p>
-        <p class="org-about__text">1987年から続く、慶應義塾大学の軽音楽サークルです。年4回の定期ライブと、他大学との対抗ライブを開催しています。初心者歓迎、楽器の貸し出しあり。</p>
-      </div>
-      <div class="org-members">
-        <p class="org-about__title">運営メンバー 3人</p>
-        <div class="org-member"><span class="dot bg-mint"></span><span class="org-member__name">やまだ</span><span class="org-member__role">代表</span></div>
-        <div class="org-member"><span class="dot bg-pink"></span><span class="org-member__name">みお</span><span class="org-member__role">会計</span></div>
-        <div class="org-member"><span class="dot bg-coral"></span><span class="org-member__name">たける</span><span class="org-member__role">広報</span></div>
-      </div>
-      <a class="org-report" href="#">このページを通報する</a>
-    </aside>
-  </div>
-</main>
+<main data-main></main>
 
 <div data-footer></div>
 
 <script>
-(function () {
+NMT.ready(function (db, ui) {
+  var f = NMT.fmt, esc = ui.esc;
+  var main = document.querySelector('[data-main]');
+  var slug = ui.param('slug') || 'keio-lightmusic';
+  var o = db.organizerBySlug(slug);
+  if (!o) {
+    main.innerHTML = '<div class="wrap section"><p class="empty">この主催者は見つかりませんでした。<a class="textlink" href="' + ui.url('events') + '">イベントを探す</a></p></div>';
+    return;
+  }
+  var grp = o.type === 'GROUP';
+  document.title = o.displayName + '｜NEXT MOVE TICKETS';
+
+  var upcoming = db.searchEvents({ organizerId: o.id, status: 'upcoming' });
+  var past = db.searchEvents({ organizerId: o.id, status: 'past' });
+  var allCount = upcoming.length + past.length;
+  var links = db.t.socialLinks.filter(function (l) { return l.organizerId === o.id; }).sort(function (a, b) { return a.sortOrder - b.sortOrder; });
+  var owner = db.isOwner(o.id);
+  // カバー: 団体の cover、無ければ直近のイベントのフライヤー（個人は出さない）
+  var cover = grp ? (o.coverUrl || ((upcoming[0] || past[0] || {}).coverUrl)) : null;
+
+  // 過去のイベントを年ごとに
+  var years = {};
+  past.forEach(function (e) { var y = f.ymd(e.startAt).slice(0, 4); (years[y] = years[y] || []).push(e); });
+  var yearHtml = Object.keys(years).sort().reverse().map(function (y) {
+    return '<div class="org-year">' +
+      '<button class="org-year__btn" type="button" aria-expanded="false" aria-controls="year-' + y + '">' +
+        '<span class="org-year__label"><span class="org-year__caret" aria-hidden="true">▶</span><span class="org-year__title">' + y + '年</span></span>' +
+        '<span class="org-year__count">' + years[y].length + '件</span>' +
+      '</button>' +
+      '<ul class="org-year__list" id="year-' + y + '" hidden>' + years[y].map(function (e) {
+        return '<li><time datetime="' + esc(e.startAt) + '">' + f.ymd(e.startAt) + '</time><a href="' + ui.url('event', { id: e.id }) + '">' + esc(e.title) + '</a></li>';
+      }).join('') + '</ul></div>';
+  }).join('') || '<p class="t-small t-muted">過去のイベントはまだありません。</p>';
+
+  var members = grp ? db.membersOf(o.id).map(function (m) { return db.profileOf(m.userId); }).filter(Boolean) : [];
+  var groupsOfUser = grp ? [] : db.managedOrganizers(o.userId).filter(function (g) { return g.type === 'GROUP'; });
+  var DOTS = ['mint', 'pink', 'coral', 'lavender'];
+
+  main.innerHTML =
+    (cover ? '<img class="org-cover" src="' + esc(cover) + '" alt="">' : '') +
+    '<section class="wrap org-profile' + (grp ? '' : ' org-profile--user') + '" aria-label="' + (grp ? '団体' : '個人') + 'プロフィール">' +
+      '<div class="org-profile__avatar' + (grp ? '' : ' org-profile__avatar--user') + '" role="img" aria-label="' + esc(o.displayName) + 'のアイコン"></div>' +
+      '<div class="org-profile__info">' +
+        '<div class="org-profile__name-row"><h1 class="org-profile__name">' + esc(o.displayName) + '</h1><span class="tag tag--outline">' + (grp ? '団体' : '個人') + '</span></div>' +
+        '<div class="org-profile__stats">' +
+          '<span class="org-profile__handle">@' + esc(o.slug) + '</span>' +
+          (grp ? '<span class="org-stat"><span class="org-stat__num" data-follower-count>' + db.followerCount(o.id) + '</span><span class="org-stat__label">フォロワー</span></span>' : '') +
+          '<span class="org-stat"><span class="org-stat__num">' + allCount + '</span><span class="org-stat__label">イベント</span></span>' +
+          links.map(function (l) { return '<a class="chip-sm chip-sm--xs" href="' + esc(l.url) + '" target="_blank" rel="noopener">' + esc(l.platform) + '</a>'; }).join('') +
+        '</div>' +
+      '</div>' +
+      '<div class="org-profile__actions">' +
+        (owner ? '<a class="btn-sm" href="' + ui.url('dashboard', { org: o.slug }) + '">管理画面へ</a>' : '') +
+        (grp ? '<button class="btn btn--black btn--plain" type="button" data-follow aria-pressed="false"></button>' : '') +
+        '<button class="btn-sm" type="button" data-copy>リンク</button>' +
+        '<button class="btn-sm" type="button" data-report aria-label="このページを通報する" title="通報する">…</button>' +
+      '</div>' +
+    '</section>' +
+
+    '<div class="org-tabs-wrap"><div class="wrap ptabs org-tabs" role="tablist" aria-label="' + (grp ? '団体' : '主催者') + 'ページ">' +
+      '<button class="ptab is-active" type="button" role="tab" aria-selected="true" aria-controls="panel-events" id="tab-events">イベント</button>' +
+      (grp ? '<button class="ptab" type="button" role="tab" aria-selected="false" aria-controls="panel-about" id="tab-about">紹介</button>' : '') +
+    '</div></div>' +
+
+    '<div class="wrap org-content">' +
+      '<div class="org-main" role="tabpanel" id="panel-events" aria-labelledby="tab-events">' +
+        '<div class="headline"><h2 class="headline__en">UPCOMING</h2><p class="headline__ja">今後のイベント ' + upcoming.length + '件</p></div>' +
+        (upcoming.length ? '<div class="event-grid">' + upcoming.map(function (e) { return ui.eventCard(e); }).join('') + '</div>' : '<p class="empty">予定されているイベントはありません。</p>') +
+        '<div class="headline org-archive-head"><h2 class="headline__en">ARCHIVE</h2><p class="headline__ja">過去のイベント</p></div>' +
+        yearHtml +
+      '</div>' +
+      (grp ? '<div class="org-main" role="tabpanel" id="panel-about" aria-labelledby="tab-about" hidden>' +
+        '<div class="headline"><h2 class="headline__en">ABOUT</h2><p class="headline__ja">紹介</p></div>' +
+        '<div class="org-intro">' + (o.bio ? o.bio.split(/\n+/).map(function (p) { return '<p>' + esc(p) + '</p>'; }).join('') : '<p class="t-muted">紹介文はまだありません。</p>') + '</div>' +
+      '</div>' : '') +
+
+      '<aside class="org-about">' +
+        (grp ? '<div class="org-about__box"><p class="org-about__title">紹介</p><p class="org-about__text">' + (o.bio ? esc(o.bio) : '紹介文はまだありません。') + '</p></div>' +
+          '<div class="org-members"><p class="org-about__title">運営メンバー ' + members.length + '人</p>' +
+          members.map(function (p, i) { return '<div class="org-member"><span class="dot bg-' + DOTS[i % DOTS.length] + '"></span><span class="org-member__name">' + esc(p.displayName) + '</span><span class="org-member__role">owner</span></div>'; }).join('') + '</div>'
+        : '<div class="org-members"><p class="org-about__title">所属している団体</p>' +
+          (groupsOfUser.length ? groupsOfUser.map(function (g, i) { return '<a class="org-member" href="' + ui.url('organizer', { slug: g.slug }) + '"><span class="dot bg-' + DOTS[i % DOTS.length] + '"></span><span class="org-member__name">' + esc(g.displayName) + '</span><span class="org-member__role">@' + esc(g.slug) + '</span></a>'; }).join('') : '<p class="t-small t-muted">所属している団体はありません。</p>') +
+          '</div>') +
+        '<button class="org-report" type="button" data-report>このページを通報する</button>' +
+      '</aside>' +
+    '</div>';
+
   // タブ切り替え
-  var tabs = document.querySelectorAll('.org-tabs .ptab');
-  for (var i = 0; i < tabs.length; i++) {
-    tabs[i].addEventListener('click', function () {
-      for (var j = 0; j < tabs.length; j++) {
-        var on = tabs[j] === this;
-        tabs[j].classList.toggle('is-active', on);
-        tabs[j].setAttribute('aria-selected', on ? 'true' : 'false');
-        document.getElementById(tabs[j].getAttribute('aria-controls')).hidden = !on;
-      }
+  var tabs = main.querySelectorAll('.org-tabs .ptab');
+  tabs.forEach(function (tab) {
+    tab.addEventListener('click', function () {
+      tabs.forEach(function (t) {
+        var on = t === tab;
+        t.classList.toggle('is-active', on);
+        t.setAttribute('aria-selected', on ? 'true' : 'false');
+        document.getElementById(t.getAttribute('aria-controls')).hidden = !on;
+      });
     });
-  }
+  });
   // 過去のイベントの開閉
-  var years = document.querySelectorAll('.org-year__btn');
-  for (var k = 0; k < years.length; k++) {
-    years[k].addEventListener('click', function () {
-      var open = this.getAttribute('aria-expanded') !== 'true';
-      this.setAttribute('aria-expanded', open ? 'true' : 'false');
-      document.getElementById(this.getAttribute('aria-controls')).hidden = !open;
+  main.querySelectorAll('.org-year__btn').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var open = b.getAttribute('aria-expanded') !== 'true';
+      b.setAttribute('aria-expanded', open ? 'true' : 'false');
+      document.getElementById(b.getAttribute('aria-controls')).hidden = !open;
     });
-  }
-  // フォロー
-  var follow = document.querySelector('[data-follow]');
-  var count = document.querySelector('[data-follower-count]');
-  follow.addEventListener('click', function () {
-    var on = follow.getAttribute('aria-pressed') !== 'true';
+  });
+  // フォロー（団体のみ）
+  var follow = main.querySelector('[data-follow]');
+  function paintFollow() {
+    var on = db.isFollowing(o.id);
     follow.setAttribute('aria-pressed', on ? 'true' : 'false');
     follow.textContent = on ? 'フォロー中' : '＋ フォローする';
-    count.textContent = on ? '235' : '234';
-  });
-  // リンクをコピー
-  var copy = document.querySelector('[data-copy]');
-  copy.addEventListener('click', function () {
-    var show = function (msg) { copy.textContent = msg; setTimeout(function () { copy.textContent = 'リンク'; }, 1600); };
-    var done = function () { show('コピー済'); }, fail = function () { show('コピーできませんでした'); };
-    if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(location.href).then(done, fail);
-    else fail();
-  });
-})();
+    var c = main.querySelector('[data-follower-count]'); if (c) c.textContent = db.followerCount(o.id);
+  }
+  if (follow) {
+    paintFollow();
+    follow.addEventListener('click', function () {
+      if (!db.currentUser()) { location.href = ui.url('login', { next: ui.url('organizer', { slug: o.slug }) }); return; }
+      try { var on = db.toggleFollow(o.id); paintFollow(); ui.toast(on ? 'フォローしました。新しいイベントをメールでお知らせします' : 'フォローを解除しました'); }
+      catch (x) { ui.toast(x.message); }
+    });
+  }
+  main.querySelector('[data-copy]').addEventListener('click', function () { ui.copyLink(); });
+  main.querySelectorAll('[data-report]').forEach(function (b) { b.addEventListener('click', function () { ui.report('ORGANIZER', o.id); }); });
+});
 </script>
 </body>
 </html>

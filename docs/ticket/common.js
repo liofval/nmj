@@ -60,7 +60,8 @@
   function rightParticipant(compact) {
     var u = db() && db().currentUser();
     var search = '<a href="' + url('events') + '#q" aria-label="検索"><img class="icon" src="assets/icon-search.svg" alt=""></a>';
-    if (!u) return search + '<a class="mytickets" href="' + url('mypage') + '">My Tickets</a><a class="header-login" href="' + url('login', { next: location.pathname.split('/').pop() + location.search }) + '">ログイン</a>';
+    var onLogin = location.pathname.split('/').pop() === PAGES.login;
+    if (!u) return search + '<a class="mytickets" href="' + url('mypage') + '">My Tickets</a>' + (onLogin ? '' : '<a class="header-login" href="' + url('login', { next: location.pathname.split('/').pop() + location.search }) + '">ログイン</a>');
     return search + '<a class="mytickets" href="' + url('mypage') + '">My Tickets</a>' +
       (compact ? '<a href="' + url('mypage') + '" aria-label="マイページ"><img class="avatar" src="assets/avatar.svg" alt=""></a>' : '');
   }

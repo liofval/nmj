@@ -9,8 +9,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Noto+Sans+JP:wght@400;500;700;900&family=DM+Mono:wght@400;500&family=Instrument+Serif:ital@1&family=Barlow+Condensed:wght@700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 <link rel="stylesheet" href="media.css">
-<script src="data.js" defer></script>
-<script src="common.js" defer></script>
+<script src="data.js"></script>
+<script src="common.js"></script>
 </head>
 <body>
 
@@ -19,137 +19,58 @@
 <main>
   <!-- Profile -->
   <section class="wrap my-profile" aria-label="プロフィール">
-    <span class="dot bg-lavender" role="img" aria-label="やまだ のアイコン"></span>
+    <span class="dot bg-lavender" role="img" data-avatar></span>
     <div class="my-profile__info">
-      <h1 class="my-profile__name">やまだ</h1>
-      <p class="my-profile__links"><span>@yamada</span><a href="#">X</a><a href="#">Instagram</a></p>
+      <h1 class="my-profile__name" data-name></h1>
+      <p class="my-profile__links" data-links></p>
     </div>
-    <a class="btn btn--outline" href="#">プロフィールを編集</a>
+    <a class="btn btn--outline" href="profile.html">プロフィールを編集</a>
   </section>
 
   <div class="wrap my-content">
     <div class="my-main">
+      <div data-pending hidden></div>
+
       <!-- お知らせ -->
-      <section class="my-block my-block--flush" aria-labelledby="h-notice">
+      <section class="my-block my-block--flush" aria-labelledby="h-notice" data-notices>
         <div class="my-block__head">
           <h2 class="my-block__title" id="h-notice">お知らせ</h2>
           <p class="my-block__note">同じ内容がメールにも届きます</p>
         </div>
-        <a class="my-notice is-unread" href="#"><span class="dot bg-coral" aria-label="未読"></span><span class="my-notice__text">慶應軽音サークル：11/8 の集合場所が変更になりました</span><span class="my-notice__time">2時間前</span></a>
-        <a class="my-notice" href="#"><span class="dot bg-white"></span><span class="my-notice__text">インカレ・バンド対抗ライブ vol.4 の QR チケットを発行しました</span><span class="my-notice__time">昨日</span></a>
       </section>
 
       <!-- チケット（参加予定／履歴） -->
       <section class="my-block" aria-label="チケット">
         <div class="ptabs my-tabs" role="tablist">
-          <button class="my-tab is-active" type="button" role="tab" aria-selected="true" aria-controls="panel-upcoming" id="tab-upcoming">参加予定<span class="my-tab__count">2</span></button>
-          <button class="my-tab" type="button" role="tab" aria-selected="false" aria-controls="panel-history" id="tab-history">履歴</button>
+          <button class="my-tab is-active" type="button" role="tab" aria-selected="true" aria-controls="panel-upcoming" id="tab-upcoming">参加予定<span class="my-tab__count" data-count-upcoming></span></button>
+          <button class="my-tab" type="button" role="tab" aria-selected="false" aria-controls="panel-history" id="tab-history">履歴<span class="my-tab__count" data-count-history></span></button>
         </div>
-
-        <div class="my-tab-panel" role="tabpanel" id="panel-upcoming" aria-labelledby="tab-upcoming">
-          <div class="my-ticket">
-            <div class="my-ticket__date"><span class="my-ticket__day">11.08</span><span class="my-ticket__time">土 17:30</span></div>
-            <img class="my-ticket__img" src="assets/flyer-band-battle.jpg" alt="">
-            <div class="my-ticket__body">
-              <span class="pill pill--open">参加予定 · あと10日</span>
-              <p class="my-ticket__title">インカレ・バンド対抗ライブ vol.4</p>
-              <p class="my-ticket__info">下北沢 SHELTER · 学生 × 2枚 · ¥3,000（支払い済み）</p>
-            </div>
-            <div class="my-ticket__actions">
-              <a class="btn-sm btn-sm--black" href="#">QR チケット</a>
-              <a class="btn-sm" href="#">申込内容</a>
-              <a class="my-ticket__cancel" href="#">キャンセル</a>
-            </div>
-          </div>
-          <div class="my-ticket">
-            <div class="my-ticket__date"><span class="my-ticket__day">11.15</span><span class="my-ticket__time">土 19:00</span></div>
-            <img class="my-ticket__img" src="assets/article-interview.jpg" alt="">
-            <div class="my-ticket__body">
-              <span class="pill pill--open">参加予定 · あと17日</span>
-              <p class="my-ticket__title">先輩に聞く、はじめてのインターン選び</p>
-              <p class="my-ticket__info">オンライン · 無料 × 1</p>
-            </div>
-            <div class="my-ticket__actions">
-              <a class="btn-sm btn-sm--black" href="#">参加 URL を開く</a>
-              <a class="btn-sm" href="#">申込内容</a>
-              <a class="my-ticket__cancel" href="#">キャンセル</a>
-            </div>
-          </div>
-          <p class="my-caution">※ 開始後はキャンセルできません。有料枠の支払い済み分は返金されません。</p>
-        </div>
-
-        <div class="my-tab-panel" role="tabpanel" id="panel-history" aria-labelledby="tab-history" hidden>
-          <div class="my-ticket my-ticket--past">
-            <div class="my-ticket__date"><span class="my-ticket__day">10.19</span><span class="my-ticket__time">日 7:30</span></div>
-            <img class="my-ticket__img" src="assets/flyer-morning-run.jpg" alt="">
-            <div class="my-ticket__body">
-              <span class="pill pill--soldout">参加済み</span>
-              <p class="my-ticket__title">朝の代々木公園ランニング＆モーニング</p>
-              <p class="my-ticket__info">代々木公園 原宿門 · 無料 × 1</p>
-            </div>
-            <div class="my-ticket__actions">
-              <a class="btn-sm" href="#">申込内容</a>
-            </div>
-          </div>
-        </div>
+        <div class="my-tab-panel" role="tabpanel" id="panel-upcoming" aria-labelledby="tab-upcoming"></div>
+        <div class="my-tab-panel" role="tabpanel" id="panel-history" aria-labelledby="tab-history" hidden></div>
       </section>
 
       <!-- 保存したイベント -->
       <section class="my-block my-saved" aria-labelledby="h-saved">
         <div class="my-block__head">
           <h2 class="my-block__title" id="h-saved">保存したイベント</h2>
-          <a class="my-block__link" href="events.html">すべて見る →</a>
+          <a class="my-block__link" href="saved.html">すべて見る →</a>
         </div>
-        <div class="event-grid">
-          <a class="event-card" href="#">
-            <img class="event-card__flyer" src="assets/flyer-zine-fair.jpg" alt="学生ZINEフェア のフライヤー">
-            <p class="event-card__date">11/2（日）12:00</p>
-            <h3 class="event-card__title">学生ZINEフェア — 刷って、並べて、交換する</h3>
-            <p class="event-card__venue">吉祥寺 Art Center Ongoing</p>
-            <p class="event-card__org">武蔵美ZINE部</p>
-            <div class="event-card__bottom"><span class="price">¥300</span><span class="pill pill--open">受付中</span></div>
-          </a>
-          <a class="event-card" href="#">
-            <img class="event-card__flyer" src="assets/article-guide.jpg" alt="国際交流ボードゲームナイト のフライヤー">
-            <p class="event-card__date">11/1（土）18:00</p>
-            <h3 class="event-card__title">国際交流ボードゲームナイト</h3>
-            <p class="event-card__venue">高田馬場 JAM Café</p>
-            <p class="event-card__org">Waseda Global</p>
-            <div class="event-card__bottom"><span class="price">¥500</span><span class="pill pill--few">残り6枚</span></div>
-          </a>
-        </div>
+        <div class="event-grid" data-saved></div>
       </section>
     </div>
 
     <!-- Side -->
     <aside class="my-side">
-      <div class="my-host">
+      <div class="my-host" data-host>
         <p class="my-host__title">主催者として</p>
-        <div class="my-host__row">
-          <span class="my-host__mark bg-lavender"></span>
-          <div class="my-host__text"><span class="my-host__name">慶應軽音サークル</span><span class="my-host__role">owner</span></div>
-          <a class="my-host__link" href="dashboard.html">管理画面へ →</a>
-        </div>
-        <div class="my-host__row">
-          <span class="my-host__mark bg-mint"></span>
-          <div class="my-host__text"><span class="my-host__name">やまだ（個人）</span><span class="my-host__role">個人主催</span></div>
-          <a class="my-host__link" href="dashboard.html">管理画面へ →</a>
-        </div>
-        <a class="my-host__new" href="#">＋ 新しい団体を作る</a>
       </div>
       <div class="my-follow">
         <div class="my-follow__head">
           <p class="my-follow__title">フォロー中の団体</p>
-          <a class="my-follow__all" href="#">すべて →</a>
+          <a class="my-follow__all" href="following.html">すべて →</a>
         </div>
-        <div class="my-follow__stack">
-          <a class="dot bg-coral" href="#" aria-label="フォロー中の団体 1"></a>
-          <a class="dot bg-mint" href="#" aria-label="フォロー中の団体 2"></a>
-          <a class="dot bg-lavender" href="organizer.html" aria-label="慶應軽音サークル"></a>
-          <a class="dot bg-pink" href="#" aria-label="フォロー中の団体 4"></a>
-          <a class="dot bg-black" href="#" aria-label="フォロー中の団体 5"></a>
-        </div>
-        <p class="my-follow__more">＋8 団体</p>
+        <div class="my-follow__stack" data-follow-stack></div>
+        <p class="my-follow__more" data-follow-more></p>
       </div>
     </aside>
   </div>
@@ -158,20 +79,204 @@
 <div data-footer></div>
 
 <script>
-/* 参加予定／履歴の切り替え */
-(function () {
-  var tabs = document.querySelectorAll('.my-tabs .my-tab');
-  for (var i = 0; i < tabs.length; i++) {
-    tabs[i].addEventListener('click', function () {
-      for (var j = 0; j < tabs.length; j++) {
-        var on = tabs[j] === this;
-        tabs[j].classList.toggle('is-active', on);
-        tabs[j].setAttribute('aria-selected', on ? 'true' : 'false');
-        document.getElementById(tabs[j].getAttribute('aria-controls')).hidden = !on;
-      }
+NMT.ready(function (db, ui) {
+  if (!ui.requireLogin()) return;
+  var f = NMT.fmt, esc = ui.esc;
+  var me = db.currentUser(), prof = db.profileOf(me.id);
+  var COLORS = ['coral', 'mint', 'lavender', 'pink', 'black'];
+  var $ = function (s) { return document.querySelector(s); };
+
+  // ---- プロフィール ----
+  $('[data-avatar]').setAttribute('aria-label', prof.displayName + ' のアイコン');
+  $('[data-name]').textContent = prof.displayName;
+  var links = db.t.socialLinks.filter(function (l) { return l.organizerId === prof.id; }).sort(function (a, b) { return a.sortOrder - b.sortOrder; });
+  $('[data-links]').innerHTML = '<span>@' + esc(prof.slug) + '</span>' +
+    links.map(function (l) { return '<a href="' + esc(l.url) + '" target="_blank" rel="noopener">' + esc(l.platform) + '</a>'; }).join('');
+
+  // ---- 支払いの途中 ----
+  function renderPending() {
+    var box = $('[data-pending]'), ps = db.pendingPayments();
+    box.hidden = !ps.length;
+    box.innerHTML = ps.map(function (p) {
+      var e = db.eventById(p.eventId);
+      var left = Math.max(0, Math.ceil((Date.parse(p.holdExpiresAt) - db.now()) / 60000));
+      return '<div class="notice my-pending"><span><b>支払いが終わっていない申込があります</b>：' + esc(e.title) + '（' + f.yen(p.amountYen) + '）。あと ' + left + ' 分で席の確保が切れます。</span>' +
+        '<a class="btn-sm btn-sm--black" href="' + ui.url('checkout', { payment: p.id }) + '">支払いに戻る</a></div>';
+    }).join('');
+  }
+
+  // ---- お知らせ ----
+  var showAllNotices = false;
+  function noticeHref(n) {
+    if (n.eventId) {
+      var tk = db.t.tickets.find(function (x) { return x.eventId === n.eventId && x.userId === me.id && !x.revokedAt; });
+      if (tk && n.type !== 'EVENT_CANCELLED') return ui.url('ticket', { id: tk.id });
+      return ui.url('event', { id: n.eventId });
+    }
+    return ui.url('mypage');
+  }
+  function renderNotices() {
+    var sec = $('[data-notices]'), list = db.notificationsOf();
+    sec.querySelectorAll('.my-notice, .my-notice-more, .my-empty-line').forEach(function (el) { el.remove(); });
+    var shown = showAllNotices ? list : list.slice(0, 5);
+    var html = shown.map(function (n) {
+      return '<a class="my-notice' + (n.readAt ? '' : ' is-unread') + '" href="' + noticeHref(n) + '" data-nid="' + esc(n.id) + '">' +
+        '<span class="dot ' + (n.readAt ? 'bg-white' : 'bg-coral') + '"' + (n.readAt ? '' : ' aria-label="未読"') + '></span>' +
+        '<span class="my-notice__text">' + esc(n.title) + '</span><span class="my-notice__time">' + f.ago(n.createdAt, db.now()) + '</span></a>';
+    }).join('');
+    if (!list.length) html = '<p class="my-empty-line">お知らせはまだありません。</p>';
+    if (list.length > 5) html += '<button class="my-notice-more textlink" type="button">' + (showAllNotices ? '閉じる' : 'すべて表示（' + list.length + '件）') + '</button>';
+    sec.insertAdjacentHTML('beforeend', html);
+  }
+  $('[data-notices]').addEventListener('click', function (ev) {
+    var a = ev.target.closest('[data-nid]');
+    if (a) { db.markRead(a.getAttribute('data-nid')); return; }
+    if (ev.target.closest('.my-notice-more')) { showAllNotices = !showAllNotices; renderNotices(); }
+  });
+
+  // ---- チケット ----
+  function state(m) {
+    var e = m.event;
+    if (e.status === 'CANCELLED') return { group: 'history', pill: { kind: 'cancelled', label: '中止' } };
+    if (!m.registrations.length) return { group: 'history', pill: { kind: 'ended', label: 'キャンセル済み' } };
+    if (db.isUpcoming(e)) {
+      var d = f.days(e.startAt, db.now());
+      return { group: 'upcoming', pill: { kind: 'open', label: '参加予定 · ' + (d <= 0 ? (db.isStarted(e) ? '開催中' : '今日') : 'あと' + d + '日') } };
+    }
+    var c = m.ticket.checkinStatus;
+    return { group: 'history', pill: c === 'CHECKED_IN' ? { kind: 'soldout', label: '参加済み' } : c === 'ABSENT' ? { kind: 'ended', label: '欠席' } : { kind: 'ended', label: '終了' } };
+  }
+  function ticketRow(m) {
+    var e = m.event, st = state(m), up = st.group === 'upcoming';
+    var slots = (m.slots.length ? m.slots : m.cancelled.map(function (r) { return db.slotById(r.slotId); }));
+    var price = m.paidYen > 0 ? f.yen(m.paidYen) + '（' + (e.status === 'CANCELLED' ? '返金済み' : '支払い済み') + '）' : '無料';
+    var actions = '';
+    if (up) {
+      actions += e.venueType === 'ONLINE' && e.onlineUrl
+        ? '<a class="btn-sm btn-sm--black" href="' + esc(e.onlineUrl) + '" target="_blank" rel="noopener">参加 URL を開く</a>'
+        : '<a class="btn-sm btn-sm--black" href="' + ui.url('ticket', { id: m.ticket.id }) + '">QR チケット</a>';
+    }
+    if (m.registrations.length) actions += '<button class="btn-sm" type="button" data-detail="' + esc(m.ticket.id) + '">申込内容</button>';
+    if (up && !db.isStarted(e)) actions += '<button class="my-ticket__cancel" type="button" data-cancel="' + esc(m.ticket.id) + '">キャンセル</button>';
+    return '<div class="my-ticket' + (up ? '' : ' my-ticket--past') + '">' +
+      '<div class="my-ticket__date"><span class="my-ticket__day">' + f.ymd(e.startAt).slice(5) + '</span><span class="my-ticket__time">' + f.wd(e.startAt) + ' ' + f.hm(e.startAt) + '</span></div>' +
+      '<img class="my-ticket__img" src="' + esc(e.coverUrl) + '" alt="">' +
+      '<div class="my-ticket__body">' + ui.pill(st.pill) +
+        '<a class="my-ticket__title" href="' + ui.url('event', { id: e.id }) + '">' + esc(e.title) + '</a>' +
+        '<p class="my-ticket__info">' + esc(e.venueName || 'オンライン') + ' · ' + esc(slots.map(function (s) { return s.name; }).join('・')) + ' · ' + price + '</p>' +
+      '</div>' +
+      '<div class="my-ticket__actions">' + actions + '</div>' +
+    '</div>';
+  }
+  var mine = [];
+  function renderTickets() {
+    mine = db.myTickets();
+    var up = mine.filter(function (m) { return state(m).group === 'upcoming'; });
+    var hist = mine.filter(function (m) { return state(m).group === 'history'; }).reverse();
+    $('[data-count-upcoming]').textContent = up.length;
+    $('[data-count-history]').textContent = hist.length;
+    $('[data-count-history]').hidden = !hist.length;
+    $('#panel-upcoming').innerHTML = (up.length ? up.map(ticketRow).join('') : '<p class="empty">参加予定のイベントはありません。<a class="textlink" href="' + ui.url('events') + '">イベントを探す</a></p>') +
+      '<p class="my-caution">※ 開始後はキャンセルできません。有料枠の支払い済み分は返金されません。</p>';
+    $('#panel-history').innerHTML = hist.length ? hist.map(ticketRow).join('') : '<p class="empty">まだ履歴はありません。</p>';
+  }
+  function byTicket(tid) { return mine.find(function (m) { return m.ticket.id === tid; }); }
+
+  // 申込内容（本人なので回答も出す）
+  function showDetail(m) {
+    var e = m.event, qs = db.questionsOf(e.id);
+    var rows = m.registrations.map(function (r) {
+      var s = db.slotById(r.slotId);
+      return '<li>' + esc(s.name) + '（' + f.yen(s.priceYen) + '）<span class="t-small t-muted"> · ' + f.ymd(r.appliedAt) + ' 申込</span></li>';
+    }).join('');
+    var ans = [];
+    m.registrations.forEach(function (r) { db.answersOf(r.id).forEach(function (a) { ans.push(a); }); });
+    var qa = qs.map(function (q) {
+      var a = ans.find(function (x) { return x.questionId === q.id; });
+      return a ? '<dt>' + esc(q.label) + '</dt><dd>' + esc(a.value) + '</dd>' : '';
+    }).join('');
+    var del = new Date(Date.parse(e.endAt) + e.answerRetentionDays * 86400e3);
+    ui.modal({
+      title: '申込内容',
+      html: '<div class="stack"><p><b>' + esc(e.title) + '</b><br><span class="t-small">' + f.card(e.startAt) + ' · ' + esc(e.venueName || 'オンライン') + '</span></p>' +
+        '<div><p class="field__label">参加枠</p><ul class="my-detail__slots">' + rows + '</ul></div>' +
+        (m.paidYen ? '<p class="t-small">お支払い：' + f.yen(m.paidYen) + '（' + (e.status === 'CANCELLED' ? '返金済み' : '支払い済み') + '）</p>' : '') +
+        (qa ? '<dl class="my-detail__qa">' + qa + '</dl>' : '') +
+        '<p class="notice notice--gray t-small">回答は主催者の運営メンバーだけが見られます。' + f.ymd(del) + ' に自動で削除されます。</p></div>',
+      actions: [{ label: '閉じる', kind: 'outline' }]
     });
   }
-})();
+
+  // キャンセル（枠ごと）
+  function cancelFlow(m) {
+    var e = m.event, multi = m.registrations.length > 1;
+    var paid = m.registrations.some(function (r) { return db.slotById(r.slotId).priceYen > 0; });
+    var list = m.registrations.map(function (r) {
+      var s = db.slotById(r.slotId), label = esc(s.name) + '（' + (s.priceYen ? f.yen(s.priceYen) + '・支払い済み' : '無料') + '）';
+      return multi ? '<label class="check"><input type="checkbox" name="reg" value="' + esc(r.id) + '">' + label + '</label>' : '<p>' + label + '</p>';
+    }).join('');
+    ui.modal({
+      title: '申込をキャンセルしますか？',
+      html: '<div class="stack"><p><b>' + esc(e.title) + '</b></p>' + (multi ? '<p class="t-small">キャンセルする枠を選んでください</p>' : '') + list +
+        (paid ? '<p class="t-small"><b>有料枠の返金は行いません</b></p>' : '') +
+        '<p class="notice notice--gray t-small">枠ごとにキャンセルできます。すべての枠をキャンセルすると QR チケットは使えなくなります。</p>' +
+        '<p class="field__error" hidden data-err></p></div>',
+      actions: [{ label: '戻る', value: false, kind: 'outline' }, { label: 'キャンセルする', kind: 'danger', onClick: function (w) {
+        var ids = multi ? [].map.call(w.querySelectorAll('input[name=reg]:checked'), function (i) { return i.value; }) : [m.registrations[0].id];
+        var err = w.querySelector('[data-err]');
+        if (!ids.length) { err.textContent = 'キャンセルする枠を選んでください'; err.hidden = false; return false; }
+        try { ids.forEach(function (id) { db.cancelRegistration(id); }); }
+        catch (x) { err.textContent = x.message; err.hidden = false; return false; }
+      } }]
+    }).then(function (v) {
+      if (!v) return;
+      ui.toast('キャンセルしました');
+      renderTickets(); renderNotices();
+    });
+  }
+  document.querySelector('.my-block[aria-label="チケット"]').addEventListener('click', function (ev) {
+    var d = ev.target.closest('[data-detail]'), c = ev.target.closest('[data-cancel]');
+    if (d) showDetail(byTicket(d.getAttribute('data-detail')));
+    if (c) cancelFlow(byTicket(c.getAttribute('data-cancel')));
+  });
+  // 参加予定／履歴の切り替え
+  var tabs = document.querySelectorAll('.my-tabs .my-tab');
+  tabs.forEach(function (tab) {
+    tab.addEventListener('click', function () {
+      tabs.forEach(function (t) {
+        var on = t === tab;
+        t.classList.toggle('is-active', on);
+        t.setAttribute('aria-selected', on ? 'true' : 'false');
+        document.getElementById(t.getAttribute('aria-controls')).hidden = !on;
+      });
+    });
+  });
+
+  // ---- 保存したイベント（開催予定から2件） ----
+  var saved = db.savedOf().filter(function (e) { return db.isUpcoming(e); }).sort(function (a, b) { return Date.parse(a.startAt) - Date.parse(b.startAt); });
+  $('[data-saved]').outerHTML = saved.length
+    ? '<div class="event-grid">' + saved.slice(0, 2).map(function (e) { return ui.eventCard(e); }).join('') + '</div>'
+    : '<p class="empty">保存したイベントはありません。イベント詳細の「保存」から追加できます。</p>';
+
+  // ---- 主催者として ----
+  var host = $('[data-host]');
+  var orgs = db.managedOrganizers();
+  host.insertAdjacentHTML('beforeend', orgs.map(function (o, i) {
+    var grp = o.type === 'GROUP';
+    return '<div class="my-host__row"><span class="my-host__mark bg-' + (grp ? ['lavender', 'coral', 'pink'][i % 3] : 'mint') + '"></span>' +
+      '<div class="my-host__text"><span class="my-host__name">' + esc(o.displayName) + (grp ? '' : '（個人）') + '</span><span class="my-host__role">' + (grp ? 'owner' : '個人主催') + '</span></div>' +
+      '<a class="my-host__link" href="' + ui.url('dashboard', { org: o.slug }) + '">管理画面へ →</a></div>';
+  }).join('') + '<a class="my-host__new" href="' + ui.url('groupNew') + '">＋ 新しい団体を作る</a>');
+
+  // ---- フォロー中の団体 ----
+  var follows = db.followingOf().map(function (x) { return db.organizerById(x.organizerId); }).filter(Boolean);
+  $('[data-follow-stack]').innerHTML = follows.slice(0, 5).map(function (o, i) {
+    return '<a class="dot bg-' + COLORS[i % COLORS.length] + '" href="' + ui.url('organizer', { slug: o.slug }) + '" aria-label="' + esc(o.displayName) + '" title="' + esc(o.displayName) + '"></a>';
+  }).join('');
+  $('[data-follow-more]').textContent = !follows.length ? 'フォロー中の団体はありません' : follows.length > 5 ? '＋' + (follows.length - 5) + ' 団体' : follows.length + ' 団体';
+
+  renderPending(); renderNotices(); renderTickets();
+});
 </script>
 </body>
 </html>

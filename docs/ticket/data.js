@@ -14,7 +14,7 @@
 (function (root) {
   'use strict';
 
-  var KEY = 'nmt:db:v1';
+  var KEY = 'nmt:db:v2';
   var DEMO_NOW = Date.parse('2026-10-29T10:00:00+09:00'); // デモの「いま」（木曜）。週末は 10/31・11/1
   var HOLD_MIN = 30;
   var CLOCK_CAP_MS = 6 * 60 * 60 * 1000; // デモの時計は開いてから最大6時間だけ進む
@@ -135,6 +135,8 @@
       slots: [{ kind: 'STUDENT', name: '学生', cap: 40, price: 18000, fill: 32 }] });
     event('e-sotsugyo', { org: 'o-keio', genre: 'g-music', title: '卒業ライブ 2026', start: '2026-03-14T17:00:00+09:00', end: '2026-03-14T21:00:00+09:00', venue: '下北沢 SHELTER', cover: 'flyer-band-battle.jpg',
       slots: [{ kind: 'STUDENT', name: '学生', cap: 120, price: 1000, fill: 120 }] });
+    event('e-autumn', { org: 'o-keio', genre: 'g-music', title: '秋の定期ライブ 2026', start: '2026-10-06T17:00:00+09:00', end: '2026-10-06T21:00:00+09:00', venue: '三田キャンパス 西校舎ホール', cover: 'flyer-acoustic.jpg',
+      slots: [{ kind: 'STUDENT', name: '学生', cap: 80, price: 500, fill: 46 }] });
     event('e-run-1019', { org: 'o-run', genre: 'g-sports', title: '朝の代々木公園ランニング＆モーニング', start: '2026-10-19T07:30:00+09:00', end: '2026-10-19T09:30:00+09:00', venue: '代々木公園 原宿門', cover: 'flyer-morning-run.jpg',
       slots: [{ kind: 'STUDENT', name: '学生', cap: 30, fill: 22 }] });
     event('e-career-ad', { org: 'o-career', genre: 'g-career', title: '業界研究ナイト：広告・PR の先輩5人', start: '2026-11-12T19:00:00+09:00', end: '2026-11-12T21:00:00+09:00', venue: '渋谷ヒカリエ 8F', cover: 'article-interview.jpg',
@@ -154,7 +156,9 @@
     var answered = {}; // ticketId → { questionId: 1 }
     var regN = 0, tkN = 0, payN = 0;
     var past = function (e) { return Date.parse(e.endAt) < DEMO_NOW; };
+    var NAMED = { 'u-yamada': ['山田 湊', 'ヤマダ ミナト', '慶應義塾大学 3年'], 'u-mio': ['三田 澪', 'ミタ ミオ', '慶應義塾大学 2年'], 'u-takeru': ['竹内 健', 'タケウチ タケル', '慶應義塾大学 2年'], 'u-saki': ['佐々木 咲', 'ササキ サキ', '青山学院大学 3年'], 'u-yuto': ['中島 悠斗', 'ナカジマ ユウト', '明治大学 1年'] };
     function nameFor(uid) {
+      if (NAMED[uid]) return { name: NAMED[uid][0], kana: NAMED[uid][1], school: NAMED[uid][2] };
       var k = parseInt(uid.replace(/\D/g, ''), 10) || 0;
       var fam = FAMILY[k % FAMILY.length], giv = GIVEN_KANJI[(k * 7) % GIVEN_KANJI.length];
       return { name: fam[0] + ' ' + giv[0], kana: fam[1] + ' ' + giv[1], school: SCHOOLS[k % SCHOOLS.length] };
@@ -220,7 +224,7 @@
     t.notifications.push(
       { id: 'n-1', userId: 'u-yamada', toEmail: 'yamada@example.com', type: 'ANNOUNCEMENT', title: '慶應軽音サークル：11/8 の集合場所が変更になりました', readAt: null, status: 'SENT', eventId: 'e-bandbattle', registrationId: null, announcementId: 'an-1', createdAt: iso('2026-10-29T08:00:00+09:00'), sentAt: iso('2026-10-29T08:00:00+09:00') },
       { id: 'n-2', userId: 'u-yamada', toEmail: 'yamada@example.com', type: 'REGISTRATION_CONFIRMED', title: 'インカレ・バンド対抗ライブ vol.4 の QR チケットを発行しました', readAt: null, status: 'SENT', eventId: 'e-bandbattle', registrationId: null, announcementId: null, createdAt: iso('2026-10-28T21:10:00+09:00'), sentAt: iso('2026-10-28T21:10:00+09:00') },
-      { id: 'n-3', userId: 'u-yamada', toEmail: 'yamada@example.com', type: 'ANSWER_DELETION_NOTICE', title: '「冬合宿 2026」の申込時の回答は、7日後（11/5）に自動で削除されます', readAt: null, status: 'SENT', eventId: 'e-gasshuku', registrationId: null, announcementId: null, createdAt: iso('2026-10-29T06:00:00+09:00'), sentAt: iso('2026-10-29T06:00:00+09:00') }
+      { id: 'n-3', userId: 'u-yamada', toEmail: 'yamada@example.com', type: 'ANSWER_DELETION_NOTICE', title: '「秋の定期ライブ 2026」の申込時の回答は、7日後（11/5）に自動で削除されます', readAt: null, status: 'SENT', eventId: 'e-autumn', registrationId: null, announcementId: null, createdAt: iso('2026-10-29T06:00:00+09:00'), sentAt: iso('2026-10-29T06:00:00+09:00') }
     );
     t.announcements[0].recipientCount = t.tickets.filter(function (x) { return x.eventId === 'e-bandbattle'; }).length;
 
@@ -296,6 +300,8 @@
     db.ticketById = function (tid) { return by('tickets', 'id', tid); };
     db.paymentById = function (pid) { expireHolds(); return by('payments', 'id', pid); };
     db.articleBySlug = function (slug) { return by('articles', 'slug', slug); };
+    db.genres = function () { return t.genres.slice().sort(function (a, b) { return a.sortOrder - b.sortOrder; }); };
+    db.publishedArticles = function (cat) { return t.articles.filter(function (a) { return a.status === 'PUBLISHED' && (!cat || a.category === cat); }).sort(function (a, b) { return Date.parse(b.publishedAt) - Date.parse(a.publishedAt); }); };
     db.slotsOf = function (eid) { return t.slots.filter(function (s) { return s.eventId === eid; }).sort(function (a, b) { return a.sortOrder - b.sortOrder; }); };
     db.questionsOf = function (eid) { return t.questions.filter(function (q) { return q.eventId === eid; }).sort(function (a, b) { return a.sortOrder - b.sortOrder; }); };
     db.questionsFor = function (eid, slotIds) { return db.questionsOf(eid).filter(function (q) { return !q.slotIds.length || q.slotIds.some(function (s) { return slotIds.indexOf(s) >= 0; }); }); };
@@ -715,18 +721,35 @@
       t.payments.filter(function (p) { return p.eventId === eid && p.status === 'PAID'; }).forEach(function (p) { p.status = 'REFUNDED'; p.refundedAt = nowIso(); });
       save(); return e;
     };
+    db.canTransfer = function (eid) {
+      var e = db.eventById(eid);
+      if (!e || !db.isOwner(e.organizerId)) return { ok: false, reason: '権限がありません' };
+      if (t.payments.some(function (p) { return p.eventId === eid && p.status === 'PAID'; })) return { ok: false, reason: '支払い済みの申込があるイベントは移管できません（入金先が変わるため）' };
+      return { ok: true };
+    };
     db.transferEvent = function (eid, toOrgId) {
       var e = ownerOf(eid);
+      var c = db.canTransfer(eid); if (!c.ok) fail(c.reason);
       need(db.organizerById(toOrgId), '移管先がありません');
       if (!db.isOwner(toOrgId)) fail('移管先の権限がありません（移管先でも owner である必要があります）');
       e.organizerId = toOrgId; e.updatedAt = nowIso(); save(); return e;
     };
-    // 参加者リスト（主催者用）: チケット1枚＝1行
+    db.answersDeleteAt = function (eid) { var e = db.eventById(eid); return new Date(Date.parse(e.endAt) + e.answerRetentionDays * 86400e3).toISOString(); };
+    db.answersExpired = function (eid) { return Date.parse(db.answersDeleteAt(eid)) <= clock(); };
+    db.checkinLogsOf = function (eid) {
+      var ids = {}; t.tickets.forEach(function (x) { if (x.eventId === eid) ids[x.id] = 1; });
+      return t.checkinLogs.filter(function (l) { return ids[l.ticketId]; }).sort(function (a, b) { return Date.parse(b.changedAt) - Date.parse(a.changedAt); });
+    };
+    db.cancelledCount = function (eid) { var ids = db.slotsOf(eid).map(function (s) { return s.id; }); return t.registrations.filter(function (r) { return r.status === 'CANCELLED' && ids.indexOf(r.slotId) >= 0; }).length; };
+    db.reports = function (q) { q = q || {}; return t.reports.filter(function (r) { return !q.status || r.status === q.status; }).sort(function (a, b) { return Date.parse(b.createdAt) - Date.parse(a.createdAt); }); };
+    // 参加者リスト（主催者用）: チケット1枚＝1行。保存期間を過ぎた回答は返さない
     db.attendees = function (eid) {
-      ownerOf(eid);
+      var ev = db.eventById(eid);
+      if (!ev || (!db.isOwner(ev.organizerId) && !db.isAdmin())) fail('権限がありません');
+      var expired = db.answersExpired(eid);
       return t.tickets.filter(function (x) { return x.eventId === eid && !x.revokedAt; }).map(function (x) {
         var regs = db.registrationsOfTicket(x.id);
-        var ans = {}; regs.forEach(function (r) { db.answersOf(r.id).forEach(function (a) { ans[a.questionId] = a.value; }); });
+        var ans = {}; if (!expired) regs.forEach(function (r) { db.answersOf(r.id).forEach(function (a) { ans[a.questionId] = a.value; }); });
         return { ticket: x, user: db.userById(x.userId), profile: db.personalOrganizer(x.userId), slots: regs.map(function (r) { return db.slotById(r.slotId); }), answers: ans, appliedAt: regs.length ? regs[0].appliedAt : x.issuedAt };
       }).sort(function (a, b) { return Date.parse(b.appliedAt) - Date.parse(a.appliedAt); });
     };
@@ -742,7 +765,7 @@
     };
     db.setCheckin = function (tid, status, method) {
       var x = need(db.ticketById(tid), 'チケットがありません');
-      if (!db.isOwner(db.eventById(x.eventId).organizerId)) fail('権限がありません');
+      if (!db.isOwner(db.eventById(x.eventId).organizerId) && !db.isAdmin()) fail('権限がありません');
       if (['NOT_CHECKED_IN', 'CHECKED_IN', 'ABSENT'].indexOf(status) < 0) fail('受付の状態が正しくありません');
       if (x.revokedAt) fail('無効になったチケットです');
       if (x.checkinStatus === status) return x;

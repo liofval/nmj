@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>プロフィールを編集｜NEXT MOVE TICKETS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Noto+Sans+JP:wght@400;500;700;900&family=DM+Mono:wght@400;500&family=Instrument+Serif:ital@1&family=Barlow+Condensed:wght@700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="media.css">
+<script src="data.js"></script>
+<script src="common.js"></script>
+</head>
+<body>
+
+<div data-header="v2" data-active="none"></div>
+
+<main class="wrap me-page">
+  <div class="narrow">
+    <a class="p-back" href="mypage.html">← マイページ</a>
+    <div class="p-head">
+      <h1 class="p-head__en">PROFILE</h1>
+      <p class="p-head__ja">プロフィールを編集</p>
+    </div>
+
+    <form class="stack me-form" novalidate data-form>
+      <section class="box stack" aria-labelledby="h-basic">
+        <h2 class="box__title" id="h-basic">プロフィール</h2>
+        <div class="me-avatar">
+          <span class="dot bg-lavender" role="img" aria-label="アイコン"></span>
+          <p class="field__help">アイコンの画像は今後の対応です（プロトタイプでは色の丸で表示します）</p>
+        </div>
+        <label class="field">
+          <span class="field__label">あだ名 <span class="req">必須</span></span>
+          <input class="input" name="displayName" maxlength="30" autocomplete="nickname">
+          <span class="field__help">ページやチケットに出る名前です。本名は出ません</span>
+          <span class="field__error" hidden data-err="displayName"></span>
+        </label>
+        <label class="field">
+          <span class="field__label">ユーザーネーム <span class="req">必須</span></span>
+          <span class="me-slug"><span class="me-slug__at">@</span><input class="input" name="slug" maxlength="30" autocomplete="username" spellcheck="false"></span>
+          <span class="field__help">半角英小文字・数字・_ - で3〜30文字。変更するとあなたのページの URL が変わります</span>
+          <span class="field__error" hidden data-err="slug"></span>
+        </label>
+        <label class="field">
+          <span class="field__label">自己紹介</span>
+          <textarea class="textarea" name="bio" maxlength="300"></textarea>
+          <span class="field__help">今は個人の主催者ページには表示しません。300文字まで</span>
+        </label>
+        <label class="field">
+          <span class="field__label">名札の名前</span>
+          <input class="input" name="badgeName" maxlength="20" placeholder="NEXT MOVER" autocomplete="off" spellcheck="false">
+          <span class="field__help">イベントパス（名札）に出す名前です。半角英字・スペース・. - ' で20文字まで。空欄のときは「NEXT MOVER」と表示します</span>
+          <span class="field__error" hidden data-err="badgeName"></span>
+        </label>
+      </section>
+
+      <section class="box stack" aria-labelledby="h-mail">
+        <h2 class="box__title" id="h-mail">メール通知</h2>
+        <div class="stack" style="--stack-gap:12px" data-mail></div>
+      </section>
+
+      <div class="cluster me-actions">
+        <button class="btn btn--black" type="submit">保存する<img class="icon" src="assets/icon-arrow-btn-white.svg" alt=""></button>
+        <a class="textlink" href="mypage.html">保存せずに戻る</a>
+      </div>
+    </form>
+
+    <section class="me-logout" aria-label="ログアウト">
+      <hr class="divider">
+      <p class="t-small t-muted" data-email></p>
+      <button class="btn btn--outline btn--sm" type="button" data-logout>ログアウト</button>
+    </section>
+  </div>
+</main>
+
+<div data-footer></div>
+
+<script>
+NMT.ready(function (db, ui) {
+  if (!ui.requireLogin()) return;
+  var esc = ui.esc, L = NMT.LABEL.EmailCategory;
+  var me = db.currentUser(), prof = db.profileOf(me.id);
+  var form = document.querySelector('[data-form]');
+  form.displayName.value = prof.displayName;
+  form.slug.value = prof.slug;
+  form.bio.value = prof.bio || '';
+  form.badgeName.value = me.badgeName || '';
+  document.querySelector('[data-email]').textContent = 'ログイン中：' + me.email + '（Google）';
+
+  // メール通知（EVENT_UPDATES は取引メールなので止められない）
+  var prefs = db.t.emailPreferences.filter(function (p) { return p.userId === me.id; });
+  var on = function (c) { var p = prefs.find(function (x) { return x.category === c; }); return !p || p.enabled; };
+  document.querySelector('[data-mail]').innerHTML = Object.keys(L).map(function (c) {
+    var locked = c === 'EVENT_UPDATES';
+    return '<label class="check"><input type="checkbox" name="mail" value="' + c + '"' + (locked || on(c) ? ' checked' : '') + (locked ? ' disabled' : '') + '>' +
+      '<span>' + esc(L[c]) + (locked ? '<br><span class="field__help">申込・QR チケット・中止のお知らせは大事な連絡なので止められません</span>' : '') + '</span></label>';
+  }).join('');
+
+  function setErr(name, msg) {
+    var el = form.querySelector('[data-err="' + name + '"]'), input = form[name];
+    el.textContent = msg || ''; el.hidden = !msg;
+    input.setAttribute('aria-invalid', msg ? 'true' : 'false');
+  }
+  form.slug.addEventListener('input', function () { form.slug.value = form.slug.value.toLowerCase(); setErr('slug', db.validateSlug(form.slug.value, prof.id)); });
+
+  form.addEventListener('submit', function (ev) {
+    ev.preventDefault();
+    var name = form.displayName.value.trim(), slug = form.slug.value.trim(), badge = form.badgeName.value.trim();
+    var nameErr = name ? '' : 'あだ名を入力してください';
+    var slugErr = db.validateSlug(slug, prof.id);
+    setErr('displayName', nameErr); setErr('slug', slugErr); setErr('badgeName', '');
+    if (nameErr || slugErr) { (nameErr ? form.displayName : form.slug).focus(); return; }
+    // 名札を先に保存（ルール外ならここで止まり、ほかは変わらない）
+    try { db.updateProfile({ badgeName: badge }); }
+    catch (x) { setErr('badgeName', x.message); form.badgeName.focus(); return; }
+    try {
+      db.updateProfile({ displayName: name, slug: slug, bio: form.bio.value });
+      form.querySelectorAll('input[name=mail]:not(:disabled)').forEach(function (c) { db.setEmailPreference(c.value, c.checked); });
+    } catch (x) { ui.toast(x.message); return; }
+    ui.toast('保存しました');
+  });
+
+  document.querySelector('[data-logout]').addEventListener('click', function () {
+    db.logout();
+    location.href = ui.url('top');
+  });
+});
+</script>
+</body>
+</html>

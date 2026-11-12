@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>団体を作る｜NEXT MOVE TICKETS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Noto+Sans+JP:wght@400;500;700;900&family=DM+Mono:wght@400;500&family=Instrument+Serif:ital@1&family=Barlow+Condensed:wght@700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="org.css">
+<script src="data.js"></script>
+<script src="common.js"></script>
+</head>
+<body>
+<div data-header="v2" data-active="none"></div>
+<main id="main" class="wrap gn-page"></main>
+<div data-footer></div>
+<script>
+NMT.ready(function (db, ui) {
+  var esc = ui.esc, main = document.getElementById('main');
+  if (!ui.requireLogin()) return;
+
+  main.innerHTML = '' +
+    '<div class="p-head"><div class="stack" style="--stack-gap:8px">' +
+      '<a class="p-back" href="' + ui.url('mypage') + '">← マイページ</a>' +
+      '<p class="p-head__en">NEW GROUP</p><h1 class="p-head__ja">団体を作る</h1></div></div>' +
+    '<div class="narrow stack" style="--stack-gap:24px">' +
+      '<p class="t-small">サークル・学生団体のページです。申請なしで作れます。代表が交代しても、イベントとフォロワーは団体に残ります。</p>' +
+      '<form class="box stack" id="gn-form" novalidate style="--stack-gap:24px">' +
+        '<label class="field"><span class="field__label">団体名 <span class="req">必須</span></span>' +
+          '<input class="input" name="displayName" maxlength="40" placeholder="例：慶應軽音サークル" autocomplete="off"></label>' +
+        '<div data-similar hidden></div>' +
+        '<label class="field"><span class="field__label">ユーザーネーム <span class="req">必須</span></span>' +
+          '<span class="gn-slug"><span class="gn-slug__at" aria-hidden="true">@</span><input class="input" name="slug" maxlength="30" placeholder="keio-lightmusic" autocomplete="off" autocapitalize="off" spellcheck="false" aria-describedby="slug-msg"></span>' +
+          '<span class="field__help" id="slug-msg">半角英小文字・数字・_ - で3〜30文字。ページの URL になります</span></label>' +
+        '<label class="field"><span class="field__label">紹介文</span>' +
+          '<textarea class="textarea" name="bio" maxlength="400" placeholder="活動内容・頻度・雰囲気など"></textarea></label>' +
+        '<p class="notice t-small">作成するとあなたが owner になります。owner は複数人にできるので、副代表なども owner として招待してください。</p>' +
+        '<p class="field__error" hidden data-err></p>' +
+        '<button class="btn btn--black btn--block" type="submit">団体を作成する<img class="icon" src="assets/icon-arrow-btn-white.svg" alt=""></button>' +
+      '</form>' +
+    '</div>';
+
+  var form = main.querySelector('#gn-form');
+  var nameEl = form.elements.displayName, slugEl = form.elements.slug, simBox = main.querySelector('[data-similar]'), err = main.querySelector('[data-err]');
+  var dismissedFor = null; // 「別の団体として作る」を選んだときの団体名
+  var requested = {};
+
+  function similar() { return db.similarGroups(nameEl.value.trim()); }
+  function renderSimilar() {
+    var list = similar(), name = nameEl.value.trim();
+    if (!list.length || dismissedFor === name) { simBox.hidden = true; simBox.innerHTML = ''; return; }
+    simBox.hidden = false;
+    simBox.innerHTML = '<div class="gn-similar stack" style="--stack-gap:12px"><p class="gn-similar__title">似た名前の団体があります</p>' +
+      '<p class="t-small">同じ団体のページが2つにならないよう、すでにある団体なら owner に参加を依頼してください。</p>' +
+      list.map(function (o) {
+        return '<div class="gn-similar__item"><div class="gn-similar__text"><a class="gn-similar__name" href="' + ui.url('organizer', { slug: o.slug }) + '">' + esc(o.displayName) + '</a>' +
+          '<span class="t-small t-muted">@' + esc(o.slug) + ' · フォロワー ' + db.followerCount(o.id) + '</span></div>' +
+          (db.isOwner(o.id) ? '<a class="org-btn" href="' + ui.url('dashboard', { org: o.slug }) + '">あなたはすでに owner です</a>'
+            : requested[o.id] ? '<span class="org-btn" aria-disabled="true">依頼しました</span>'
+            : '<button class="org-btn org-btn--black" type="button" data-join="' + esc(o.id) + '">この団体に参加を依頼</button>') + '</div>';
+      }).join('') +
+      '<button class="textlink t-small" type="button" data-dismiss>別の団体として作る</button></div>';
+  }
+  function checkSlug() {
+    var msg = main.querySelector('#slug-msg'), v = slugEl.value.trim();
+    if (!v) { msg.textContent = '半角英小文字・数字・_ - で3〜30文字。ページの URL になります'; msg.className = 'field__help'; slugEl.removeAttribute('aria-invalid'); return ''; }
+    var e = db.validateSlug(v);
+    msg.textContent = e || '✓ 使えます（' + location.host + '/@' + v + '）';
+    msg.className = e ? 'field__error' : 'field__help';
+    if (e) slugEl.setAttribute('aria-invalid', 'true'); else slugEl.removeAttribute('aria-invalid');
+    return e;
+  }
+
+  nameEl.addEventListener('input', renderSimilar);
+  slugEl.addEventListener('input', checkSlug);
+  simBox.addEventListener('click', function (ev) {
+    if (ev.target.closest('[data-dismiss]')) { dismissedFor = nameEl.value.trim(); renderSimilar(); slugEl.focus(); return; }
+    var b = ev.target.closest('[data-join]'); if (!b) return;
+    var o = db.organizerById(b.getAttribute('data-join'));
+    ui.modal({
+      title: o.displayName + ' に参加を依頼',
+      html: '<div class="stack"><p class="t-small">団体の owner が承認すると、あなたも owner になります（団体の設定 → メンバーで承認されます）。</p>' +
+        '<label class="field"><span class="field__label">ひとこと（任意）</span><textarea class="textarea" name="message" maxlength="300" placeholder="例：今年度の副代表のやまだです"></textarea></label></div>',
+      actions: [{ label: 'やめる', value: false, kind: 'outline' }, { label: '依頼する', kind: 'black', onClick: function (w) {
+        try { db.requestJoin(o.id, w.querySelector('textarea').value.trim()); } catch (x) { ui.toast(x.message); return false; }
+      } }]
+    }).then(function (v) { if (v) { requested[o.id] = 1; renderSimilar(); ui.toast('参加を依頼しました。owner の承認を待ってください'); } });
+  });
+
+  form.addEventListener('submit', function (ev) {
+    ev.preventDefault();
+    err.hidden = true;
+    var name = nameEl.value.trim();
+    if (similar().length && dismissedFor !== name) { renderSimilar(); simBox.scrollIntoView({ block: 'center' }); err.textContent = '似た名前の団体があります。参加を依頼するか「別の団体として作る」を選んでください'; err.hidden = false; return; }
+    try {
+      var o = db.createGroup({ displayName: name, slug: slugEl.value.trim(), bio: form.elements.bio.value.trim() || null });
+      location.href = ui.url('dashboard', { org: o.slug });
+    } catch (x) { err.textContent = x.message; err.hidden = false; }
+  });
+});
+</script>
+</body>
+</html>

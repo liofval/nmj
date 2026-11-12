@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>参加者リスト・受付｜NEXT MOVE TICKETS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Noto+Sans+JP:wght@400;500;700;900&family=DM+Mono:wght@400;500&family=Instrument+Serif:ital@1&family=Barlow+Condensed:wght@700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="org.css">
+<link rel="stylesheet" href="manage.css">
+<script src="data.js"></script>
+<script src="common.js"></script>
+</head>
+<body class="org-page">
+<div data-header="org" data-active="events"></div>
+<main id="main"><div class="wrap" id="root"></div></main>
+<div data-footer></div>
+<script>
+NMT.ready(function (db, ui) {
+  var f = NMT.fmt, L = NMT.LABEL, root = document.getElementById('root');
+  var id = ui.param('id'), org = NMT.currentOrg();
+  var PAGE = 'attendees', EN = 'ATTENDEES', JA = '参加者リスト・受付', DENY = 'このイベントの主催者（owner）だけが参加者リストを見られます。';
+
+  // ---- 共通: 見出し・権限 ----
+  function gateBox(title, body, actions) {
+    root.innerHTML = '<div class="box mg-gate"><p class="mg-gate__title">' + ui.esc(title) + '</p><p class="t-small">' + ui.esc(body) + '</p><div class="cluster">' + (actions || '') + '</div></div>';
+  }
+  function pickEvent() {
+    var mine = db.t.events.filter(function (e) { return db.canManageEvent(e.id) && e.status !== 'DRAFT'; }).sort(function (a, b) { return Date.parse(a.startAt) - Date.parse(b.startAt); });
+    if (!mine.length) return gateBox('管理しているイベントがありません', 'あなたが owner の団体（または個人）のイベントがここに出ます。', '<a class="btn btn--black" href="' + ui.url('dashboard', { org: org && org.slug }) + '">ダッシュボードへ</a>');
+    root.innerHTML = '<div class="mg-head"><div class="p-head"><div><p class="p-head__en">' + EN + '</p><h1 class="p-head__ja">' + ui.esc(JA) + '：イベントを選ぶ</h1></div></div></div>' +
+      '<div class="box"><div class="stack" style="--stack-gap:0">' + mine.map(function (e) {
+        return '<a class="an-item" href="' + ui.url(PAGE, { id: e.id }) + '"><span class="an-item__subject">' + ui.esc(e.title) + '</span><span class="an-item__meta">' + f.card(e.startAt) + ' · ' + ui.esc(db.organizerById(e.organizerId).displayName) + '</span></a>';
+      }).join('') + '</div></div>';
+  }
+  function head(e, compact) {
+    var o = db.organizerById(e.organizerId);
+    var tabs = [['attendees', '参加者・受付'], ['checkin', 'QR で受付'], ['announce', '告知'], ['transfer', '移管']];
+    return '<div class="mg-head">' +
+      '<a class="p-back" href="' + ui.url('dashboard', { org: o.slug }) + '">← ダッシュボード</a>' +
+      (compact ? '' : '<div class="p-head"><div><p class="p-head__en">' + EN + '</p><h1 class="p-head__ja">' + ui.esc(JA) + '</h1></div></div>') +
+      '<div class="mg-event"><p class="mg-event__title">' + ui.esc(e.title) + '</p><p class="mg-event__meta">' + f.card(e.startAt) + ' · ' + ui.esc(e.venueName || 'オンライン') + ' · ' + ui.esc(o.displayName) + (e.status === 'CANCELLED' ? ' · 中止' : '') + '</p></div>' +
+      '</div>' +
+      '<nav class="tabs mg-tabs" aria-label="イベントの管理">' + tabs.map(function (t) {
+        return '<a class="tabs__item' + (t[0] === PAGE ? ' is-active' : '') + '" href="' + ui.url(t[0], { id: e.id }) + '"' + (t[0] === PAGE ? ' aria-current="page"' : '') + '>' + t[1] + '</a>';
+      }).join('') + '<a class="tabs__item" href="' + ui.url('event', { id: e.id }) + '">公開ページ</a></nav>';
+  }
+  if (!ui.requireLogin()) return;
+  if (!id) return pickEvent();
+  var e = db.eventById(id);
+  if (!e) return gateBox('イベントがありません', 'URL が正しいか確かめてください。', '<a class="btn btn--black" href="' + ui.url(PAGE) + '">イベントを選ぶ</a>');
+  if (!db.canManageEvent(id)) return gateBox('このページを見る権限がありません', DENY, '<a class="btn btn--outline" href="' + ui.url('event', { id: id }) + '">公開ページへ</a>');
+
+  // ---- 参加者リスト ----
+  var qs = db.questionsOf(id);
+  var qName = qs.find(function (q) { return q.commonKey === 'NAME'; });
+  var qKana = qs.find(function (q) { return q.commonKey === 'KANA'; });
+  var deleteAt = Date.parse(e.endAt) + e.answerRetentionDays * 86400e3;
+  var deleted = deleteAt <= db.now();
+  var state = { q: '', slot: '', status: '', open: {} };
+
+  function payLabel(a) {
+    var regs = db.registrationsOfTicket(a.ticket.id);
+    var p = regs.map(function (r) { return r.paymentId && db.paymentById(r.paymentId); }).filter(Boolean)[0];
+    return p ? L.PaymentStatus[p.status] : '無料';
+  }
+  function seg(a) {
+    return '<div class="seg" role="group" aria-label="' + ui.esc(a.profile.displayName) + ' の受付の状態">' + ['NOT_CHECKED_IN', 'CHECKED_IN', 'ABSENT'].map(function (s) {
+      return '<button type="button" data-tid="' + ui.esc(a.ticket.id) + '" data-status="' + s + '" aria-pressed="' + (a.ticket.checkinStatus === s) + '">' + L.CheckinStatus[s] + '</button>';
+    }).join('') + '</div>';
+  }
+  function answersHtml(a) {
+    if (deleted) return '<p class="t-small t-muted">申込時の回答は保存期間を過ぎたため削除済みです</p>';
+    return '<dl class="att-answers">' + db.questionsFor(id, a.slots.map(function (s) { return s.id; })).map(function (q) {
+      return '<dt>' + ui.esc(q.label) + '</dt><dd>' + ui.esc(a.answers[q.id] || '—') + '</dd>';
+    }).join('') + '</dl>';
+  }
+  function checkedAt(a) { return a.ticket.checkinStatus === 'CHECKED_IN' && a.ticket.checkedInAt ? ' ' + f.hm(a.ticket.checkedInAt) : ''; }
+
+  function render() {
+    var all = db.attendees(id), sum = db.checkinSummary(id), slots = db.slotsOf(id);
+    var q = state.q.trim().toLowerCase();
+    var list = all.filter(function (a) {
+      if (state.slot && !a.slots.some(function (s) { return s.id === state.slot; })) return false;
+      if (state.status && a.ticket.checkinStatus !== state.status) return false;
+      if (q) {
+        var hay = [a.profile.displayName, '@' + a.profile.slug].concat(deleted ? [] : [qName && a.answers[qName.id], qKana && a.answers[qKana.id]]).join(' ').toLowerCase();
+        if (hay.indexOf(q) < 0) return false;
+      }
+      return true;
+    });
+    var slotChips = '<button type="button" class="chip' + (!state.slot ? ' is-active' : '') + '" data-slot="">すべて ' + all.length + '</button>' + slots.map(function (s) {
+      var n = all.filter(function (a) { return a.slots.some(function (x) { return x.id === s.id; }); }).length;
+      return '<button type="button" class="chip' + (state.slot === s.id ? ' is-active' : '') + '" data-slot="' + ui.esc(s.id) + '">' + ui.esc(s.name) + ' ' + n + '</button>';
+    }).join('');
+    var rows = list.map(function (a) {
+      var open = !!state.open[a.ticket.id];
+      var slotNames = a.slots.map(function (s) { return s.name; }).join('＋');
+      return '<tr' + (open ? ' class="is-open"' : '') + '><td>' + seg(a) + '<div class="att-slug">' + checkedAt(a).trim() + '</div></td>' +
+        '<td><div class="att-name">' + ui.esc(a.profile.displayName) + '</div><div class="att-slug">@' + ui.esc(a.profile.slug) + '</div></td>' +
+        '<td>' + ui.esc(slotNames) + '</td><td>' + ui.esc(payLabel(a)) + '</td>' +
+        '<td>' + f.md(a.appliedAt) + ' ' + f.hm(a.appliedAt) + '</td>' +
+        '<td><button type="button" class="textlink att-open" data-open="' + ui.esc(a.ticket.id) + '" aria-expanded="' + open + '">' + (open ? '▲ 閉じる' : '▼ 回答を見る') + '</button></td></tr>' +
+        (open ? '<tr class="is-open"><td></td><td colspan="5">' + answersHtml(a) + '</td></tr>' : '');
+    }).join('');
+    var cards = list.map(function (a) {
+      var open = !!state.open[a.ticket.id];
+      return '<div class="att-card' + (a.ticket.checkinStatus === 'CHECKED_IN' ? ' is-checked' : '') + '">' +
+        '<div class="att-card__top"><div><div class="att-name">' + ui.esc(a.profile.displayName) + (a.ticket.checkinStatus === 'CHECKED_IN' ? ' ✓' : '') + '</div>' +
+        '<div class="att-card__sub">@' + ui.esc(a.profile.slug) + ' · ' + ui.esc(a.slots.map(function (s) { return s.name; }).join('＋')) + ' · ' + ui.esc(payLabel(a)) + '</div>' +
+        '<div class="att-card__sub">申込 ' + f.md(a.appliedAt) + ' ' + f.hm(a.appliedAt) + (checkedAt(a) ? ' · 受付' + checkedAt(a) : '') + '</div></div></div>' +
+        (open ? answersHtml(a) : '') +
+        '<div class="att-card__row"><button type="button" class="textlink att-open" data-open="' + ui.esc(a.ticket.id) + '" aria-expanded="' + open + '">' + (open ? '▲ 閉じる' : '▼ 回答を見る') + '</button>' + seg(a) + '</div></div>';
+    }).join('');
+    var empty = '<p class="empty">' + (all.length ? '条件に合う参加者がいません' : 'まだ申込がありません') + '</p>';
+
+    document.getElementById('att-stats').innerHTML =
+      '<div class="mg-stat"><p class="mg-stat__label">参加者</p><p class="mg-stat__num">' + sum.total + '</p></div>' +
+      '<div class="mg-stat mg-stat--mint"><p class="mg-stat__label">受付済</p><p class="mg-stat__num">' + sum.CHECKED_IN + '<small>/ ' + sum.total + '</small></p></div>' +
+      '<div class="mg-stat"><p class="mg-stat__label">未受付</p><p class="mg-stat__num">' + sum.NOT_CHECKED_IN + '</p></div>' +
+      '<div class="mg-stat"><p class="mg-stat__label">欠席</p><p class="mg-stat__num">' + sum.ABSENT + '</p></div>';
+    document.getElementById('att-slots').innerHTML = slotChips;
+    document.getElementById('att-count').textContent = list.length + ' 人を表示';
+    document.getElementById('att-table').innerHTML = list.length ?
+      '<div class="table-scroll"><table class="table att-table"><thead><tr><th>受付</th><th>あだ名</th><th>参加枠</th><th>支払い</th><th>申込日時</th><th>回答</th></tr></thead><tbody>' + rows + '</tbody></table></div>' : empty;
+    document.getElementById('att-cards').innerHTML = list.length ? cards : empty;
+  }
+
+  root.innerHTML = head(e) +
+    '<div class="mg-body">' +
+      '<div class="cluster"><a class="btn btn--black btn--sm" href="' + ui.url('checkin', { id: id }) + '">QR で受付</a><button type="button" class="btn btn--outline btn--sm" data-csv>CSV で控えを出力</button></div>' +
+      '<div class="mg-stats" id="att-stats" aria-label="受付の集計"></div>' +
+      '<div class="org-card box" style="border:0"><div class="stack">' +
+        '<div class="chip-row" id="att-slots" aria-label="参加枠で絞り込み"></div>' +
+        '<div class="att-tools">' +
+          '<label class="sr-only" for="att-q">検索</label><input class="input" id="att-q" type="search" placeholder="あだ名・@ユーザーネーム' + (deleted ? '' : '・氏名') + 'で検索">' +
+          '<label class="sr-only" for="att-status">受付の状態</label><select class="select" id="att-status"><option value="">受付の状態：すべて</option>' + ['NOT_CHECKED_IN', 'CHECKED_IN', 'ABSENT'].map(function (s) { return '<option value="' + s + '">' + L.CheckinStatus[s] + '</option>'; }).join('') + '</select>' +
+        '</div>' +
+        '<div class="att-meta"><span class="att-meta__count" id="att-count"></span><span class="t-muted">' + (deleted ? '申込時の回答は ' + f.ymd(deleteAt) + ' に自動で削除しました（終了から ' + e.answerRetentionDays + ' 日）' : '申込時の回答は ' + f.ymd(deleteAt) + ' に自動で削除されます（終了から ' + e.answerRetentionDays + ' 日）') + '</span></div>' +
+      '</div></div>' +
+      '<div class="att-list"><div class="att-table-wrap" id="att-table"></div><div class="att-cards" id="att-cards"></div></div>' +
+      '<p class="t-small t-muted">本名・連絡先などの回答はこのイベントの主催者だけが見られます。受付の状態はいつでも戻せ、変えるたびに記録が残ります。</p>' +
+    '</div>';
+
+  render();
+
+  document.getElementById('att-q').addEventListener('input', function (ev) { state.q = ev.target.value; render(); });
+  document.getElementById('att-status').addEventListener('change', function (ev) { state.status = ev.target.value; render(); });
+  root.addEventListener('click', function (ev) {
+    var b = ev.target.closest('[data-slot]');
+    if (b) { state.slot = b.getAttribute('data-slot'); return render(); }
+    b = ev.target.closest('[data-open]');
+    if (b) { var t = b.getAttribute('data-open'); state.open[t] = !state.open[t]; return render(); }
+    b = ev.target.closest('.seg [data-status]');
+    if (b) {
+      if (b.getAttribute('aria-pressed') === 'true') return;
+      try {
+        var st = b.getAttribute('data-status');
+        db.setCheckin(b.getAttribute('data-tid'), st, 'MANUAL');
+        ui.toast({ NOT_CHECKED_IN: '未受付に戻しました', CHECKED_IN: '受付済にしました', ABSENT: '欠席にしました' }[st]);
+      } catch (err) { ui.toast(err.message); }
+      return render();
+    }
+    if (ev.target.closest('[data-csv]')) openCsv();
+  });
+
+  function openCsv() {
+    ui.modal({
+      title: 'CSV で控えを出力',
+      html: '<div class="stack">' +
+        '<div class="notice">本名・連絡先などの個人情報を含みます。利用目的（' + ui.esc(e.dataUsePurpose || '未設定') + '）以外に使わず、不要になったら削除してください。</div>' +
+        '<label class="check"><input type="checkbox" name="answers"' + (deleted ? ' disabled' : ' checked') + '>申込時の回答を含める' + (deleted ? '（削除済みのため選べません）' : '') + '</label>' +
+        '<p class="t-small t-muted">出力した人と日時は記録されます。</p></div>',
+      actions: [{ label: '戻る', value: false, kind: 'outline' }, { label: '出力する', kind: 'black', onClick: function (w) {
+        try {
+          var csv = db.exportCsv(id, !deleted && w.querySelector('input[name=answers]').checked);
+          var blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8' });
+          var a = document.createElement('a');
+          a.href = URL.createObjectURL(blob); a.download = 'attendees-' + id + '.csv';
+          document.body.appendChild(a); a.click(); a.remove();
+          setTimeout(function () { URL.revokeObjectURL(a.href); }, 1000);
+        } catch (err) { ui.toast(err.message); return false; }
+      } }]
+    }).then(function (v) { if (v) ui.toast('CSV を出力しました'); });
+  }
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>フォロー中の団体｜NEXT MOVE TICKETS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Noto+Sans+JP:wght@400;500;700;900&family=DM+Mono:wght@400;500&family=Instrument+Serif:ital@1&family=Barlow+Condensed:wght@700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="media.css">
+<script src="data.js"></script>
+<script src="common.js"></script>
+</head>
+<body>
+
+<div data-header="v2" data-active="none"></div>
+
+<main class="wrap me-page">
+  <a class="p-back" href="mypage.html">← マイページ</a>
+  <div class="p-head">
+    <h1 class="p-head__en">FOLLOWING</h1>
+    <p class="p-head__ja" data-title>フォロー中の団体</p>
+  </div>
+  <div data-mail-off hidden></div>
+  <p class="t-small t-muted me-note">フォローできるのは団体だけです。団体が新しいイベントを公開すると、メールでお知らせします（団体ごとに止められます）。</p>
+  <div class="stack" data-list></div>
+</main>
+
+<div data-footer></div>
+
+<script>
+NMT.ready(function (db, ui) {
+  if (!ui.requireLogin()) return;
+  var esc = ui.esc, f = NMT.fmt;
+  var me = db.currentUser();
+  var list = document.querySelector('[data-list]');
+  var COLORS = ['coral', 'mint', 'lavender', 'pink', 'black'];
+  var removed = {}; // 解除した直後の行（元に戻すを出す）
+
+  var pref = db.t.emailPreferences.find(function (p) { return p.userId === me.id && p.category === 'FOLLOW_NEWS'; });
+  if (pref && !pref.enabled) {
+    var off = document.querySelector('[data-mail-off]');
+    off.hidden = false;
+    off.innerHTML = '<p class="notice me-note"><span>メール通知の設定で「' + esc(NMT.LABEL.EmailCategory.FOLLOW_NEWS) + '」がオフのため、どの団体のメールも届きません。<a class="textlink" href="' + ui.url('profile') + '">設定を変える</a></span></p>';
+  }
+
+  function row(o, i) {
+    var url = ui.url('organizer', { slug: o.slug });
+    if (removed[o.id]) {
+      return '<div class="me-row me-row--removed"><span class="me-row__text"><b>' + esc(o.displayName) + '</b> のフォローを解除しました</span>' +
+        '<button class="btn-sm" type="button" data-undo="' + esc(o.id) + '">元に戻す</button></div>';
+    }
+    var fol = db.followingOf().find(function (x) { return x.organizerId === o.id; });
+    var next = db.searchEvents({ organizerId: o.id, status: 'upcoming' }).filter(function (e) { return e.status === 'PUBLISHED'; })[0];
+    return '<div class="me-row">' +
+      '<a class="dot bg-' + COLORS[i % COLORS.length] + ' me-row__dot" href="' + url + '" aria-hidden="true" tabindex="-1"></a>' +
+      '<div class="me-row__main">' +
+        '<a class="me-row__name" href="' + url + '">' + esc(o.displayName) + '</a>' +
+        '<p class="me-row__meta">@' + esc(o.slug) + ' · フォロワー ' + db.followerCount(o.id) + '</p>' +
+        (next ? '<p class="me-row__next"><span class="t-muted">次のイベント</span> <a class="textlink" href="' + ui.url('event', { id: next.id }) + '">' + esc(next.title) + '</a> · ' + f.md(next.startAt) + '（' + f.wd(next.startAt) + '）</p>'
+              : '<p class="me-row__next t-muted">予定されているイベントはありません</p>') +
+      '</div>' +
+      '<div class="me-row__actions">' +
+        '<label class="check me-row__mail"><input type="checkbox" data-notify="' + esc(o.id) + '"' + (fol && fol.notifyEmail ? ' checked' : '') + '>新規公開をメールで受け取る</label>' +
+        '<button class="btn-sm" type="button" data-unfollow="' + esc(o.id) + '">フォロー解除</button>' +
+      '</div>' +
+    '</div>';
+  }
+  var order = db.followingOf().map(function (x) { return x.organizerId; });
+  function render() {
+    var current = db.followingOf().map(function (x) { return x.organizerId; });
+    document.querySelector('[data-title]').textContent = 'フォロー中の団体（' + current.length + '）';
+    var ids = order.filter(function (id) { return current.indexOf(id) >= 0 || removed[id]; });
+    list.innerHTML = ids.length ? ids.map(function (id, i) { return row(db.organizerById(id), i); }).join('')
+      : '<p class="empty">フォロー中の団体はありません。団体のページの「＋ フォローする」から追加できます。<br><a class="textlink" href="' + ui.url('events') + '">イベントを探す</a></p>';
+  }
+  list.addEventListener('click', function (ev) {
+    var u = ev.target.closest('[data-unfollow]'), b = ev.target.closest('[data-undo]');
+    try {
+      if (u) { var id = u.getAttribute('data-unfollow'); db.toggleFollow(id); removed[id] = true; render(); }
+      if (b) { var id2 = b.getAttribute('data-undo'); db.toggleFollow(id2); delete removed[id2]; render(); ui.toast('フォローに戻しました'); }
+    } catch (x) { ui.toast(x.message); }
+  });
+  list.addEventListener('change', function (ev) {
+    var c = ev.target.closest('[data-notify]'); if (!c) return;
+    db.setFollowNotify(c.getAttribute('data-notify'), c.checked);
+    ui.toast(c.checked ? '新しいイベントのメールを受け取ります' : 'この団体のメールを止めました');
+  });
+  render();
+});
+</script>
+</body>
+</html>

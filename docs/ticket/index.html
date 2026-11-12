@@ -8,8 +8,9 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Noto+Sans+JP:wght@400;500;700;900&family=DM+Mono:wght@400;500&family=Instrument+Serif:ital@1&family=Barlow+Condensed:wght@700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
-<script src="data.js" defer></script>
-<script src="common.js" defer></script>
+<link rel="stylesheet" href="events.css">
+<script src="data.js"></script>
+<script src="common.js"></script>
 </head>
 <body>
 
@@ -23,30 +24,30 @@
 
   <!-- Hero: 検索 -->
   <section class="wrap top-search" aria-label="イベントを探す">
-    <form class="searchbox" action="events.html" role="search">
+    <form class="searchbox" action="events.html" role="search" data-top-search>
       <label class="searchbox__field searchbox__field--grow">
         <img class="icon" src="assets/icon-search.svg" alt="">
-        <input class="searchbox__input" type="search" name="q" placeholder="イベント名・団体名・会場">
+        <input class="searchbox__input" type="search" name="q" placeholder="イベント名・団体名・会場" aria-label="キーワード">
       </label>
-      <div class="searchbox__field">
+      <label class="searchbox__field">
         <span class="searchbox__label">日付</span>
-        <span class="searchbox__value">今週末</span>
+        <select class="searchbox__value fsel" name="when" data-sel="when"></select>
         <img class="icon icon--14" src="assets/icon-chevron-down.svg" alt="">
-      </div>
-      <div class="searchbox__field">
+      </label>
+      <label class="searchbox__field">
         <span class="searchbox__label">エリア</span>
-        <span class="searchbox__value">東京都</span>
+        <select class="searchbox__value fsel" name="area" data-sel="area"></select>
         <img class="icon icon--14" src="assets/icon-chevron-down.svg" alt="">
-      </div>
+      </label>
       <button class="btn btn--coral" type="submit">探す<img class="icon" src="assets/icon-arrow-btn.svg" alt=""></button>
     </form>
     <div class="chip-row">
       <span class="chip-row__label">よく使う条件</span>
-      <a class="chip" href="events.html">今日</a>
-      <a class="chip" href="events.html">今週末</a>
-      <a class="chip" href="events.html">無料</a>
-      <a class="chip" href="events.html">学生割あり</a>
-      <a class="chip" href="events.html">オンライン</a>
+      <a class="chip" href="events.html?when=today">今日</a>
+      <a class="chip" href="events.html?when=weekend">今週末</a>
+      <a class="chip" href="events.html?free=1">無料</a>
+      <a class="chip" href="events.html?kind=STUDENT">学生割あり</a>
+      <a class="chip" href="events.html?area=online">オンライン</a>
     </div>
   </section>
 
@@ -55,44 +56,11 @@
     <div class="sec-head">
       <div class="sec-head__titles">
         <h2 class="sec-head__en">THIS WEEKEND</h2>
-        <p class="sec-head__ja">今週末のイベント（24件）</p>
+        <p class="sec-head__ja" data-weekend-count>今週末のイベント</p>
       </div>
-      <a class="link-arrow" href="events.html">すべて見る<img class="icon" src="assets/icon-arrow-up-right.svg" alt=""></a>
+      <a class="link-arrow" href="events.html?when=weekend">すべて見る<img class="icon" src="assets/icon-arrow-up-right.svg" alt=""></a>
     </div>
-    <div class="event-grid">
-      <a class="event-card" href="#">
-        <img class="event-card__flyer" src="assets/flyer-halloween.jpg" alt="渋谷ハロウィン・アフターパーティ 2026 のフライヤー">
-        <p class="event-card__date">11/1（土）21:00</p>
-        <h3 class="event-card__title">渋谷ハロウィン・アフターパーティ 2026</h3>
-        <p class="event-card__venue">渋谷 WOMB</p>
-        <p class="event-card__org">青学イベントサークル Link</p>
-        <div class="event-card__bottom"><span class="price">¥2,000〜</span><span class="pill pill--few">残り12枚</span></div>
-      </a>
-      <a class="event-card" href="#">
-        <img class="event-card__flyer" src="assets/flyer-morning-run.jpg" alt="朝の代々木公園ランニング＆モーニング のフライヤー">
-        <p class="event-card__date">11/2（日）7:30</p>
-        <h3 class="event-card__title">朝の代々木公園ランニング＆モーニング</h3>
-        <p class="event-card__venue">代々木公園 原宿門</p>
-        <p class="event-card__org">RUN TOKYO CAMPUS</p>
-        <div class="event-card__bottom"><span class="price price--free">無料</span><span class="pill pill--open">受付中</span></div>
-      </a>
-      <a class="event-card" href="#">
-        <img class="event-card__flyer" src="assets/flyer-hackathon.jpg" alt="24時間ハッカソン のフライヤー">
-        <p class="event-card__date">11/1（土）10:00</p>
-        <h3 class="event-card__title">24時間ハッカソン「つくって、見せて、寝る」</h3>
-        <p class="event-card__venue">東京大学 本郷キャンパス</p>
-        <p class="event-card__org">UT Hack</p>
-        <div class="event-card__bottom"><span class="price">¥1,000</span><span class="pill pill--soldout">売り切れ</span></div>
-      </a>
-      <a class="event-card" href="#">
-        <img class="event-card__flyer" src="assets/flyer-zine-fair.jpg" alt="学生ZINEフェア のフライヤー">
-        <p class="event-card__date">11/2（日）12:00</p>
-        <h3 class="event-card__title">学生ZINEフェア — 刷って、並べて、交換する</h3>
-        <p class="event-card__venue">吉祥寺 Art Center Ongoing</p>
-        <p class="event-card__org">武蔵美ZINE部</p>
-        <div class="event-card__bottom"><span class="price">¥300</span><span class="pill pill--open">受付中</span></div>
-      </a>
-    </div>
+    <div class="event-grid" data-weekend></div>
   </section>
 
   <!-- Genres -->
@@ -103,32 +71,7 @@
         <p class="sec-head__ja">ジャンルから探す</p>
       </div>
     </div>
-    <div class="genre-grid">
-      <a class="genre-card genre-card--coral" href="events.html">
-        <div class="genre-card__top"><span>音楽・ライブ</span><img class="icon" src="assets/icon-arrow-up-right.svg" alt=""></div>
-        <div class="genre-card__bottom"><span class="genre-card__en">MUSIC</span><span class="genre-card__count">42件</span></div>
-      </a>
-      <a class="genre-card genre-card--mint" href="events.html">
-        <div class="genre-card__top"><span>スポーツ</span><img class="icon" src="assets/icon-arrow-up-right.svg" alt=""></div>
-        <div class="genre-card__bottom"><span class="genre-card__en">SPORTS</span><span class="genre-card__count">27件</span></div>
-      </a>
-      <a class="genre-card genre-card--lavender" href="events.html">
-        <div class="genre-card__top"><span>学び・勉強会</span><img class="icon" src="assets/icon-arrow-up-right.svg" alt=""></div>
-        <div class="genre-card__bottom"><span class="genre-card__en">STUDY</span><span class="genre-card__count">35件</span></div>
-      </a>
-      <a class="genre-card genre-card--pink" href="events.html">
-        <div class="genre-card__top"><span>交流会・パーティ</span><img class="icon" src="assets/icon-arrow-up-right.svg" alt=""></div>
-        <div class="genre-card__bottom"><span class="genre-card__en">PARTY</span><span class="genre-card__count">58件</span></div>
-      </a>
-      <a class="genre-card genre-card--gray" href="events.html">
-        <div class="genre-card__top"><span>アート・展示</span><img class="icon" src="assets/icon-arrow-up-right.svg" alt=""></div>
-        <div class="genre-card__bottom"><span class="genre-card__en">ART</span><span class="genre-card__count">19件</span></div>
-      </a>
-      <a class="genre-card genre-card--white" href="events.html">
-        <div class="genre-card__top"><span>キャリア</span><img class="icon" src="assets/icon-arrow-up-right.svg" alt=""></div>
-        <div class="genre-card__bottom"><span class="genre-card__en">CAREER</span><span class="genre-card__count">21件</span></div>
-      </a>
-    </div>
+    <div class="genre-grid" data-genres></div>
   </section>
 
   <!-- Journal -->
@@ -141,26 +84,7 @@
         </div>
         <a class="link-arrow" href="media.html">記事をすべて見る<img class="icon" src="assets/icon-arrow-up-right.svg" alt=""></a>
       </div>
-      <div class="article-grid">
-        <a class="article-card" href="article.html">
-          <img class="article-card__img" src="assets/article-guide.jpg" alt="">
-          <p class="article-card__cat">ガイド</p>
-          <h3 class="article-card__title">「はじめまして」が苦手な人のための、イベントの楽しみ方</h3>
-          <p class="article-card__meta">10.24｜読了 8分</p>
-        </a>
-        <a class="article-card" href="article.html">
-          <img class="article-card__img" src="assets/article-interview.jpg" alt="">
-          <p class="article-card__cat">インタビュー</p>
-          <h3 class="article-card__title">主催者に聞く：100人規模の交流会を3週間でつくるまで</h3>
-          <p class="article-card__meta">10.20｜読了 10分</p>
-        </a>
-        <a class="article-card" href="article.html">
-          <img class="article-card__img" src="assets/flyer-halloween.jpg" alt="">
-          <p class="article-card__cat">スポット</p>
-          <h3 class="article-card__title">渋谷で学生が集まる、夜のイベントスペース5選</h3>
-          <p class="article-card__meta">10.16｜読了 4分</p>
-        </a>
-      </div>
+      <div class="article-grid" data-journal></div>
     </div>
   </section>
 
@@ -171,12 +95,68 @@
         <h2 class="t-h2">イベントを主催する学生団体の方へ</h2>
         <p class="t-body">掲載は無料。告知・申込・当日の受付までここで完結します（手数料はチケットが売れたときだけ5%）。</p>
       </div>
-      <a class="btn btn--black" href="organizer.html">イベントを掲載する<img class="icon" src="assets/icon-arrow-btn-white.svg" alt=""></a>
+      <a class="btn btn--black" href="login.html" data-host-link>イベントを掲載する<img class="icon" src="assets/icon-arrow-btn-white.svg" alt=""></a>
     </div>
   </section>
 </main>
 
 <div data-footer></div>
+
+<script>
+// ヘッダー差し込み（DOMContentLoaded）の後に描く
+document.addEventListener('DOMContentLoaded', function () {
+NMT.ready(function (db, ui) {
+  var f = NMT.fmt;
+
+  // 検索フォーム（日付・エリアは選択。送ると events.html の条件付き URL へ）
+  var wr = db.weekendRange();
+  var form = document.querySelector('[data-top-search]');
+  var whenSel = form.querySelector('[data-sel=when]'), areaSel = form.querySelector('[data-sel=area]');
+  whenSel.innerHTML = [['', '指定なし'], ['today', '今日'], ['weekend', '今週末'], ['month', '今月']].map(function (o) {
+    return '<option value="' + o[0] + '">' + ui.esc(o[1]) + '</option>';
+  }).join('');
+  areaSel.innerHTML = '<option value="">すべて</option>' + NMT.AREAS.map(function (a) {
+    return '<option value="' + ui.esc(a) + '">' + ui.esc(a === 'online' ? 'オンライン' : a) + '</option>';
+  }).join('');
+  form.addEventListener('submit', function (ev) {
+    ev.preventDefault();
+    location.href = ui.url('events', { q: form.q.value.trim(), when: whenSel.value, area: areaSel.value });
+  });
+
+  // THIS WEEKEND（今週末に開催する公開イベント。最大4件）
+  var weekend = db.searchEvents({ from: wr.from, to: wr.to });
+  document.querySelector('[data-weekend-count]').textContent = '今週末のイベント（' + weekend.length + '件）';
+  var wg = document.querySelector('[data-weekend]');
+  if (weekend.length) wg.innerHTML = weekend.slice(0, 4).map(function (e) { return ui.eventCard(e); }).join('');
+  else wg.outerHTML = '<p class="empty">今週末（' + f.md(wr.from) + '–' + f.md(wr.to) + '）のイベントはまだありません</p>';
+
+  // GENRES（今後のイベントの件数）
+  var genres = db.t.genres.slice().sort(function (a, b) { return a.sortOrder - b.sortOrder; });
+  document.querySelector('[data-genres]').innerHTML = genres.map(function (g) {
+    var n = db.searchEvents({ genre: g.slug }).length;
+    return '<a class="genre-card genre-card--' + ui.esc(g.color) + '" href="' + ui.url('events', { genre: g.slug }) + '">' +
+      '<div class="genre-card__top"><span>' + ui.esc(g.name) + '</span><img class="icon" src="assets/icon-arrow-up-right.svg" alt=""></div>' +
+      '<div class="genre-card__bottom"><span class="genre-card__en">' + ui.esc(g.en) + '</span><span class="genre-card__count">' + n + '件</span></div></a>';
+  }).join('');
+
+  // JOURNAL（公開済みの記事の新着3件）
+  var arts = db.t.articles.filter(function (a) { return a.status === 'PUBLISHED' && a.publishedAt && Date.parse(a.publishedAt) <= db.now(); })
+    .sort(function (a, b) { return Date.parse(b.publishedAt) - Date.parse(a.publishedAt); }).slice(0, 3);
+  document.querySelector('[data-journal]').innerHTML = arts.map(function (a) {
+    return '<a class="article-card" href="' + ui.url('article', { slug: a.slug }) + '">' +
+      '<img class="article-card__img" src="' + ui.esc(a.coverUrl) + '" alt="" loading="lazy">' +
+      '<p class="article-card__cat">' + ui.esc(a.category) + '</p>' +
+      '<h3 class="article-card__title">' + ui.esc(a.title) + '</h3>' +
+      '<p class="article-card__meta">' + f.ymd(a.publishedAt).slice(5) + '｜読了 ' + a.readMinutes + '分</p></a>';
+  }).join('') || '<p class="empty">記事はまだありません</p>';
+
+  // 主催者向け帯：ヘッダーの「主催者の方へ」と同じ行き先（ログイン → 団体作成 / ダッシュボード）
+  var u = db.currentUser(), host = document.querySelector('[data-host-link]');
+  var groups = u ? db.managedOrganizers(u.id).filter(function (o) { return o.type === 'GROUP'; }) : [];
+  host.href = !u ? ui.url('login', { next: ui.pages.groupNew }) : groups.length ? ui.url('dashboard', { org: groups[0].slug }) : ui.url('groupNew');
+});
+});
+</script>
 
 </body>
 </html>

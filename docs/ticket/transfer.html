@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>イベント移管｜NEXT MOVE TICKETS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Noto+Sans+JP:wght@400;500;700;900&family=DM+Mono:wght@400;500&family=Instrument+Serif:ital@1&family=Barlow+Condensed:wght@700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="org.css">
+<link rel="stylesheet" href="manage.css">
+<script src="data.js"></script>
+<script src="common.js"></script>
+</head>
+<body class="org-page">
+<div data-header="org" data-active="events"></div>
+<main id="main"><div class="wrap" id="root"></div></main>
+<div data-footer></div>
+<script>
+NMT.ready(function (db, ui) {
+  var f = NMT.fmt, L = NMT.LABEL, root = document.getElementById('root');
+  var id = ui.param('id'), org = NMT.currentOrg();
+  var PAGE = 'transfer', EN = 'TRANSFER', JA = '団体へ移す', DENY = 'このイベントの主催者（owner）だけが移管できます。';
+
+  // ---- 共通: 見出し・権限 ----
+  function gateBox(title, body, actions) {
+    root.innerHTML = '<div class="box mg-gate"><p class="mg-gate__title">' + ui.esc(title) + '</p><p class="t-small">' + ui.esc(body) + '</p><div class="cluster">' + (actions || '') + '</div></div>';
+  }
+  function pickEvent() {
+    var mine = db.t.events.filter(function (e) { return db.canManageEvent(e.id) && e.status !== 'DRAFT'; }).sort(function (a, b) { return Date.parse(a.startAt) - Date.parse(b.startAt); });
+    if (!mine.length) return gateBox('管理しているイベントがありません', 'あなたが owner の団体（または個人）のイベントがここに出ます。', '<a class="btn btn--black" href="' + ui.url('dashboard', { org: org && org.slug }) + '">ダッシュボードへ</a>');
+    root.innerHTML = '<div class="mg-head"><div class="p-head"><div><p class="p-head__en">' + EN + '</p><h1 class="p-head__ja">' + ui.esc(JA) + '：イベントを選ぶ</h1></div></div></div>' +
+      '<div class="box"><div class="stack" style="--stack-gap:0">' + mine.map(function (e) {
+        return '<a class="an-item" href="' + ui.url(PAGE, { id: e.id }) + '"><span class="an-item__subject">' + ui.esc(e.title) + '</span><span class="an-item__meta">' + f.card(e.startAt) + ' · ' + ui.esc(db.organizerById(e.organizerId).displayName) + '</span></a>';
+      }).join('') + '</div></div>';
+  }
+  function head(e, compact) {
+    var o = db.organizerById(e.organizerId);
+    var tabs = [['attendees', '参加者・受付'], ['checkin', 'QR で受付'], ['announce', '告知'], ['transfer', '移管']];
+    return '<div class="mg-head">' +
+      '<a class="p-back" href="' + ui.url('dashboard', { org: o.slug }) + '">← ダッシュボード</a>' +
+      (compact ? '' : '<div class="p-head"><div><p class="p-head__en">' + EN + '</p><h1 class="p-head__ja">' + ui.esc(JA) + '</h1></div></div>') +
+      '<div class="mg-event"><p class="mg-event__title">' + ui.esc(e.title) + '</p><p class="mg-event__meta">' + f.card(e.startAt) + ' · ' + ui.esc(e.venueName || 'オンライン') + ' · ' + ui.esc(o.displayName) + (e.status === 'CANCELLED' ? ' · 中止' : '') + '</p></div>' +
+      '</div>' +
+      '<nav class="tabs mg-tabs" aria-label="イベントの管理">' + tabs.map(function (t) {
+        return '<a class="tabs__item' + (t[0] === PAGE ? ' is-active' : '') + '" href="' + ui.url(t[0], { id: e.id }) + '"' + (t[0] === PAGE ? ' aria-current="page"' : '') + '>' + t[1] + '</a>';
+      }).join('') + '<a class="tabs__item" href="' + ui.url('event', { id: e.id }) + '">公開ページ</a></nav>';
+  }
+  if (!ui.requireLogin()) return;
+  if (!id) return pickEvent();
+  var e = db.eventById(id);
+  if (!e) return gateBox('イベントがありません', 'URL が正しいか確かめてください。', '<a class="btn btn--black" href="' + ui.url(PAGE) + '">イベントを選ぶ</a>');
+  if (!db.canManageEvent(id)) return gateBox('このページを見る権限がありません', DENY, '<a class="btn btn--outline" href="' + ui.url('event', { id: id }) + '">公開ページへ</a>');
+
+  // ---- 移管 ----
+  var cur = db.organizerById(e.organizerId);
+  // 候補は自分が owner の団体だけ（wireframes 20：団体→個人は UI で提供しない）
+  var cands = db.managedOrganizers().filter(function (o) { return o.type === 'GROUP' && o.id !== cur.id; });
+  function orgName(o) { return o.displayName + (o.type === 'USER' ? '（個人）' : '') + '（@' + o.slug + '）'; }
+  var points = '<div class="box box--gray tr-points">' +
+    '<p>✓ 参加者・申込・回答・支払いの記録はそのまま引き継がれます</p>' +
+    '<p>✓ イベントの URL は変わりません</p>' +
+    '<p>・移管先のフォロワーへの通知は送られません</p>' +
+    '<p>・移管後は移管先の団体の owner が管理します</p></div>';
+  var moved = ui.param('moved') === '1';
+  var ng = !cands.length;
+  var ngText = cur.type === 'GROUP'
+    ? 'このイベントはすでに団体「' + cur.displayName + '」の主催です。あなたが owner の団体がほかにありません（団体から個人へは移せません）。'
+    : 'あなたが owner の団体がまだありません。先に団体を作ると、ここから移せるようになります。';
+
+  root.innerHTML = head(e) +
+    '<div class="narrow stack">' +
+      (moved ? '<div class="notice notice--mint" role="status"><span>「' + ui.esc(cur.displayName) + '」へ移しました。<a class="textlink" href="' + ui.url('dashboard', { org: cur.slug }) + '">団体のダッシュボードへ</a></span></div>' : '') +
+      '<div class="box stack">' +
+        '<p class="t-small">' + (cur.type === 'USER' ? '個人で作ったイベントを、あなたが owner の団体の主催に変更します。' : 'このイベントの主催を、あなたが owner の別の団体に変更します。') + '</p>' +
+        '<div class="field"><span class="field__label">現在の主催者</span><span class="tr-current"><span class="tr-swatch" aria-hidden="true"></span>' + ui.esc(orgName(cur)) + '</span></div>' +
+        (ng ? '<div class="notice notice--error" role="alert"><span><b>このイベントは移管できません</b><br>' + ui.esc(ngText) + '</span></div>' : '') +
+        '<label class="field"><span class="field__label">移管先 <span class="req">必須</span></span>' +
+          '<select class="select" id="tr-to"' + (ng ? ' disabled' : '') + '>' + (ng ? '<option>— 選択できません —</option>' : '<option value="">選んでください</option>' + cands.map(function (o) { return '<option value="' + ui.esc(o.id) + '">' + ui.esc(orgName(o)) + '</option>'; }).join('')) + '</select>' +
+          '<span class="field__help">あなたが owner の団体だけが候補です</span></label>' +
+        '<p class="field__error" id="tr-err" hidden></p>' +
+        points +
+        '<div class="tr-actions"><a class="btn btn--outline btn--sm" href="' + ui.url('dashboard', { org: cur.slug }) + '">戻る</a>' +
+          (ng ? '<a class="btn btn--outline btn--sm" href="' + ui.url('groupNew') + '">先に団体を作る</a>' : '') +
+          '<span class="tr-actions__spacer"></span>' +
+          '<button type="button" class="btn btn--black btn--sm" id="tr-go"' + (ng ? ' disabled' : '') + '>団体へ移す</button></div>' +
+      '</div>' +
+    '</div>';
+
+  if (ng) return;
+  document.getElementById('tr-go').addEventListener('click', function () {
+    var to = db.organizerById(document.getElementById('tr-to').value);
+    var err = document.getElementById('tr-err');
+    if (!to) { err.textContent = '移管先を選んでください'; err.hidden = false; return; }
+    err.hidden = true;
+    ui.modal({ title: '「' + to.displayName + '」へ移しますか？', html: '<p>「' + ui.esc(e.title) + '」の主催者を ' + ui.esc(orgName(cur)) + ' から ' + ui.esc(orgName(to)) + ' に変更します。</p>' + '<div style="margin-top:16px">' + points + '</div>',
+      actions: [{ label: 'やめる', value: false, kind: 'outline' }, { label: '団体へ移す', value: true, kind: 'black' }] }).then(function (yes) {
+      if (!yes) return;
+      try { db.transferEvent(id, to.id); location.href = ui.url('transfer', { id: id, moved: 1 }); }
+      catch (e2) { err.textContent = e2.message; err.hidden = false; }
+    });
+  });
+});
+</script>
+</body>
+</html>

@@ -209,3 +209,128 @@
 .ec-savebar__text { font-size: 13px; line-height: normal; white-space: nowrap; }
 .ec-savebar__btns { display: flex; align-items: flex-start; gap: 12px; }
 .ec-savebar .org-btn { padding: 10px 16px; border-color: var(--color-white); background: transparent; color: var(--color-white); }
+
+/* ---------- プロトタイプで足した部品（Figma に無い状態・画面） ---------- */
+/* hidden 属性は display 指定より優先（会場/オンラインの切り替えなど） */
+main [hidden] { display: none !important; }
+
+/* 権限なし・団体なしの案内 */
+.org-gate { padding-top: clamp(32px, 4.2vw, 60px); }
+.org-gate .box { width: min(640px, 100%); }
+.org-gate__title { font-weight: 700; font-size: var(--h2); line-height: 1.45; }
+.org-bullets { list-style: disc; padding-left: 1.4em; display: flex; flex-direction: column; gap: 4px; }
+
+/* ダッシュボード: 空の状態・中止したイベント・長い文字の省略 */
+.dash-empty { font-size: 14px; color: var(--color-muted); }
+.dash-cancelled { display: flex; flex-direction: column; gap: 8px; padding-top: 16px; border-top: 1px solid var(--color-line); }
+.dash-cancelled .dash-list__sub { white-space: normal; }
+.dash-event + .dash-actions + .dash-event { padding-top: 24px; border-top: 1.5px solid var(--color-black); }
+.dash-list__name, .dash-list__sub, .dash-recent__name, .dash-recent__sub, .dash-stat__sub, .dash-event__title a { overflow: hidden; text-overflow: ellipsis; }
+.dash-list__name, .dash-list__sub, .dash-recent__name, .dash-recent__sub, .dash-stat__sub { display: block; }
+.dash-actions .org-btn--plain { display: inline-flex; }
+
+/* イベント作成: 枠・質問の並び、ロック表示、画像選択 */
+.ec-tiers, .ec-qs { display: flex; flex-direction: column; gap: 20px; }
+.ec-tier .ec-row + .ec-row, .ec-tier .ec-row + .ec-field { margin-top: 0; }
+.ec-tier__lock { font-size: 12px; color: var(--color-muted); }
+.ec-tier .ec-select { padding: 14px 32px 15px 0; border: 0; border-bottom: 1.5px solid var(--color-black); background-color: transparent; background-position: right 4px center; line-height: 1.75; }
+.ec-empty { padding: 20px; border: 1px dashed var(--color-line-strong); font-size: 13px; color: var(--color-muted); }
+.ec-q .ec-fixed__name { display: flex; flex-direction: column; gap: 2px; }
+.ec-q__opts { font-weight: 400; font-size: 12px; color: var(--color-muted); }
+.ec-q__lock { font-size: 14px; }
+.ec-modal-set { border: 0; padding: 0; margin: 0; }
+.ec-covers { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.ec-cover { padding: 0; border: 2px solid transparent; background: none; cursor: pointer; }
+.ec-cover img { display: block; width: 100%; aspect-ratio: 4 / 5; object-fit: cover; }
+.ec-cover.is-active { border-color: var(--color-coral); }
+.ec-dup-row { padding: 12px 0; border-top: 1px solid var(--color-line); }
+/* 保存バーがある画面では DEMO バーを保存バーの上へ逃がす */
+.ec-page .demo-bar { bottom: calc(var(--savebar-h, 92px) + 12px); }
+
+/* 団体作成・団体の設定 */
+.gn-page { padding-bottom: var(--gap-section); }
+.gn-slug { display: flex; align-items: stretch; }
+.gn-slug__at { display: flex; align-items: center; padding: 0 12px; border: 1.5px solid var(--color-black); border-right: 0; background: var(--color-gray-100); font-weight: 700; }
+.gn-slug .input { flex: 1 1 auto; min-width: 0; }
+.gn-similar { padding: 16px 18px; background: var(--color-pink); border: 1.5px solid var(--color-coral); }
+.gn-similar__title { font-weight: 700; font-size: 15px; }
+.gn-similar__item { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 12px; padding-top: 12px; border-top: 1px solid var(--color-coral); }
+.gn-similar__text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.gn-similar [data-dismiss] { align-self: flex-start; }
+.gn-similar__name { font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
+.gs-tabs { margin-bottom: 24px; }
+.gs-panel { max-width: 880px; }
+.gs-row-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; }
+.gs-item { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px; padding-top: 12px; border-top: 1px solid var(--color-line); }
+.gs-item__text { flex: 1 1 260px; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.gs-link { overflow-wrap: anywhere; }
+.gs-dl { display: grid; grid-template-columns: auto 1fr; gap: 6px 16px; }
+.gs-dl dt { font-weight: 700; }
+
+/* ---------- レスポンシブ（1440 の見た目は上のまま。狭い幅だけ組み替える） ---------- */
+@media (max-width: 1023px) {
+  .dash-head { flex-wrap: wrap; padding-top: 28px; padding-bottom: 24px; }
+  .dash-org__name { font-size: clamp(22px, 3.2vw, 32px); }
+  .dash-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; padding-bottom: 24px; }
+  .dash-stat__num { font-size: clamp(36px, 5.4vw, 56px); }
+  .dash-body { flex-direction: column; align-items: stretch; }
+  .dash-side { width: 100%; }
+  .dash-actions { flex-wrap: wrap; }
+  .dash-actions__spacer { flex-basis: 100%; height: 0; }
+
+  .ec-head { flex-wrap: wrap; padding-top: 24px; }
+  .ec-head__right { flex-wrap: wrap; }
+  .ec-layout { flex-direction: column; align-items: stretch; gap: 16px; }
+  .ec-toc { position: static; width: 100%; padding: 12px 16px; }
+  .ec-toc__item { display: none; }
+  .ec-toc__todo { padding-top: 0; border-top: 0; }
+  .ec-sec { padding: 20px clamp(16px, 3vw, 32px) 24px; }
+  .ec-row { flex-wrap: wrap; }
+  .ec-row > * { flex: 1 1 200px; }
+  .ec-row > .ec-field--cap { flex: 1 1 200px; }
+  .ec-savebar__text { white-space: normal; }
+}
+@media (max-width: 767px) {
+  .dash-org__text { white-space: normal; min-width: 0; }
+  .dash-org__swatch { width: 44px; height: 44px; }
+  .dash-head .btn { width: 100%; justify-content: center; }
+  .dash-stat { padding: 14px 16px; }
+  .dash-published, .dash-list { padding: 20px 16px; }
+  .dash-event { gap: 14px; }
+  .dash-event__flyer { width: 72px; height: 90px; }
+  .dash-event__meta { flex-wrap: wrap; white-space: normal; gap: 6px 10px; }
+  .dash-event__title { font-size: 18px; }
+  .dash-event + .dash-actions { margin-top: 0; }
+  .dash-quota__row { gap: 8px; }
+  .dash-quota__name { width: 84px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .dash-quota__count { font-size: 15px; }
+  .dash-pair { flex-direction: column; align-items: stretch; }
+  .dash-list__item { flex-wrap: wrap; }
+  .dash-list__text { flex-basis: 100%; }
+
+  .ec-head__title { font-size: 24px; }
+  .ec-head__left { flex-wrap: wrap; gap: 10px 16px; }
+  .ec-head__right { width: 100%; }
+  .ec-head__right .btn { display: none; } /* SP は下の保存バーから公開する */
+  .ec-sec__head { flex-wrap: wrap; white-space: normal; row-gap: 8px; }
+  .ec-sec__num { font-size: 24px; }
+  .ec-sec__title { font-size: 17px; }
+  .ec-row > * { flex-basis: 100%; }
+  .ec-row--end { align-items: stretch; }
+  .ec-flyer { align-items: flex-start; }
+  .ec-flyer__img { width: 88px; height: 110px; }
+  .ec-tier { padding: 14px; }
+  .ec-tier__head { white-space: normal; gap: 8px; flex-wrap: wrap; }
+  .ec-tier__name { flex-wrap: wrap; gap: 4px 10px; }
+  .ec-fixed { flex-wrap: wrap; }
+  .ec-fixed__name { flex-basis: calc(100% - 40px); }
+  .ec-seg { flex-wrap: wrap; }
+  .ec-savebar__inner { flex-direction: column; align-items: stretch; gap: 10px; padding-top: 10px; padding-bottom: 12px; }
+  .ec-savebar__text { font-size: 12px; }
+  .ec-savebar__btns { display: grid; grid-template-columns: 1fr 1.4fr; gap: 8px; }
+  .ec-savebar__btns .btn { padding: 12px 14px; justify-content: center; }
+  .ec-page { --savebar-h: 124px; }
+  .ec-covers { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+/* datetime-local は text より 2px 高くなるので、Figma の入力欄（57px）にそろえる */
+.ec-input[type="datetime-local"] { padding-top: 13px; padding-bottom: 13px; }

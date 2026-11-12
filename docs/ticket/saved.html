@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>保存したイベント｜NEXT MOVE TICKETS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Noto+Sans+JP:wght@400;500;700;900&family=DM+Mono:wght@400;500&family=Instrument+Serif:ital@1&family=Barlow+Condensed:wght@700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="media.css">
+<script src="data.js"></script>
+<script src="common.js"></script>
+</head>
+<body>
+
+<div data-header="v2" data-active="none"></div>
+
+<main class="wrap me-page">
+  <a class="p-back" href="mypage.html">← マイページ</a>
+  <div class="p-head">
+    <h1 class="p-head__en">SAVED</h1>
+    <p class="p-head__ja">保存したイベント</p>
+  </div>
+  <p class="t-small t-muted me-note">保存したイベントは、主催者からのお知らせ（会場の変更など）がメールで届くことがあります。</p>
+  <div class="tabs" role="tablist" aria-label="保存したイベント">
+    <button class="tabs__item" type="button" role="tab" aria-selected="true" aria-controls="panel-up" id="tab-up" data-tab="up"></button>
+    <button class="tabs__item" type="button" role="tab" aria-selected="false" aria-controls="panel-end" id="tab-end" data-tab="end"></button>
+  </div>
+  <div class="me-saved" role="tabpanel" id="panel-up" aria-labelledby="tab-up"></div>
+  <div class="me-saved" role="tabpanel" id="panel-end" aria-labelledby="tab-end" hidden></div>
+</main>
+
+<div data-footer></div>
+
+<script>
+NMT.ready(function (db, ui) {
+  if (!ui.requireLogin()) return;
+  var esc = ui.esc;
+
+  function item(e) {
+    return '<div class="me-saved__item">' + ui.eventCard(e) +
+      '<button class="btn-sm me-saved__unsave" type="button" data-unsave="' + esc(e.id) + '" aria-label="' + esc(e.title) + ' の保存を解除">保存を解除</button></div>';
+  }
+  function render() {
+    var all = db.savedOf();
+    var up = all.filter(function (e) { return db.isUpcoming(e); }).sort(function (a, b) { return Date.parse(a.startAt) - Date.parse(b.startAt); });
+    var end = all.filter(function (e) { return !db.isUpcoming(e); }).sort(function (a, b) { return Date.parse(b.startAt) - Date.parse(a.startAt); });
+    document.getElementById('tab-up').textContent = '開催予定 ' + up.length;
+    document.getElementById('tab-end').textContent = '終了 ' + end.length;
+    document.getElementById('panel-up').innerHTML = up.length ? '<div class="event-grid">' + up.map(item).join('') + '</div>'
+      : '<p class="empty">開催予定の保存したイベントはありません。イベント詳細の「保存」から追加できます。<br><a class="textlink" href="' + ui.url('events') + '">イベントを探す</a></p>';
+    document.getElementById('panel-end').innerHTML = end.length ? '<div class="event-grid">' + end.map(item).join('') + '</div>'
+      : '<p class="empty">終了したイベントはありません。</p>';
+  }
+  document.querySelectorAll('[data-tab]').forEach(function (t, _, all) {
+    t.addEventListener('click', function () {
+      all.forEach(function (x) {
+        var on = x === t;
+        x.setAttribute('aria-selected', on ? 'true' : 'false');
+        document.getElementById(x.getAttribute('aria-controls')).hidden = !on;
+      });
+    });
+  });
+  document.querySelector('main').addEventListener('click', function (ev) {
+    var b = ev.target.closest('[data-unsave]'); if (!b) return;
+    try { db.toggleSave(b.getAttribute('data-unsave')); render(); ui.toast('保存を解除しました'); }
+    catch (x) { ui.toast(x.message); }
+  });
+  render();
+});
+</script>
+</body>
+</html>

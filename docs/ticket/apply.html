@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>申込｜NEXT MOVE TICKETS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Noto+Sans+JP:wght@400;500;700;900&family=DM+Mono:wght@400;500&family=Instrument+Serif:ital@1&family=Barlow+Condensed:wght@700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="flow.css">
+<script src="data.js"></script>
+<script src="common.js"></script>
+</head>
+<body>
+<div data-header="v2" data-active="events"></div>
+<main id="main" class="flow-main"><div class="wrap"><div class="narrow" id="apply"></div></div></main>
+<div data-footer></div>
+<script>
+NMT.ready(function (db, ui) {
+  if (!ui.requireLogin()) return;
+  var f = NMT.fmt, L = NMT.LABEL, esc = ui.esc;
+  var box = document.getElementById('apply');
+  var id = ui.param('id');
+  var e = id && db.eventById(id);
+  var backLink = e ? '<a class="p-back" href="' + ui.url('event', { id: e.id }) + '">← イベントに戻る</a>' : '<a class="p-back" href="' + ui.url('events') + '">← イベント一覧へ</a>';
+
+  function head(sub) {
+    return '<div class="p-head"><div class="stack" style="--stack-gap:8px">' + backLink + '<p class="p-head__en">APPLY</p><h1 class="p-head__ja">' + esc(sub) + '</h1></div></div>';
+  }
+  function stop(title, msg) {
+    box.innerHTML = head(title) + '<div class="empty">' + msg + '</div>';
+  }
+  if (!e || (e.status === 'DRAFT' && !db.canManageEvent(e.id))) return stop('イベントが見つかりません', '<a class="textlink" href="' + ui.url('events') + '">イベント一覧へ</a>');
+  document.title = '申込：' + e.title + '｜NEXT MOVE TICKETS';
+  if (e.status === 'DRAFT') return stop(e.title, '下書きのイベントには申し込めません。');
+  if (e.status === 'CANCELLED') return stop(e.title, 'このイベントは中止されました。');
+  if (db.isStarted(e)) return stop(e.title, '開始後は申し込めません。');
+  var pend = db.pendingPayments().filter(function (p) { return p.eventId === e.id; })[0];
+  if (pend) return stop(e.title, '支払いの途中の申込があります（' + esc(f.hm(pend.holdExpiresAt)) + ' まで席を確保）。<br><a class="btn btn--coral" style="margin-top:16px" href="' + ui.url('checkout', { payment: pend.id }) + '">支払いを続ける</a>');
+
+  var org = db.organizerById(e.organizerId);
+  var slots = db.slotsOf(e.id);
+  var mt = db.myTickets().filter(function (x) { return x.event.id === e.id && !x.ticket.revokedAt; })[0];
+  var mineIds = mt ? mt.slots.map(function (s) { return s.id; }) : [];
+  function selectable(s) { return mineIds.indexOf(s.id) < 0 && db.slotState(s.id) === 'open'; }
+
+  // 画面の状態（ページ内だけで持つ）
+  var st = { step: 1, sel: [], answers: {}, agree: false, error: '' };
+  var pre = ui.param('slot');
+  if (pre && slots.some(function (s) { return s.id === pre && selectable(s); })) st.sel = [pre];
+  // 枠が1つだけのイベントは ① を飛ばす
+  if (slots.length === 1 && selectable(slots[0])) { st.sel = [slots[0].id]; st.step = 2; }
+
+  function total() { return st.sel.reduce(function (a, sid) { return a + db.slotById(sid).priceYen; }, 0); }
+  function questions() { return db.questionsFor(e.id, st.sel); }
+  function steps() {
+    var names = ['枠を選ぶ', '質問に回答', '確認'];
+    return '<ol class="steps" aria-label="申込の手順">' + names.map(function (n, i) {
+      var k = i + 1;
+      return '<li class="steps__item' + (k === st.step ? ' is-current' : k < st.step ? ' is-done' : '') + '"' + (k === st.step ? ' aria-current="step"' : '') + '><span>' + n + '</span></li>';
+    }).join('') + '</ol>';
+  }
+  function titleRow() {
+    return '<div style="margin:20px 0 16px"><p class="t-h3">' + esc(e.title) + '</p><p class="t-small t-muted">' + esc(f.card(e.startAt)) + ' · ' + esc(e.venueName || 'オンライン') + ' · ' + esc(org.displayName) + '</p></div>';
+  }
+  function errBox() { return st.error ? '<div class="notice notice--error" role="alert" style="margin-top:16px"><div>' + esc(st.error) + '</div></div>' : ''; }
+
+  // ① 枠を選ぶ
+  function step1() {
+    var anyOpen = slots.some(selectable);
+    var html = slots.map(function (s) {
+      var state = db.slotState(s.id), mine = mineIds.indexOf(s.id) >= 0, ok = selectable(s);
+      var why = mine ? '申込済み' : state === 'full' ? '満員のため選べません' : state === 'before' ? f.card(s.opensAt) + ' から受付' : state === 'closed' ? '受付は終了しました' : '残 ' + db.slotRemaining(s.id) + ' / ' + s.capacity + ' 席';
+      var pill = mine ? '<span class="pill pill--open">参加予定</span>' : state === 'full' ? '<span class="pill pill--soldout">満員</span>' : state === 'before' ? '<span class="pill pill--before">受付前</span>' : state === 'closed' ? '<span class="pill pill--ended">受付終了</span>' : '';
+      return '<label class="option"><input type="checkbox" name="slot" value="' + esc(s.id) + '"' + (st.sel.indexOf(s.id) >= 0 ? ' checked' : '') + (ok ? '' : ' disabled') + '>' +
+        '<span class="option__body"><span class="option__title">' + esc(s.name) + '</span>' +
+        '<span class="option__meta">' + esc(L.SlotKind[s.kind] || s.kind) + ' · ' + esc(why) + (s.priceYen > 0 && ok ? ' · 決済が終わった時点で参加予定になります' : '') + '</span>' +
+        (s.description ? '<span class="option__meta">' + esc(s.description) + '</span>' : '') + (pill ? '<span>' + pill + '</span>' : '') + '</span>' +
+        '<span class="option__price">' + esc(f.yen(s.priceYen)) + '</span></label>';
+    }).join('');
+    var capNote = e.capacity ? '<p class="t-small t-muted" style="margin-top:12px">イベント全体の上限 ' + e.capacity + ' 人（残 ' + db.eventRemaining(e.id) + '）。補欠はありません。</p>' : '<p class="t-small t-muted" style="margin-top:12px">満員の枠は選べません（補欠はありません）。</p>';
+    return titleRow() + '<p class="t-body" style="margin-bottom:12px">申し込む枠を選んでください（複数可）</p>' +
+      '<fieldset class="stack" style="--stack-gap:10px;border:0;padding:0;margin:0"><legend class="sr-only">参加枠</legend>' + html + '</fieldset>' + capNote +
+      (anyOpen ? '' : '<div class="notice notice--gray" style="margin-top:16px"><div>いま申し込める枠はありません。' + (mt ? '<a class="textlink" href="' + ui.url('ticket', { id: mt.ticket.id }) + '">QR チケットを表示</a>' : '') + '</div></div>') +
+      errBox() +
+      '<div class="flow-actions"><div class="flow-actions__sum"><span class="t-small t-muted">' + st.sel.length + ' 枠を選択</span><span class="flow-actions__total">' + esc(f.yen(total())) + '</span></div>' +
+      '<button class="btn btn--black" type="button" data-act="to2"' + (st.sel.length ? '' : ' disabled') + '>次へ<img class="icon" src="assets/icon-arrow-btn-white.svg" alt=""></button></div>';
+  }
+
+  // ② 質問に回答
+  function field(q) {
+    var v = st.answers[q.id], name = 'q-' + q.id;
+    var target = q.slotIds.length ? '<span class="field__help">' + esc(q.slotIds.map(function (sid) { var s = db.slotById(sid); return s ? s.name : ''; }).join('・')) + ' を選んだ人だけに聞いています</span>' : '';
+    var label = '<span class="field__label" id="' + name + '-l">' + esc(q.label) + ' ' + (q.required ? '<span class="req">必須</span>' : '<span class="t-small t-muted" style="font-weight:400">任意</span>') + (q.isPersonalData ? ' <span class="tag tag--pi">個人情報</span>' : '') + '</span>';
+    var help = q.helpText ? '<span class="field__help">' + esc(q.helpText) + '</span>' : '';
+    var pi = q.isPersonalData ? '<span class="field__help">利用目的：' + esc(e.dataUsePurpose || '（未設定）') + '</span>' : '';
+    var err = '<span class="field__error" hidden data-err="' + esc(q.id) + '"></span>';
+    var input;
+    if (q.type === 'TEXTAREA') input = '<textarea class="textarea" name="' + name + '" data-q="' + esc(q.id) + '" aria-labelledby="' + name + '-l">' + esc(v || '') + '</textarea>';
+    else if (q.type === 'SELECT' || q.type === 'MULTI_SELECT') {
+      var multi = q.type === 'MULTI_SELECT', arr = multi ? (v || []) : [v];
+      input = '<div class="choice-list" role="group" aria-labelledby="' + name + '-l">' + (q.options || []).map(function (op) {
+        return '<label class="check"><input type="' + (multi ? 'checkbox' : 'radio') + '" name="' + name + '" data-q="' + esc(q.id) + '" value="' + esc(op) + '"' + (arr.indexOf(op) >= 0 ? ' checked' : '') + '>' + esc(op) + '</label>';
+      }).join('') + '</div>';
+    } else {
+      var auto = q.commonKey === 'NAME' ? ' autocomplete="name"' : q.commonKey === 'KANA' ? ' autocomplete="off"' : q.type === 'TEL' ? ' autocomplete="tel"' : '';
+      input = '<input class="input" type="' + (q.type === 'TEL' ? 'tel' : 'text') + '" name="' + name + '" data-q="' + esc(q.id) + '" value="' + esc(v || '') + '" aria-labelledby="' + name + '-l"' + auto + (q.type === 'TEL' ? ' inputmode="tel" placeholder="090-1234-5678"' : '') + '>';
+    }
+    return '<div class="field" data-field="' + esc(q.id) + '">' + label + help + target + input + pi + err + '</div>';
+  }
+  function step2() {
+    var qs = questions();
+    var common = qs.filter(function (q) { return q.commonKey; }), extra = qs.filter(function (q) { return !q.commonKey; });
+    return titleRow() +
+      '<div class="notice notice--gray"><div>回答は <b>' + esc(org.displayName) + ' の運営メンバーだけ</b>が見られます。イベント終了から ' + esc(e.answerRetentionDays) + ' 日で自動で削除されます。プロフィールには保存しません。</div></div>' +
+      '<form class="q-list" style="margin-top:24px" novalidate data-form>' +
+        (common.length ? '<p class="q-group-title">共通の質問</p>' + common.map(field).join('') : '') +
+        (extra.length ? '<p class="q-group-title">主催者からの質問</p>' + extra.map(field).join('') : '') +
+      '</form>' + errBox() +
+      '<div class="flow-actions"><button class="btn btn--outline" type="button" data-act="to1">← 戻る</button>' +
+      '<button class="btn btn--black" type="button" data-act="to3">内容を確認<img class="icon" src="assets/icon-arrow-btn-white.svg" alt=""></button></div>';
+  }
+  function collect() {
+    var form = box.querySelector('[data-form]'); if (!form) return;
+    questions().forEach(function (q) {
+      var els = form.querySelectorAll('[data-q="' + q.id + '"]');
+      if (q.type === 'MULTI_SELECT') st.answers[q.id] = [].filter.call(els, function (x) { return x.checked; }).map(function (x) { return x.value; });
+      else if (q.type === 'SELECT') { var c = [].filter.call(els, function (x) { return x.checked; })[0]; st.answers[q.id] = c ? c.value : undefined; }
+      else st.answers[q.id] = els[0] ? els[0].value : '';
+    });
+  }
+  // data.js の checkApply と同じ決まりで、その場でエラーを出す
+  function validate() {
+    var bad = null;
+    questions().forEach(function (q) {
+      var v = st.answers[q.id];
+      var empty = v == null || (Array.isArray(v) ? !v.length : !String(v).trim());
+      var msg = q.required && empty ? '入力してください' : !empty && q.type === 'TEL' && !/^[0-9+\-() ]{10,15}$/.test(String(v)) ? '電話番号の形（数字と - で10〜15文字）で入力してください' : '';
+      var el = box.querySelector('[data-err="' + q.id + '"]');
+      if (el) { el.textContent = msg; el.hidden = !msg; }
+      var inp = box.querySelector('[data-field="' + q.id + '"] .input, [data-field="' + q.id + '"] .textarea');
+      if (inp) inp.setAttribute('aria-invalid', msg ? 'true' : 'false');
+      if (msg && !bad) bad = box.querySelector('[data-field="' + q.id + '"] input, [data-field="' + q.id + '"] textarea');
+    });
+    if (bad) bad.focus();
+    return !bad;
+  }
+
+  // ③ 確認
+  function step3() {
+    var qs = questions(), amount = total();
+    var end = new Date(Date.parse(e.endAt) + e.answerRetentionDays * 86400e3);
+    var rows = st.sel.map(function (sid) { var s = db.slotById(sid); return '<tr><th scope="row">' + esc(s.name) + '</th><td class="num-cell">' + esc(f.yen(s.priceYen)) + '</td></tr>'; }).join('') +
+      '<tr class="total"><th scope="row">合計</th><td class="num-cell">' + esc(f.yen(amount)) + '</td></tr>';
+    var ans = qs.map(function (q) {
+      var v = st.answers[q.id]; v = Array.isArray(v) ? v.join('、') : v;
+      return '<tr><th scope="row">' + esc(q.label) + '</th><td>' + (v && String(v).trim() ? esc(v) : '<span class="t-muted">（未回答）</span>') + '</td></tr>';
+    }).join('');
+    var hasPi = qs.some(function (q) { return q.isPersonalData; });
+    return titleRow() +
+      '<p class="q-group-title">参加枠</p><table class="confirm-table">' + rows + '</table>' +
+      '<p class="q-group-title" style="margin-top:24px">回答</p><table class="confirm-table">' + ans + '</table>' +
+      '<p style="margin-top:8px"><button class="textlink t-small" type="button" data-act="to2">← 回答を直す</button></p>' +
+      '<div class="box" style="margin-top:24px"><div class="stack" style="--stack-gap:10px">' +
+        '<p class="t-h3">個人情報の取り扱い</p>' +
+        '<p class="t-small">回答を見る人：<b>' + esc(org.displayName) + ' の運営メンバーのみ</b></p>' +
+        '<p class="t-small">保持期間：<b>イベント終了から ' + esc(e.answerRetentionDays) + ' 日</b>（' + esc(f.ymd(end)) + ' に自動で削除）</p>' +
+        (hasPi ? '<p class="t-small">利用目的：' + esc(e.dataUsePurpose || '（未設定）') + '</p>' : '') +
+        (amount > 0 ? '<hr class="divider"><p class="t-h3">キャンセルと返金</p><p class="t-small">有料枠は支払い後にキャンセルしても<b>返金されません</b>。有料枠を含む申込は、支払いが終わった時点ですべての枠が参加予定になります。支払いをやめた場合は申込されません。</p>' : '') +
+      '</div></div>' +
+      '<label class="check" style="margin-top:16px"><input type="checkbox" data-agree' + (st.agree ? ' checked' : '') + '>上記に同意して申し込む</label>' +
+      errBox() +
+      '<div class="flow-actions"><button class="btn btn--outline" type="button" data-act="to2">← 戻る</button>' +
+      '<button class="btn ' + (amount > 0 ? 'btn--coral' : 'btn--black') + '" type="button" data-act="submit"' + (st.agree ? '' : ' disabled') + '>' + (amount > 0 ? esc(f.yen(amount)) + ' の支払いへ<img class="icon" src="assets/icon-arrow-btn.svg" alt="">' : '申込を確定する<img class="icon" src="assets/icon-arrow-btn-white.svg" alt="">') + '</button></div>';
+  }
+
+  // 完了（無料のみ）
+  function done(ticketId) {
+    var x = db.myTickets().filter(function (t) { return t.ticket.id === ticketId; })[0];
+    var isGroup = org.type === 'GROUP', fol = isGroup && db.isFollowing(org.id);
+    box.innerHTML = '<div class="result" role="status">' +
+      '<p class="result__mark result__mark--ok" aria-hidden="true">✓</p>' +
+      '<h1 class="result__title">申込を受け付けました</h1>' +
+      '<p class="t-muted">' + esc(e.title) + ' · ' + esc(f.card(e.startAt)) + '</p>' +
+      '<div class="box" style="width:min(480px,100%);text-align:left">' + (x ? x.slots : []).map(function (s) { return '<div class="tk-slot"><span class="tk-slot__name">' + esc(s.name) + '</span><span class="pill pill--open">参加予定</span></div>'; }).join('') + '</div>' +
+      '<p class="t-small t-muted">QR チケットをメールでも送りました。当日は受付で QR を見せてください。</p>' +
+      '<div class="result__actions">' +
+        '<a class="btn btn--black btn--block" href="' + ui.url('ticket', { id: ticketId }) + '">QR チケットを表示<img class="icon" src="assets/icon-arrow-btn-white.svg" alt=""></a>' +
+        '<a class="btn btn--outline btn--block" href="' + ui.url('mypage') + '">マイページで確認</a>' +
+        (isGroup ? '<button class="btn-sm" type="button" data-act="follow" aria-pressed="' + fol + '" style="align-self:center">' + (fol ? 'フォロー中' : '＋ ' + esc(org.displayName) + ' をフォロー') + '</button>' : '') +
+      '</div></div>';
+  }
+
+  function render() {
+    var body = st.step === 1 ? step1() : st.step === 2 ? step2() : step3();
+    box.innerHTML = head(['参加枠を選ぶ', '質問に回答', '内容の確認'][st.step - 1]) + steps() + body;
+  }
+  function go(step) { st.error = ''; st.step = step; render(); window.scrollTo(0, 0); }
+
+  box.addEventListener('change', function (ev) {
+    var t = ev.target;
+    if (t.name === 'slot') {
+      st.sel = [].filter.call(box.querySelectorAll('input[name=slot]'), function (x) { return x.checked; }).map(function (x) { return x.value; });
+      st.error = ''; render();
+    } else if (t.hasAttribute('data-agree')) {
+      st.agree = t.checked;
+      box.querySelector('[data-act="submit"]').disabled = !st.agree;
+    }
+  });
+  box.addEventListener('click', function (ev) {
+    var b = ev.target.closest('[data-act]'); if (!b || b.disabled) return;
+    var act = b.getAttribute('data-act');
+    if (act === 'to1') { collect(); go(1); }
+    else if (act === 'to2') { if (st.step === 1 && !st.sel.length) return; go(2); }
+    else if (act === 'to3') { collect(); if (validate()) { st.agree = false; go(3); } }
+    else if (act === 'submit') {
+      try {
+        var r = db.apply(e.id, st.sel, st.answers);
+        if (r.kind === 'payment') location.href = ui.url('checkout', { payment: r.paymentId });
+        else { done(r.ticketId); window.scrollTo(0, 0); }
+      } catch (err) { st.error = err.message; render(); }
+    } else if (act === 'follow') {
+      try { var on = db.toggleFollow(org.id); b.setAttribute('aria-pressed', String(on)); b.textContent = on ? 'フォロー中' : '＋ ' + org.displayName + ' をフォロー'; ui.toast(on ? 'フォローしました' : 'フォローを外しました'); } catch (err) { ui.toast(err.message); }
+    }
+  });
+
+  render();
+});
+</script>
+</body>
+</html>

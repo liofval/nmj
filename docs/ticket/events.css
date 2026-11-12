@@ -5,14 +5,14 @@
    ========================================================= */
 
 /* ---------- ページ見出し（EVENTS ＋ 和文 ＋ 表示切替） ---------- */
-.page-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; padding-top: 40px; padding-bottom: 28px; }
+.page-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px 24px; padding-top: clamp(24px, 2.8vw, 40px); padding-bottom: clamp(20px, 1.95vw, 28px); }
 .page-head__titles { display: flex; align-items: flex-end; gap: 20px; white-space: nowrap; }
-.page-head__en { font-family: var(--font-display); font-weight: 400; font-size: 88px; line-height: 0.92; } /* Ticket/Display/L */
+.page-head__en { font-family: var(--font-display); font-weight: 400; font-size: clamp(48px, 6.12vw, 88px); line-height: 0.92; } /* Ticket/Display/L */
 .page-head__sub { display: flex; flex-direction: column; gap: 2px; padding-bottom: 8px; }
-.page-head__ja { font-weight: 700; font-size: 22px; line-height: 1.45; }
+.page-head__ja { font-weight: 700; font-size: var(--h2); line-height: 1.45; }
 .page-head__count { font-size: 13px; line-height: 1.65; }
 /* Calendar は行送りが normal（Figma 1771:10238） */
-.page-head--cal { padding-bottom: 24px; }
+.page-head--cal { padding-bottom: clamp(16px, 1.67vw, 24px); }
 .page-head--cal .page-head__en { line-height: 1.5; }
 .page-head--cal .page-head__ja,
 .page-head--cal .page-head__count { line-height: normal; }
@@ -30,7 +30,8 @@
 .filterbar .searchbox__input { color: var(--color-black); }
 
 /* ---------- チップ行＋並び順 ---------- */
-.filter-row { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding-top: 20px; padding-bottom: 32px; }
+.filter-row { display: flex; align-items: center; justify-content: space-between; gap: 16px 24px; padding-top: 20px; padding-bottom: clamp(20px, 2.23vw, 32px); }
+.filter-row > .chip-row { min-width: 0; }
 .filter-row--cal { padding-top: 0; }
 .sort { display: inline-flex; align-items: center; gap: 10px; white-space: nowrap; background: transparent; border: 0; padding: 0; cursor: pointer; }
 .sort__label { font-size: 13px; line-height: 1.65; color: var(--color-muted); }
@@ -41,12 +42,12 @@
 
 /* ---------- カード表示 ---------- */
 .events-results { padding-bottom: 64px; }
-.events-results .event-grid { row-gap: 56px; margin-top: 56px; }
+.events-results .event-grid { row-gap: clamp(32px, 3.9vw, 56px); margin-top: clamp(24px, 3.9vw, 56px); }
 .event-card.is-soldout .event-card__flyer { opacity: .45; }
 .pill--upcoming { background: var(--color-lavender); } /* 発売前（11/1 正午から 等） */
 
 /* もっと見る */
-.more { display: flex; justify-content: center; padding-top: 40px; padding-bottom: var(--gap-section); }
+.more { display: flex; justify-content: center; padding-top: clamp(24px, 2.8vw, 40px); padding-bottom: var(--gap-section); }
 
 /* ---------- リスト表示（EventListRow） ---------- */
 .day-head { display: flex; align-items: center; gap: 16px; padding-top: 24px; padding-bottom: 12px; border-bottom: 1.5px solid var(--color-black); white-space: nowrap; }
@@ -79,34 +80,38 @@
 .g-party { background: var(--color-pink); }
 .g-other { background: var(--color-gray-100); border: 1px solid var(--color-black); }
 
-.cal-layout { display: flex; align-items: flex-start; gap: 40px; padding-bottom: var(--gap-section); }
+.cal-layout { display: flex; align-items: flex-start; gap: clamp(24px, 2.8vw, 40px); padding-bottom: var(--gap-section); }
 
 /* 月表示 */
-.cal-month { width: 868px; flex-shrink: 0; }
-.cal-month__head { display: flex; align-items: center; justify-content: space-between; padding-bottom: 16px; }
+.cal-month { flex: 0 1 868px; min-width: 0; }
+.cal-month__head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding-bottom: 16px; }
 .cal-month__title { display: flex; align-items: flex-end; gap: 16px; white-space: nowrap; line-height: normal; }
-.cal-month__en { font-family: var(--font-display); font-weight: 400; font-size: 44px; line-height: normal; }
+.cal-month__en { font-family: var(--font-display); font-weight: 400; font-size: var(--display-m); line-height: normal; }
 .cal-month__ja { font-weight: 700; font-size: 15px; }
 .cal-month__nav { display: flex; gap: 8px; }
 .cal-navbtn { padding: 8px 14px; border: 1px solid var(--color-black); background: var(--color-white); font-weight: 700; font-size: 13px; line-height: normal; white-space: nowrap; cursor: pointer; }
 .cal-navbtn:hover { background: var(--color-gray-100); }
 
-.cal-grid { display: grid; grid-template-columns: repeat(7, 124px); }
-.cal-grid__wd { padding: 10px 0 10px 10px; font-weight: 700; font-size: 12px; line-height: normal; border-top: 1.5px solid var(--color-black); border-bottom: 1px solid var(--color-black); }
-.cal-day { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; height: 118px; padding: 8px; overflow: hidden; border-right: 1px solid var(--color-line); border-bottom: 1px solid var(--color-line); }
+.cal-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); }
+.cal-grid__wd { padding: 10px 0 10px clamp(4px, .7vw, 10px); font-weight: 700; font-size: 12px; line-height: normal; border-top: 1.5px solid var(--color-black); border-bottom: 1px solid var(--color-black); }
+.cal-day { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; min-width: 0; height: clamp(64px, 8.2vw, 118px); padding: clamp(4px, .56vw, 8px); cursor: pointer; overflow: hidden; border-right: 1px solid var(--color-line); border-bottom: 1px solid var(--color-line); }
 .cal-day:nth-child(7n) { border-right: 0; }
-.cal-day__num { display: flex; align-items: center; gap: 6px; font-family: var(--font-display); font-size: 22px; line-height: normal; }
+.cal-day__num { display: flex; align-items: center; gap: 6px; font-family: var(--font-display); font-size: clamp(16px, 1.53vw, 22px); line-height: normal; }
+button.cal-day__num { padding: 0; border: 0; background: none; color: inherit; cursor: pointer; text-align: left; }
+.cal-day--out { cursor: default; }
+.cal-day:not(.cal-day--out):not(.is-selected):hover { background: var(--color-gray-100); }
 .cal-day--out .cal-day__num { color: var(--color-muted); }
 .cal-day.is-selected { background: var(--color-black); color: var(--color-white); }
 .cal-today { padding: 1px 5px; background: var(--color-coral); color: var(--color-black); font-family: var(--font-jp); font-weight: 700; font-size: 10px; line-height: normal; }
 .cal-tag { display: block; width: 100%; padding: 2px 6px; color: var(--color-black); font-weight: 700; font-size: 10px; line-height: normal; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .cal-tag:hover { text-decoration: underline; }
-.cal-more { font-weight: 700; font-size: 11px; line-height: normal; }
+.cal-more { font-weight: 700; font-size: 11px; line-height: normal; padding: 0; border: 0; background: none; color: inherit; cursor: pointer; }
+.cal-more:hover { text-decoration: underline; }
 
 /* その日のイベント（DayPanel） */
 .day-panel { flex: 1 1 0; min-width: 0; }
 .day-panel__head { display: flex; align-items: flex-end; gap: 12px; padding-bottom: 16px; border-bottom: 1.5px solid var(--color-black); white-space: nowrap; line-height: normal; }
-.day-panel__date { font-family: var(--font-display); font-size: 56px; line-height: normal; }
+.day-panel__date { font-family: var(--font-display); font-size: clamp(40px, 3.9vw, 56px); line-height: normal; }
 .day-panel__label { font-weight: 700; font-size: 17px; }
 .day-item { display: flex; align-items: flex-start; gap: 16px; padding: 16px 0; border-bottom: 1px solid var(--color-line); }
 .day-item__thumb { width: 84px; height: 105px; object-fit: cover; flex-shrink: 0; background: var(--color-gray-100); }
@@ -119,3 +124,64 @@
 .day-item:hover .day-item__title { text-decoration: underline; text-underline-offset: 3px; }
 .day-panel__link { padding-top: 20px; padding-bottom: 12px; line-height: normal; }
 .day-panel__hint { padding: 14px 16px; background: var(--color-gray-100); font-size: 12px; line-height: 1.65; }
+
+/* ---------- プロトタイプで足したもの（Figma に無い：選択式の値・空の状態） ---------- */
+/* 絞り込みの値・並び順は <select>。見た目は Figma の「値＋▼」のまま、幅は選んだ文字に合わせる */
+.fsel { appearance: none; -webkit-appearance: none; field-sizing: content; min-width: 0; max-width: 100%; height: auto; margin: 0; padding: 0; border: 0; border-radius: 0; background: transparent; color: var(--color-black); text-overflow: ellipsis; cursor: pointer; }
+.fsel:focus { outline: 0; }
+.searchbox__field:has(.fsel:focus-visible), .sort:has(.fsel:focus-visible) { outline: 3px solid var(--color-lavender); outline-offset: -3px; }
+label.searchbox__field { cursor: pointer; }
+.chip:disabled { opacity: .4; cursor: not-allowed; }
+.events-empty { display: flex; flex-direction: column; align-items: center; gap: 8px; margin-top: clamp(24px, 3.9vw, 56px); }
+.events-empty .btn { margin-top: 16px; }
+.more[hidden] { display: none; }
+.day-panel__empty { padding: 24px 0; font-size: 13px; line-height: 1.65; color: var(--color-muted); border-bottom: 1px solid var(--color-line); }
+
+/* ---------- レスポンシブ（Figma に SP 版は無い。プロトタイプ用） ---------- */
+@media (max-width: 1023px) {
+  .filter-row { flex-wrap: wrap; }
+  .filter-row > .chip-row { flex: 1 1 100%; }
+  .event-row { gap: 20px; }
+  .event-row__date { width: 88px; }
+  .event-row__day { font-size: 32px; }
+  .event-row__price { width: auto; }
+  .event-row__arrow { display: none; }
+  .cal-layout { flex-direction: column; align-items: stretch; }
+  .cal-month { flex: none; width: 100%; }
+  .cal-legend { flex-wrap: wrap; gap: 8px 16px; }
+}
+@media (max-width: 767px) {
+  .page-head { flex-wrap: wrap; }
+  .page-head__titles { flex-wrap: wrap; gap: 4px 16px; }
+  .view-toggle__item { padding: 8px 14px; }
+  /* 絞り込み：キーワードを1段目、日付・エリア・ジャンル・価格を2列×2段に */
+  .filterbar .searchbox__field { padding: 12px 14px; gap: 8px; min-width: 0; }
+  .filterbar .searchbox__field:not(.searchbox__field--grow) { flex: 1 1 calc(50% - 1px); border-left: 0; border-bottom: 1px solid var(--color-line); }
+  .filterbar .searchbox__field:nth-child(odd):not(.searchbox__field--grow) { border-left: 1px solid var(--color-line); }
+  .filterbar .searchbox__field:nth-child(n+4) { border-bottom: 0; }
+  .filterbar .searchbox__label { font-size: 12px; }
+  .filterbar .fsel { flex: 1 1 auto; font-size: 14px; }
+  .top-search .searchbox__field:not(.searchbox__field--grow) { min-width: 0; }
+  .top-search .fsel { flex: 1 1 auto; }
+  .sort__value { font-size: 14px; }
+  /* リスト：日付を1行に、価格とステータスは本文の下 */
+  .event-row { flex-wrap: wrap; gap: 8px 14px; padding: 16px 0; }
+  .event-row__date { width: 100%; flex-direction: row; align-items: baseline; gap: 8px; }
+  .event-row__day { font-size: 22px; }
+  .event-row__thumb { width: 64px; height: 80px; }
+  .event-row__body { flex: 1 1 calc(100% - 78px); }
+  .event-row__title { font-size: 15px; }
+  .event-row__price { margin-left: 78px; }
+  .event-row__price .price { font-size: 20px; }
+  .day-head__date { font-size: 18px; }
+  /* カレンダー：予定は色の帯だけ（文字は右のパネル＝下に出す） */
+  .cal-day { gap: 3px; }
+  .cal-tag { height: 5px; padding: 0; font-size: 0; }
+  .cal-today { padding: 0 3px; font-size: 9px; }
+  .cal-day__num { gap: 3px; }
+  .cal-more { font-size: 10px; }
+  .cal-grid__wd { padding-left: 4px; }
+  .day-item__thumb { width: 64px; height: 80px; }
+  /* 2列のカードで価格と長いピル（「10/31 正午から」）が並ばないときは折り返す（共通部品の style.css にも欲しい） */
+  .event-card__bottom { flex-wrap: wrap; gap: 6px; }
+}

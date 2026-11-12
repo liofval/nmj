@@ -9,313 +9,487 @@
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Noto+Sans+JP:wght@400;500;700;900&family=DM+Mono:wght@400;500&family=Instrument+Serif:ital@1&family=Barlow+Condensed:wght@700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 <link rel="stylesheet" href="org.css">
-<script src="data.js" defer></script>
-<script src="common.js" defer></script>
+<script src="data.js"></script>
+<script src="common.js"></script>
 </head>
-<body class="org-page">
+<body class="org-page ec-page">
 <div data-header="org" data-active="dashboard"></div>
-<main>
-  <!-- 見出し（Figma 1775:10568） -->
-  <div class="wrap ec-head">
-    <div class="ec-head__left">
-      <h1 class="ec-head__title">イベントを作成</h1>
-      <button class="org-btn" type="button">過去のイベントから複製</button>
-    </div>
-    <div class="ec-head__right">
-      <span class="ec-autosave">自動保存 12:04</span>
-      <button class="org-btn" type="button">プレビュー</button>
-      <button class="btn btn--black" type="submit" form="event-form">公開する<img class="icon" src="assets/icon-arrow-btn-white.svg" alt=""></button>
-    </div>
-  </div>
+<!-- 中身は data.js から描く（Figma 1775:10568〜。?org= で作成、?id= で編集） -->
+<main id="main"></main>
+<script>
+NMT.ready(function (db, ui) {
+  var esc = ui.esc, f = NMT.fmt, L = NMT.LABEL, main = document.getElementById('main');
+  if (!ui.requireLogin()) return;
 
-  <!-- 本体（Figma 1775:10581） -->
-  <div class="wrap ec-layout">
-    <!-- 目次（Figma 1775:10582） -->
-    <nav class="ec-toc" aria-label="入力の進み具合">
-      <a class="ec-toc__item is-done" href="#sec-01"><span class="ec-toc__num">✓</span><span class="ec-toc__label">主催者・ジャンル・地域</span></a>
-      <a class="ec-toc__item is-done" href="#sec-02"><span class="ec-toc__num">✓</span><span class="ec-toc__label">基本情報</span></a>
-      <a class="ec-toc__item is-current" href="#sec-03" aria-current="step"><span class="ec-toc__num">3</span><span class="ec-toc__label">参加枠</span></a>
-      <a class="ec-toc__item" href="#sec-04"><span class="ec-toc__num">4</span><span class="ec-toc__label">申込時の質問</span></a>
-      <a class="ec-toc__item" href="#sec-05"><span class="ec-toc__num">5</span><span class="ec-toc__label">参加者情報の扱い</span></a>
-      <a class="ec-toc__item is-later" href="#sec-06"><span class="ec-toc__num">6</span><span class="ec-toc__label">入金先（後日）</span></a>
-      <div class="ec-toc__todo">
-        <p class="ec-toc__todo-title">公開まであと</p>
-        <p>・参加枠を1つ以上</p>
-        <p>・個人情報の利用目的</p>
-      </div>
-    </nav>
+  var eid = ui.param('id');
+  var ev = eid ? db.eventById(eid) : null;
+  var org = ev ? db.organizerById(ev.organizerId) : NMT.currentOrg();
 
-    <!-- フォーム（Figma 1775:10611）。送信先なし -->
-    <form class="ec-form" id="event-form" action="#" onsubmit="return false;" autocomplete="off" novalidate>
-      <!-- 01 -->
-      <section class="ec-sec" id="sec-01" aria-labelledby="sec-01-title">
-        <div class="ec-sec__head">
-          <span class="ec-sec__num">01</span>
-          <h2 class="ec-sec__title" id="sec-01-title">主催者・ジャンル・地域</h2>
-        </div>
-        <div class="ec-row">
-          <div class="ec-field ec-field--box">
-            <label class="ec-label" for="f-org">主催者<span class="ec-req">必須</span></label>
-            <select class="ec-select" id="f-org" name="org" required>
-              <option selected>慶應軽音サークル（@keio-lightmusic）</option>
-              <option>個人として主催</option>
-            </select>
-            <p class="ec-help">自分／管理している団体から選ぶ</p>
-          </div>
-          <div class="ec-field ec-field--box">
-            <label class="ec-label" for="f-genre">ジャンル<span class="ec-req">必須</span></label>
-            <select class="ec-select" id="f-genre" name="genre" required>
-              <option selected>音楽・ライブ</option>
-              <option>スポーツ</option>
-              <option>テック・ハッカソン</option>
-              <option>アート・カルチャー</option>
-              <option>交流・新歓</option>
-            </select>
-          </div>
-          <div class="ec-field ec-field--box">
-            <label class="ec-label" for="f-area">地域<span class="ec-req">必須</span></label>
-            <select class="ec-select" id="f-area" name="area" required>
-              <option selected>東京都</option>
-              <option>神奈川県</option>
-              <option>埼玉県</option>
-              <option>千葉県</option>
-              <option>オンライン</option>
-            </select>
-            <p class="ec-help">オンラインのみなら「オンライン」</p>
-          </div>
-        </div>
-      </section>
+  function gate(title, body, actions) {
+    main.innerHTML = '<div class="wrap org-gate"><div class="box stack"><h1 class="org-gate__title">' + esc(title) + '</h1><p class="t-small">' + esc(body) + '</p><div class="cluster">' + (actions || '') + '</div></div></div>';
+  }
+  if (eid && !ev) return gate('イベントが見つかりません', 'URL を確かめてください。', '<a class="org-btn" href="' + ui.url('dashboard') + '">ダッシュボードへ</a>');
+  if (ev && !db.canManageEvent(ev.id)) return gate('このイベントを編集する権限がありません', '主催者（団体の owner）だけが編集できます。', '<a class="org-btn" href="' + ui.url('event', { id: ev.id }) + '">イベントページを見る</a>');
+  if (!ev && !org) return gate('管理している団体がありません', '先に団体を作るか、個人として主催するには初回設定を済ませてください。', '<a class="btn btn--black" href="' + ui.url('groupNew') + '">団体を作る</a>');
+  if (!ev && !db.isOwner(org.id)) return gate('この団体でイベントを作る権限がありません', org.displayName + ' でイベントを作れるのは owner だけです。', '<a class="org-btn" href="' + ui.url('dashboard') + '">ダッシュボードへ</a>');
 
-      <!-- 02 -->
-      <section class="ec-sec" id="sec-02" aria-labelledby="sec-02-title">
-        <div class="ec-sec__head">
-          <span class="ec-sec__num">02</span>
-          <h2 class="ec-sec__title" id="sec-02-title">基本情報</h2>
-        </div>
-        <div class="ec-field ec-field--line">
-          <label class="ec-label" for="f-title">タイトル<span class="ec-req">必須</span></label>
-          <input class="ec-input" id="f-title" name="title" type="text" value="インカレ・バンド対抗ライブ vol.4" required>
-        </div>
-        <div class="ec-flyer">
-          <img class="ec-flyer__img" src="assets/flyer-band-battle.jpg" alt="現在のフライヤー画像">
-          <div class="ec-flyer__body">
-            <p class="ec-flyer__title">フライヤー画像（4:5 推奨）</p>
-            <p class="ec-help">JPG / PNG · 10MB まで。一覧やカードではこの画像が表示されます。</p>
-            <div class="ec-flyer__btns">
-              <label class="org-btn ec-file">画像を変更<input type="file" name="flyer" accept="image/jpeg,image/png"></label>
-              <button class="org-btn" type="button">トリミング</button>
-            </div>
-          </div>
-        </div>
-        <div class="ec-row">
-          <div class="ec-field ec-field--line">
-            <label class="ec-label" for="f-start">開始<span class="ec-req">必須</span></label>
-            <input class="ec-input" id="f-start" name="start" type="text" value="2026/11/08（土）17:30" required>
-          </div>
-          <div class="ec-field ec-field--line">
-            <label class="ec-label" for="f-end">終了</label>
-            <input class="ec-input" id="f-end" name="end" type="text" value="21:00">
-          </div>
-          <div class="ec-field ec-field--line">
-            <label class="ec-label" for="f-open">開場</label>
-            <input class="ec-input" id="f-open" name="open" type="text" value="17:00">
-          </div>
-        </div>
-        <div class="ec-group">
-          <p class="ec-label" id="lbl-venue-type">会場</p>
-          <div class="ec-seg" role="radiogroup" aria-labelledby="lbl-venue-type">
-            <input type="radio" name="venue_type" id="vt-offline" value="offline" checked><label for="vt-offline">対面</label>
-            <input type="radio" name="venue_type" id="vt-online" value="online"><label for="vt-online">オンライン</label>
-            <input type="radio" name="venue_type" id="vt-both" value="both"><label for="vt-both">両方</label>
-          </div>
-          <div class="ec-row">
-            <div class="ec-field ec-field--line">
-              <label class="ec-label" for="f-venue">会場名<span class="ec-req">必須</span></label>
-              <input class="ec-input" id="f-venue" name="venue" type="text" value="下北沢 SHELTER" required>
-            </div>
-            <div class="ec-field ec-field--line">
-              <label class="ec-label" for="f-address">住所<span class="ec-req">必須</span></label>
-              <input class="ec-input" id="f-address" name="address" type="text" value="東京都世田谷区北沢2-6-10" required>
-            </div>
-          </div>
-        </div>
-        <div class="ec-field ec-field--box">
-          <label class="ec-label" for="f-desc">説明</label>
-          <textarea class="ec-textarea" id="f-desc" name="description" rows="2">関東の大学軽音サークル12組が、30分ずつの持ち時間で競う年に一度の対抗戦です。</textarea>
-          <p class="ec-help">Markdown で書けます</p>
-        </div>
-      </section>
+  var coverUrl = ev ? ev.coverUrl : 'assets/flyer-band-battle.jpg';
+  var COMMON_TEXT = { NAME: '氏名・フリガナ', AFFILIATION: '所属（学校名と学年／社会人）' };
+  var PRESETS = {
+    tel: { label: '電話番号', type: 'TEL', required: true, isPersonalData: true },
+    emergency: { label: '緊急連絡先', type: 'TEL', helpText: '当日つながる家族などの番号', required: false, isPersonalData: true },
+    allergy: { label: 'アレルギー・食事制限', type: 'TEXT', required: false, isPersonalData: true },
+    instrument: { label: '楽器の経験', type: 'SELECT', options: ['なし', '1年未満', '1〜3年', '3年以上'], required: false, isPersonalData: false }
+  };
 
-      <!-- 03 -->
-      <section class="ec-sec" id="sec-03" aria-labelledby="sec-03-title">
-        <div class="ec-sec__head">
-          <span class="ec-sec__num">03</span>
-          <h2 class="ec-sec__title" id="sec-03-title">参加枠</h2>
-          <button class="org-btn" type="button">＋ 枠を追加</button>
-        </div>
-        <div class="ec-row ec-row--end">
-          <div class="ec-field ec-field--line ec-field--cap">
-            <label class="ec-label" for="f-cap">イベント全体の上限（任意）</label>
-            <input class="ec-input" id="f-cap" name="capacity_total" type="text" inputmode="numeric" value="70 人">
-          </div>
-          <p class="ec-help ec-help--grow">枠の定員の合計より少なくできます。空欄なら枠の定員だけ。</p>
-        </div>
+  function opt(v, label, sel) { return '<option value="' + esc(v) + '"' + (sel ? ' selected' : '') + '>' + esc(label) + '</option>'; }
+  function tryDo(fn) { try { return fn(); } catch (err) { ui.toast(err.message || String(err)); return null; } }
+  function isDraft() { return !ev || ev.status === 'DRAFT'; }
 
-        <fieldset class="ec-tier">
-          <legend class="sr-only">参加枠: 学生</legend>
-          <div class="ec-tier__head">
-            <div class="ec-tier__name">
-              <span class="ec-tier__handle" aria-hidden="true">≡</span>
-              <span class="ec-tier__title">学生</span>
-              <span class="ec-tier__note">学生証の提示が必要</span>
-            </div>
-            <button class="org-btn org-btn--plain ec-tier__del" type="button">削除</button>
-          </div>
-          <div class="ec-row">
-            <div class="ec-field ec-field--line">
-              <label class="ec-label" for="t1-cap">定員<span class="ec-req">必須</span></label>
-              <input class="ec-input" id="t1-cap" name="tier[0][capacity]" type="text" inputmode="numeric" value="40 人" required>
-            </div>
-            <div class="ec-field ec-field--line">
-              <label class="ec-label" for="t1-price">価格<span class="ec-req">必須</span></label>
-              <input class="ec-input" id="t1-price" name="tier[0][price]" type="text" inputmode="numeric" value="¥ 1,500" required>
-            </div>
-            <div class="ec-field ec-field--line">
-              <label class="ec-label" for="t1-period">受付期間</label>
-              <input class="ec-input" id="t1-period" name="tier[0][period]" type="text" value="〜11/7 23:59">
-            </div>
-          </div>
-        </fieldset>
+  // ---------- 描画 ----------
+  function renderPage() {
+    var e = ev || {};
+    var orgs = db.managedOrganizers();
+    var genres = db.t.genres.slice().sort(function (a, b) { return a.sortOrder - b.sortOrder; });
+    var vt = e.venueType || 'OFFLINE';
+    var ret = Number(e.answerRetentionDays || 30);
+    var vis = e.attendeeListVisibility || 'ORGANIZER_ONLY';
 
-        <fieldset class="ec-tier">
-          <legend class="sr-only">参加枠: 一般</legend>
-          <div class="ec-tier__head">
-            <div class="ec-tier__name">
-              <span class="ec-tier__handle" aria-hidden="true">≡</span>
-              <span class="ec-tier__title">一般</span>
-              <span class="ec-tier__note">1ドリンク別</span>
-            </div>
-            <button class="org-btn org-btn--plain ec-tier__del" type="button">削除</button>
-          </div>
-          <div class="ec-row">
-            <div class="ec-field ec-field--line">
-              <label class="ec-label" for="t2-cap">定員<span class="ec-req">必須</span></label>
-              <input class="ec-input" id="t2-cap" name="tier[1][capacity]" type="text" inputmode="numeric" value="10 人" required>
-            </div>
-            <div class="ec-field ec-field--line">
-              <label class="ec-label" for="t2-price">価格<span class="ec-req">必須</span></label>
-              <input class="ec-input" id="t2-price" name="tier[1][price]" type="text" inputmode="numeric" value="¥ 2,000" required>
-            </div>
-            <div class="ec-field ec-field--line">
-              <label class="ec-label" for="t2-period">受付期間</label>
-              <input class="ec-input" id="t2-period" name="tier[1][period]" type="text" value="〜11/7 23:59">
-            </div>
-          </div>
-        </fieldset>
+    main.innerHTML = '' +
+      '<div class="wrap ec-head">' +
+        '<div class="ec-head__left">' +
+          '<h1 class="ec-head__title" data-head-title></h1>' +
+          '<button class="org-btn" type="button" data-dup-from>過去のイベントから複製</button>' +
+        '</div>' +
+        '<div class="ec-head__right">' +
+          '<span class="ec-autosave" data-saved></span>' +
+          '<button class="org-btn" type="button" data-preview>プレビュー</button>' +
+          '<button class="btn btn--black" type="submit" form="event-form"><span data-submit-label>公開する</span><img class="icon" src="assets/icon-arrow-btn-white.svg" alt=""></button>' +
+        '</div>' +
+      '</div>' +
+      '<div class="wrap ec-layout">' +
+        '<nav class="ec-toc" aria-label="入力の進み具合" data-toc></nav>' +
+        '<form class="ec-form" id="event-form" action="#" autocomplete="off" novalidate>' +
+          (ev && ev.status === 'CANCELLED' ? '<p class="ec-callout">このイベントは ' + f.md(ev.cancelledAt) + ' に中止しました（' + esc(ev.cancelReason || '') + '）。参加者には中止のお知らせが届いています。</p>' : '') +
+          // 01
+          '<section class="ec-sec" id="sec-01" aria-labelledby="sec-01-title">' +
+            '<div class="ec-sec__head"><span class="ec-sec__num">01</span><h2 class="ec-sec__title" id="sec-01-title">主催者・ジャンル・地域</h2></div>' +
+            '<div class="ec-row">' +
+              '<div class="ec-field ec-field--box"><label class="ec-label" for="f-org">主催者<span class="ec-req">必須</span></label>' +
+                '<select class="ec-select" id="f-org" name="org" required' + (ev ? ' disabled' : '') + '>' +
+                  (ev ? opt(org.id, org.displayName + '（@' + org.slug + '）', true) : orgs.map(function (o) { return opt(o.id, o.type === 'USER' ? '個人として主催（@' + o.slug + '）' : o.displayName + '（@' + o.slug + '）', o.id === org.id); }).join('')) +
+                '</select>' +
+                '<p class="ec-help">' + (ev ? '主催者を変えるときは <a class="textlink" href="' + ui.url('transfer', { id: ev.id }) + '">移管</a>' : '自分／管理している団体から選ぶ') + '</p></div>' +
+              '<div class="ec-field ec-field--box"><label class="ec-label" for="f-genre">ジャンル<span class="ec-req">必須</span></label>' +
+                '<select class="ec-select" id="f-genre" name="genre" required>' + genres.map(function (g) { return opt(g.id, g.name, g.id === (e.genreId || 'g-music')); }).join('') + '</select></div>' +
+              '<div class="ec-field ec-field--box"><label class="ec-label" for="f-area">地域<span class="ec-req">必須</span></label>' +
+                '<select class="ec-select" id="f-area" name="area" required>' + NMT.AREAS.map(function (a) { return opt(a, a === 'online' ? 'オンライン' : a, a === (e.area || '東京都')); }).join('') + '</select>' +
+                '<p class="ec-help">オンラインのみなら「オンライン」</p></div>' +
+            '</div>' +
+          '</section>' +
+          // 02
+          '<section class="ec-sec" id="sec-02" aria-labelledby="sec-02-title">' +
+            '<div class="ec-sec__head"><span class="ec-sec__num">02</span><h2 class="ec-sec__title" id="sec-02-title">基本情報</h2></div>' +
+            '<div class="ec-field ec-field--line"><label class="ec-label" for="f-title">タイトル<span class="ec-req">必須</span></label>' +
+              '<input class="ec-input" id="f-title" name="title" type="text" maxlength="80" value="' + esc(e.title || '') + '" placeholder="例：インカレ・バンド対抗ライブ vol.5" required></div>' +
+            '<div class="ec-flyer">' +
+              '<img class="ec-flyer__img" src="' + esc(coverUrl) + '" alt="現在のフライヤー画像" data-cover>' +
+              '<div class="ec-flyer__body"><p class="ec-flyer__title">フライヤー画像（4:5 推奨）</p>' +
+                '<p class="ec-help">一覧やカードではこの画像が表示されます。プロトタイプでは用意した画像から選びます。</p>' +
+                '<div class="ec-flyer__btns"><button class="org-btn" type="button" data-pick-cover>画像を変更</button></div></div>' +
+            '</div>' +
+            '<div class="ec-row">' +
+              '<div class="ec-field ec-field--line"><label class="ec-label" for="f-start">開始<span class="ec-req">必須</span></label>' +
+                '<input class="ec-input" id="f-start" name="start" type="datetime-local" value="' + (e.startAt ? f.localInput(e.startAt) : '') + '" required></div>' +
+              '<div class="ec-field ec-field--line"><label class="ec-label" for="f-end">終了</label>' +
+                '<input class="ec-input" id="f-end" name="end" type="datetime-local" value="' + (e.endAt ? f.localInput(e.endAt) : '') + '"></div>' +
+            '</div>' +
+            '<div class="ec-group">' +
+              '<p class="ec-label" id="lbl-venue-type">会場</p>' +
+              '<div class="ec-seg" role="radiogroup" aria-labelledby="lbl-venue-type">' +
+                '<input type="radio" name="venue_type" id="vt-offline" value="OFFLINE"' + (vt === 'OFFLINE' ? ' checked' : '') + '><label for="vt-offline">対面</label>' +
+                '<input type="radio" name="venue_type" id="vt-online" value="ONLINE"' + (vt === 'ONLINE' ? ' checked' : '') + '><label for="vt-online">オンライン</label>' +
+              '</div>' +
+              '<div class="ec-row" data-venue="OFFLINE"' + (vt === 'OFFLINE' ? '' : ' hidden') + '>' +
+                '<div class="ec-field ec-field--line"><label class="ec-label" for="f-venue">会場名<span class="ec-req">必須</span></label>' +
+                  '<input class="ec-input" id="f-venue" name="venue" type="text" value="' + esc(e.venueType === 'ONLINE' ? '' : e.venueName || '') + '" placeholder="例：下北沢 SHELTER"></div>' +
+                '<div class="ec-field ec-field--line"><label class="ec-label" for="f-address">住所</label>' +
+                  '<input class="ec-input" id="f-address" name="address" type="text" value="' + esc(e.address || '') + '" placeholder="例：東京都世田谷区北沢2-6-10"></div>' +
+              '</div>' +
+              '<div class="ec-field ec-field--line" data-venue="ONLINE"' + (vt === 'ONLINE' ? '' : ' hidden') + '><label class="ec-label" for="f-url">参加 URL<span class="ec-req">必須</span></label>' +
+                '<input class="ec-input" id="f-url" name="online_url" type="url" value="' + esc(e.onlineUrl || '') + '" placeholder="https://">' +
+                '<p class="ec-help">オンラインの URL は参加予定の人にだけ表示されます</p></div>' +
+            '</div>' +
+            '<div class="ec-field ec-field--box"><label class="ec-label" for="f-desc">説明</label>' +
+              '<textarea class="ec-textarea" id="f-desc" name="description" rows="2">' + esc(e.body || '') + '</textarea>' +
+              '<p class="ec-help">Markdown で書けます</p></div>' +
+          '</section>' +
+          // 03
+          '<section class="ec-sec" id="sec-03" aria-labelledby="sec-03-title">' +
+            '<div class="ec-sec__head"><span class="ec-sec__num">03</span><h2 class="ec-sec__title" id="sec-03-title">参加枠</h2>' +
+              '<button class="org-btn" type="button" data-add-slot>＋ 枠を追加</button></div>' +
+            '<div class="ec-row ec-row--end">' +
+              '<div class="ec-field ec-field--line ec-field--cap"><label class="ec-label" for="f-cap">イベント全体の上限（任意）</label>' +
+                '<input class="ec-input" id="f-cap" name="capacity_total" type="number" min="1" inputmode="numeric" value="' + (e.capacity || '') + '" placeholder="人数"></div>' +
+              '<p class="ec-help ec-help--grow">枠の定員の合計より少なくできます。空欄なら枠の定員だけ。</p>' +
+            '</div>' +
+            '<div class="ec-tiers" data-slots></div>' +
+          '</section>' +
+          // 04
+          '<section class="ec-sec" id="sec-04" aria-labelledby="sec-04-title">' +
+            '<div class="ec-sec__head"><span class="ec-sec__num">04</span><h2 class="ec-sec__title" id="sec-04-title">申込時の質問</h2>' +
+              '<button class="org-btn" type="button" data-add-q>＋ 自由記述の質問</button></div>' +
+            '<div class="ec-qs" data-questions></div>' +
+          '</section>' +
+          // 05
+          '<section class="ec-sec" id="sec-05" aria-labelledby="sec-05-title">' +
+            '<div class="ec-sec__head"><span class="ec-sec__num">05</span><h2 class="ec-sec__title" id="sec-05-title">参加者情報の扱い</h2></div>' +
+            '<div class="ec-group ec-group--mid"><p class="ec-label" id="lbl-list">参加者リストの公開</p>' +
+              '<div class="ec-seg" role="radiogroup" aria-labelledby="lbl-list">' +
+                '<input type="radio" name="attendee_list" id="al-org" value="ORGANIZER_ONLY"' + (vis === 'ORGANIZER_ONLY' ? ' checked' : '') + '><label for="al-org">主催者のみ（既定）</label>' +
+                '<input type="radio" name="attendee_list" id="al-nick" value="PUBLIC_NICKNAME"' + (vis === 'PUBLIC_NICKNAME' ? ' checked' : '') + '><label for="al-nick">参加者のあだ名を公開</label>' +
+              '</div></div>' +
+            '<div class="ec-group ec-group--mid"><p class="ec-label" id="lbl-retention">回答の保存期間</p>' +
+              '<div class="ec-seg" role="radiogroup" aria-labelledby="lbl-retention">' +
+                [[30, '30日（推奨）'], [90, '90日'], [365, '1年']].map(function (r) { return '<input type="radio" name="retention" id="rt-' + r[0] + '" value="' + r[0] + '"' + (ret === r[0] ? ' checked' : '') + '><label for="rt-' + r[0] + '">' + r[1] + '</label>'; }).join('') +
+              '</div>' +
+              '<p class="ec-callout">イベント終了からこの期間が過ぎると、申込時の回答は自動で削除されます。参加記録と支払い履歴は残ります。事後に連絡が必要な合宿・野外イベント以外は、短い期間を選んでください。' + (isDraft() ? '' : '公開後は短くする方向だけにしてください。') + '</p>' +
+            '</div>' +
+            '<div class="ec-field ec-field--line"><label class="ec-label" for="f-purpose">個人情報の利用目的<span class="ec-req" data-purpose-req>必須</span></label>' +
+              '<input class="ec-input" id="f-purpose" name="purpose" type="text" value="' + esc(e.dataUsePurpose || '') + '" placeholder="例：当日の受付と、名札の作成に使用します">' +
+              '<p class="ec-help">個人情報の質問が1つでもあると公開に必須。申込画面に表示されます</p></div>' +
+          '</section>' +
+          // 06
+          '<section class="ec-sec ec-sec--disabled" id="sec-06" aria-labelledby="sec-06-title">' +
+            '<div class="ec-sec__head"><span class="ec-sec__num">06</span><h2 class="ec-sec__title" id="sec-06-title">入金先</h2></div>' +
+            '<p class="ec-sec__note">実決済を始めるときに設定できるようになります（現在はモック決済）。</p>' +
+          '</section>' +
+        '</form>' +
+      '</div>';
 
-        <fieldset class="ec-tier">
-          <legend class="sr-only">参加枠: 早割（学生）</legend>
-          <div class="ec-tier__head">
-            <div class="ec-tier__name">
-              <span class="ec-tier__handle" aria-hidden="true">≡</span>
-              <span class="ec-tier__title">早割（学生）</span>
-            </div>
-            <button class="org-btn org-btn--plain ec-tier__del" type="button">削除</button>
-          </div>
-          <div class="ec-row">
-            <div class="ec-field ec-field--line">
-              <label class="ec-label" for="t3-cap">定員<span class="ec-req">必須</span></label>
-              <input class="ec-input" id="t3-cap" name="tier[2][capacity]" type="text" inputmode="numeric" value="20 人" required>
-            </div>
-            <div class="ec-field ec-field--line">
-              <label class="ec-label" for="t3-price">価格<span class="ec-req">必須</span></label>
-              <input class="ec-input" id="t3-price" name="tier[2][price]" type="text" inputmode="numeric" value="¥ 1,000" required>
-            </div>
-            <div class="ec-field ec-field--line">
-              <label class="ec-label" for="t3-period">受付期間</label>
-              <input class="ec-input" id="t3-period" name="tier[2][period]" type="text" value="〜10/31 23:59">
-            </div>
-          </div>
-        </fieldset>
-      </section>
+    var bar = document.querySelector('.ec-savebar');
+    if (!bar) {
+      bar = document.createElement('div'); bar.className = 'ec-savebar';
+      main.insertAdjacentElement('afterend', bar);
+    }
+    bar.innerHTML = '<div class="wrap ec-savebar__inner"><p class="ec-savebar__text" data-bar-text></p><div class="ec-savebar__btns" data-bar-btns></div></div>';
 
-      <!-- 04 -->
-      <section class="ec-sec" id="sec-04" aria-labelledby="sec-04-title">
-        <div class="ec-sec__head">
-          <span class="ec-sec__num">04</span>
-          <h2 class="ec-sec__title" id="sec-04-title">申込時の質問</h2>
-          <button class="org-btn" type="button">＋ 自由記述の質問</button>
-        </div>
-        <p class="ec-fixed-label">全イベント共通（削除・変更できません）</p>
-        <div class="ec-fixed">
-          <span class="ec-fixed__tag">固定</span>
-          <span class="ec-fixed__name">氏名・フリガナ</span>
-          <span class="ec-fixed__badge">個人情報</span>
-          <span class="ec-fixed__badge">必須</span>
-        </div>
-        <div class="ec-fixed">
-          <span class="ec-fixed__tag">固定</span>
-          <span class="ec-fixed__name">所属（学校名と学年／社会人）</span>
-          <span class="ec-fixed__badge">必須</span>
-        </div>
-        <p class="ec-fixed-label">よく使う質問を追加</p>
-        <div class="ec-chips">
-          <button class="chip" type="button">＋ 電話番号</button>
-          <button class="chip" type="button">＋ 緊急連絡先</button>
-          <button class="chip" type="button">＋ アレルギー・食事制限</button>
-          <button class="chip" type="button">＋ 楽器の経験</button>
-        </div>
-      </section>
+    renderSlots(); renderQuestions(); renderStatus();
+  }
 
-      <!-- 05 -->
-      <section class="ec-sec" id="sec-05" aria-labelledby="sec-05-title">
-        <div class="ec-sec__head">
-          <span class="ec-sec__num">05</span>
-          <h2 class="ec-sec__title" id="sec-05-title">参加者情報の扱い</h2>
-        </div>
-        <div class="ec-group ec-group--mid">
-          <p class="ec-label" id="lbl-list">参加者リストの公開</p>
-          <div class="ec-seg" role="radiogroup" aria-labelledby="lbl-list">
-            <input type="radio" name="attendee_list" id="al-org" value="organizer" checked><label for="al-org">主催者のみ（既定）</label>
-            <input type="radio" name="attendee_list" id="al-nick" value="nickname"><label for="al-nick">参加者のあだ名を公開</label>
-          </div>
-        </div>
-        <div class="ec-group ec-group--mid">
-          <p class="ec-label" id="lbl-retention">個人情報の保持期間</p>
-          <div class="ec-seg" role="radiogroup" aria-labelledby="lbl-retention">
-            <input type="radio" name="retention" id="rt-30" value="30d" checked><label for="rt-30">30日（推奨）</label>
-            <input type="radio" name="retention" id="rt-90" value="90d"><label for="rt-90">90日</label>
-            <input type="radio" name="retention" id="rt-1y" value="1y"><label for="rt-1y">1年</label>
-          </div>
-          <p class="ec-callout">イベント終了からこの期間が過ぎると、申込時の回答は自動で削除されます。参加記録と支払い履歴は残ります。事後に連絡が必要な合宿・野外イベント以外は、短い期間を選んでください。</p>
-        </div>
-        <div class="ec-field ec-field--line">
-          <label class="ec-label" for="f-purpose">利用目的<span class="ec-req">必須</span></label>
-          <input class="ec-input" id="f-purpose" name="purpose" type="text" value="当日の受付と、名札の作成に使用します" required>
-        </div>
-      </section>
+  // 参加枠（data.js の枠をそのまま編集。変えた欄はその場で updateSlot）
+  function renderSlots() {
+    var box = main.querySelector('[data-slots]');
+    var slots = ev ? db.slotsOf(ev.id) : [];
+    if (!slots.length) { box.innerHTML = '<p class="ec-empty">まだ枠がありません。「＋ 枠を追加」から作ってください（公開には1つ以上必要です）。</p>'; return; }
+    box.innerHTML = slots.map(function (s) {
+      var taken = db.slotTaken(s.id), k = s.id;
+      return '<fieldset class="ec-tier" data-slot="' + esc(s.id) + '">' +
+        '<legend class="sr-only">参加枠: ' + esc(s.name) + '</legend>' +
+        '<div class="ec-tier__head"><div class="ec-tier__name"><span class="ec-tier__handle" aria-hidden="true">≡</span><span class="ec-tier__title">' + esc(s.name) + '</span>' +
+          '<span class="ec-tier__note">' + esc(L.SlotKind[s.kind]) + ' · 申込 ' + taken + '人' + (s.description ? ' · ' + esc(s.description) : '') + '</span></div>' +
+          (taken ? '<span class="ec-tier__lock">申込があるので削除できません</span>' : '<button class="org-btn org-btn--plain ec-tier__del" type="button" data-del-slot="' + esc(s.id) + '">削除</button>') + '</div>' +
+        '<div class="ec-row">' +
+          '<div class="ec-field ec-field--line"><label class="ec-label" for="' + k + '-cap">定員<span class="ec-req">必須</span></label><input class="ec-input" id="' + k + '-cap" data-f="capacity" type="number" min="' + Math.max(1, taken) + '" inputmode="numeric" value="' + s.capacity + '" required></div>' +
+          '<div class="ec-field ec-field--line"><label class="ec-label" for="' + k + '-price">価格（円・0で無料）<span class="ec-req">必須</span></label><input class="ec-input" id="' + k + '-price" data-f="priceYen" type="number" min="0" step="100" inputmode="numeric" value="' + s.priceYen + '" required></div>' +
+          '<div class="ec-field ec-field--line"><label class="ec-label" for="' + k + '-kind">種類</label><select class="ec-select ec-select--line" id="' + k + '-kind" data-f="kind">' + Object.keys(L.SlotKind).map(function (x) { return opt(x, L.SlotKind[x], x === s.kind); }).join('') + '</select></div>' +
+        '</div>' +
+        '<div class="ec-row">' +
+          '<div class="ec-field ec-field--line"><label class="ec-label" for="' + k + '-name">枠名<span class="ec-req">必須</span></label><input class="ec-input" id="' + k + '-name" data-f="name" type="text" maxlength="30" value="' + esc(s.name) + '" required></div>' +
+          '<div class="ec-field ec-field--line"><label class="ec-label" for="' + k + '-opens">受付開始（任意）</label><input class="ec-input" id="' + k + '-opens" data-f="opensAt" type="datetime-local" value="' + (s.opensAt ? f.localInput(s.opensAt) : '') + '"></div>' +
+          '<div class="ec-field ec-field--line"><label class="ec-label" for="' + k + '-closes">受付終了（任意）</label><input class="ec-input" id="' + k + '-closes" data-f="closesAt" type="datetime-local" value="' + (s.closesAt ? f.localInput(s.closesAt) : '') + '"></div>' +
+        '</div>' +
+        '<div class="ec-field ec-field--line"><label class="ec-label" for="' + k + '-desc">補足（任意）</label><input class="ec-input" id="' + k + '-desc" data-f="description" type="text" maxlength="60" value="' + esc(s.description || '') + '" placeholder="例：学生証の提示が必要"></div>' +
+      '</fieldset>';
+    }).join('') + (isDraft() ? '' : '<p class="ec-help">公開後も枠の追加・編集はできます。定員は申込済みの人数より少なくできません。</p>');
+  }
 
-      <!-- 06（後日・無効） -->
-      <section class="ec-sec ec-sec--disabled" id="sec-06" aria-labelledby="sec-06-title">
-        <div class="ec-sec__head">
-          <span class="ec-sec__num">06</span>
-          <h2 class="ec-sec__title" id="sec-06-title">入金先</h2>
-        </div>
-        <p class="ec-sec__note">実決済を始めるときに設定できるようになります（現在はモック決済）。</p>
-      </section>
-    </form>
-  </div>
-</main>
+  // 申込時の質問（共通3つは固定。追加の質問は 追加／削除）
+  function renderQuestions() {
+    var box = main.querySelector('[data-questions]');
+    var qs = ev ? db.questionsOf(ev.id) : [];
+    var custom = qs.filter(function (q) { return !q.commonKey; });
+    var slotName = {}; (ev ? db.slotsOf(ev.id) : []).forEach(function (s) { slotName[s.id] = s.name; });
+    var locked = !isDraft();
+    box.innerHTML = '<p class="ec-fixed-label">全イベント共通（削除・変更できません）</p>' +
+      '<div class="ec-fixed"><span class="ec-fixed__tag">固定</span><span class="ec-fixed__name">' + COMMON_TEXT.NAME + '</span><span class="ec-fixed__badge">個人情報</span><span class="ec-fixed__badge">必須</span></div>' +
+      '<div class="ec-fixed"><span class="ec-fixed__tag">固定</span><span class="ec-fixed__name">' + COMMON_TEXT.AFFILIATION + '</span><span class="ec-fixed__badge">必須</span></div>' +
+      (custom.length ? '<p class="ec-fixed-label">追加の質問' + (locked ? '（公開後は削除できません。追加はできます）' : '') + '</p>' + custom.map(function (q) {
+        return '<div class="ec-fixed ec-q"><span class="ec-fixed__tag">' + esc(L.QuestionType[q.type]) + '</span>' +
+          '<span class="ec-fixed__name">' + esc(q.label) + (q.options ? '<span class="ec-q__opts">' + esc(q.options.join(' / ')) + '</span>' : '') + '</span>' +
+          (q.slotIds.length ? '<span class="ec-fixed__badge">' + esc(q.slotIds.map(function (s) { return slotName[s] || '（削除した枠）'; }).join('・')) + 'のみ</span>' : '') +
+          (q.isPersonalData ? '<span class="ec-fixed__badge">個人情報</span>' : '') +
+          (q.required ? '<span class="ec-fixed__badge">必須</span>' : '') +
+          (locked ? '<span class="ec-q__lock" title="公開後は削除できません" aria-label="公開後は削除できません">🔒</span>' : '<button class="org-btn org-btn--plain" type="button" data-del-q="' + esc(q.id) + '">削除</button>') +
+        '</div>';
+      }).join('') : '') +
+      '<p class="ec-fixed-label">よく使う質問を追加</p>' +
+      '<div class="ec-chips">' +
+        '<button class="chip" type="button" data-preset="tel">＋ 電話番号</button>' +
+        '<button class="chip" type="button" data-preset="emergency">＋ 緊急連絡先</button>' +
+        '<button class="chip" type="button" data-preset="allergy">＋ アレルギー・食事制限</button>' +
+        '<button class="chip" type="button" data-preset="instrument">＋ 楽器の経験</button>' +
+      '</div>';
+  }
 
-<!-- 保存バー（Figma 1775:10884）。画面下に固定 -->
-<div class="ec-savebar">
-  <div class="wrap ec-savebar__inner">
-    <p class="ec-savebar__text">公開すると、フォロワー 234人にメールで通知されます</p>
-    <div class="ec-savebar__btns">
-      <button class="org-btn" type="button">下書き保存</button>
-      <button class="btn btn--coral" type="submit" form="event-form">公開する<img class="icon" src="assets/icon-arrow-btn.svg" alt=""></button>
-    </div>
-  </div>
-</div>
+  // 見出し・保存時刻・目次・保存バー
+  function renderStatus() {
+    var curOrg = currentOrgChoice();
+    var status = ev ? ev.status : 'NEW';
+    main.querySelector('[data-head-title]').textContent = ev ? 'イベントを編集' : 'イベントを作成';
+    document.title = (ev ? 'イベントを編集' : 'イベントを作成') + '｜NEXT MOVE TICKETS';
+    main.querySelector('[data-saved]').textContent = ev ? ({ DRAFT: '下書き', PUBLISHED: '公開中', CANCELLED: '中止' }[status]) + ' · 保存 ' + f.hm(ev.updatedAt) : '未保存';
+    main.querySelector('[data-submit-label]').textContent = status === 'PUBLISHED' || status === 'CANCELLED' ? '変更を保存' : '公開する';
+
+    // 目次: 入力の進み具合
+    var v = collect();
+    var slots = ev ? db.slotsOf(ev.id) : [];
+    var personal = ev ? db.questionsOf(ev.id).some(function (q) { return q.isPersonalData; }) : true;
+    var done = [
+      !!(v.genreId && v.area),
+      !!(v.title && v.startAt && (v.venueType === 'OFFLINE' ? v.venueName : v.onlineUrl)),
+      slots.length > 0,
+      true,
+      !personal || !!v.dataUsePurpose
+    ];
+    var labels = ['主催者・ジャンル・地域', '基本情報', '参加枠', '申込時の質問', '参加者情報の扱い'];
+    var cur = done.indexOf(false);
+    var errs = ev ? db.publishErrors(ev.id) : null;
+    main.querySelector('[data-toc]').innerHTML = labels.map(function (l, i) {
+      var cls = done[i] ? 'is-done' : i === cur ? 'is-current' : '';
+      return '<a class="ec-toc__item ' + cls + '" href="#sec-0' + (i + 1) + '"' + (i === cur ? ' aria-current="step"' : '') + '><span class="ec-toc__num">' + (done[i] ? '✓' : i + 1) + '</span><span class="ec-toc__label">' + labels[i] + '</span></a>';
+    }).join('') +
+      '<a class="ec-toc__item is-later" href="#sec-06"><span class="ec-toc__num">6</span><span class="ec-toc__label">入金先（後日）</span></a>' +
+      '<div class="ec-toc__todo">' + (status === 'PUBLISHED' ? '<p class="ec-toc__todo-title">公開中</p><p>変更は保存するとすぐ反映されます</p>' :
+        status === 'CANCELLED' ? '<p class="ec-toc__todo-title">中止済み</p>' :
+        !errs ? '<p class="ec-toc__todo-title">公開まであと</p><p>・下書き保存すると確認できます</p>' :
+        errs.length ? '<p class="ec-toc__todo-title">公開まであと</p>' + errs.map(function (x) { return '<p>・' + esc(x.replace(/を?入れてください|を?作ってください|にしてください/, '')) + '</p>'; }).join('') :
+        '<p class="ec-toc__todo-title">公開できます</p><p>・足りない項目はありません</p>') + '</div>';
+
+    main.querySelector('[data-purpose-req]').hidden = !personal;
+
+    // 保存バー
+    var text = status === 'PUBLISHED' ? '公開中のイベントです。保存すると参加者が見る内容もすぐに変わります'
+      : status === 'CANCELLED' ? '中止したイベントです'
+      : curOrg && curOrg.type === 'GROUP' ? '公開すると、フォロワー ' + db.followerCount(curOrg.id) + '人にメールで通知されます'
+      : '公開すると、イベントページが誰でも見られるようになります';
+    document.querySelector('[data-bar-text]').textContent = text;
+    document.querySelector('[data-bar-btns]').innerHTML = status === 'PUBLISHED' || status === 'CANCELLED'
+      ? '<a class="org-btn" href="' + ui.url('event', { id: ev.id }) + '">イベントページを見る</a><button class="btn btn--coral" type="submit" form="event-form">変更を保存<img class="icon" src="assets/icon-arrow-btn.svg" alt=""></button>'
+      : '<button class="org-btn" type="button" data-save-draft>下書き保存</button><button class="btn btn--coral" type="submit" form="event-form">公開する<img class="icon" src="assets/icon-arrow-btn.svg" alt=""></button>';
+  }
+
+  // ---------- 入力の取り出し・保存 ----------
+  function val(id) { var el = document.getElementById(id); return el ? el.value.trim() : ''; }
+  function radio(name) { var el = main.querySelector('input[name="' + name + '"]:checked'); return el ? el.value : null; }
+  function currentOrgChoice() { var sel = document.getElementById('f-org'); return sel ? db.organizerById(sel.value) || org : org; }
+  function collect() {
+    var vt = radio('venue_type') || 'OFFLINE';
+    var cap = val('f-cap');
+    return {
+      title: val('f-title'), genreId: val('f-genre'), area: val('f-area'),
+      startAt: f.fromLocalInput(val('f-start')), endAt: f.fromLocalInput(val('f-end')) || undefined,
+      venueType: vt, venueName: vt === 'OFFLINE' ? val('f-venue') || null : null, address: vt === 'OFFLINE' ? val('f-address') || null : null,
+      onlineUrl: vt === 'ONLINE' ? val('f-url') || null : null,
+      body: document.getElementById('f-desc') ? document.getElementById('f-desc').value : '',
+      capacity: cap ? Math.max(1, parseInt(cap, 10) || 0) || null : null,
+      coverUrl: coverUrl,
+      attendeeListVisibility: radio('attendee_list') || 'ORGANIZER_ONLY',
+      answerRetentionDays: Number(radio('retention') || 30),
+      dataUsePurpose: val('f-purpose') || null
+    };
+  }
+  // まだ DB に無ければ下書きとして作る（createEvent → updateEvent）。URL を ?id= に替える
+  function ensureEvent() {
+    if (ev) return ev;
+    var v = collect(), o = currentOrgChoice();
+    ev = db.createEvent(o.id, { title: v.title || undefined, genreId: v.genreId, area: v.area, capacity: v.capacity, body: v.body, venueType: v.venueType, venueName: v.venueName, address: v.address, onlineUrl: v.onlineUrl, coverUrl: v.coverUrl,
+      attendeeListVisibility: v.attendeeListVisibility, answerRetentionDays: v.answerRetentionDays, dataUsePurpose: v.dataUsePurpose, startAt: v.startAt || undefined, endAt: v.endAt || undefined });
+    org = o;
+    history.replaceState(null, '', ui.url('eventCreate', { id: ev.id }));
+    var sel = document.getElementById('f-org'); if (sel) sel.disabled = true;
+    return ev;
+  }
+  function save() {
+    var v = collect();
+    if (!v.title) v.title = ev ? ev.title : '';
+    var created = !ev;
+    ensureEvent();
+    try {
+      if (!v.startAt) delete v.startAt;
+      if (!v.title) delete v.title;
+      db.updateEvent(ev.id, v);
+    } catch (err) { if (created) renderStatus(); throw err; }
+    ev = db.eventById(ev.id);
+    renderStatus();
+    return ev;
+  }
+
+  // ---------- 操作 ----------
+  function addSlotModal() {
+    return ui.modal({
+      title: '参加枠を追加',
+      html: '<div class="stack">' +
+        '<div class="form-row"><label class="field"><span class="field__label">種類</span><select class="select" name="kind">' + Object.keys(L.SlotKind).map(function (x) { return opt(x, L.SlotKind[x]); }).join('') + '</select></label>' +
+        '<label class="field"><span class="field__label">枠名 <span class="req">必須</span></span><input class="input" name="name" maxlength="30" placeholder="例：学生"></label></div>' +
+        '<div class="form-row"><label class="field"><span class="field__label">定員 <span class="req">必須</span></span><input class="input" name="capacity" type="number" min="1" inputmode="numeric"></label>' +
+        '<label class="field"><span class="field__label">価格（円・0で無料）</span><input class="input" name="price" type="number" min="0" step="100" value="0" inputmode="numeric"></label></div>' +
+        '<p class="field__error" hidden data-err></p></div>',
+      actions: [{ label: 'やめる', value: false, kind: 'outline' }, { label: '追加する', kind: 'black', onClick: function (w) {
+        var err = w.querySelector('[data-err]');
+        try {
+          ensureEvent();
+          db.addSlot(ev.id, { kind: w.querySelector('[name=kind]').value, name: w.querySelector('[name=name]').value.trim(), capacity: Number(w.querySelector('[name=capacity]').value), priceYen: Number(w.querySelector('[name=price]').value || 0) });
+        } catch (x) { err.textContent = x.message; err.hidden = false; return false; }
+      } }]
+    }).then(function (v) { if (v) { ev = db.eventById(ev.id); renderSlots(); renderQuestions(); renderStatus(); ui.toast('枠を追加しました'); } });
+  }
+
+  function addQuestionModal(preset) {
+    var p = preset || {};
+    var slots = ev ? db.slotsOf(ev.id) : [];
+    return ui.modal({
+      title: '質問を追加',
+      html: '<div class="stack">' +
+        '<label class="field"><span class="field__label">質問 <span class="req">必須</span></span><input class="input" name="label" maxlength="60" value="' + esc(p.label || '') + '" placeholder="例：食物アレルギー"></label>' +
+        '<label class="field"><span class="field__label">説明（任意）</span><input class="input" name="help" maxlength="100" value="' + esc(p.helpText || '') + '"></label>' +
+        '<label class="field"><span class="field__label">種類</span><select class="select" name="type">' + Object.keys(L.QuestionType).map(function (x) { return opt(x, L.QuestionType[x], x === (p.type || 'TEXT')); }).join('') + '</select></label>' +
+        '<label class="field" data-opts' + (p.type === 'SELECT' || p.type === 'MULTI_SELECT' ? '' : ' hidden') + '><span class="field__label">選択肢（1行に1つ・2つ以上）</span><textarea class="textarea" name="options">' + esc((p.options || []).join('\n')) + '</textarea></label>' +
+        '<label class="check"><input type="checkbox" name="required"' + (p.required ? ' checked' : '') + '>必須にする</label>' +
+        '<label class="check"><input type="checkbox" name="personal"' + (p.isPersonalData ? ' checked' : '') + '>個人情報として扱う（参加者リストと本人にだけ見せ、保存期間が過ぎたら削除）</label>' +
+        (slots.length ? '<fieldset class="stack ec-modal-set" style="--stack-gap:8px"><legend class="field__label">対象の枠（選ばなければ全員に聞く）</legend>' + slots.map(function (s) { return '<label class="check"><input type="checkbox" name="slot" value="' + esc(s.id) + '">' + esc(s.name) + '</label>'; }).join('') + '</fieldset>' : '') +
+        (isDraft() ? '' : '<p class="notice t-small">公開中のイベントです。追加した質問は公開後に削除できません。</p>') +
+        '<p class="field__error" hidden data-err></p></div>',
+      onOpen: function (w) {
+        var sel = w.querySelector('[name=type]'), box = w.querySelector('[data-opts]');
+        sel.addEventListener('change', function () { box.hidden = !(sel.value === 'SELECT' || sel.value === 'MULTI_SELECT'); });
+      },
+      actions: [{ label: 'やめる', value: false, kind: 'outline' }, { label: '追加する', kind: 'black', onClick: function (w) {
+        var err = w.querySelector('[data-err]');
+        var type = w.querySelector('[name=type]').value;
+        var opts = w.querySelector('[name=options]').value.split('\n').map(function (s) { return s.trim(); }).filter(Boolean);
+        try {
+          if (!w.querySelector('[name=label]').value.trim()) throw new Error('質問を入れてください');
+          ensureEvent();
+          db.addQuestion(ev.id, { label: w.querySelector('[name=label]').value.trim(), helpText: w.querySelector('[name=help]').value.trim() || null, type: type,
+            options: type === 'SELECT' || type === 'MULTI_SELECT' ? opts : null, required: w.querySelector('[name=required]').checked, isPersonalData: w.querySelector('[name=personal]').checked,
+            slotIds: [].map.call(w.querySelectorAll('[name=slot]:checked'), function (c) { return c.value; }) });
+        } catch (x) { err.textContent = x.message; err.hidden = false; return false; }
+      } }]
+    }).then(function (v) { if (v) { ev = db.eventById(ev.id); renderQuestions(); renderStatus(); ui.toast('質問を追加しました'); } });
+  }
+
+  function pickCover() {
+    var seen = {}, imgs = [];
+    db.t.events.concat(db.t.articles).forEach(function (x) { if (x.coverUrl && !seen[x.coverUrl]) { seen[x.coverUrl] = 1; imgs.push(x.coverUrl); } });
+    return ui.modal({
+      title: 'フライヤー画像を選ぶ',
+      html: '<div class="ec-covers">' + imgs.map(function (u) { return '<button type="button" class="ec-cover' + (u === coverUrl ? ' is-active' : '') + '" data-cover-url="' + esc(u) + '" aria-pressed="' + (u === coverUrl) + '"><img src="' + esc(u) + '" alt=""></button>'; }).join('') + '</div>',
+      onOpen: function (w) {
+        w.addEventListener('click', function (x) {
+          var b = x.target.closest('[data-cover-url]'); if (!b) return;
+          [].forEach.call(w.querySelectorAll('[data-cover-url]'), function (o) { o.classList.toggle('is-active', o === b); o.setAttribute('aria-pressed', String(o === b)); });
+        });
+      },
+      actions: [{ label: 'やめる', value: false, kind: 'outline' }, { label: 'この画像にする', kind: 'black', onClick: function (w) {
+        var b = w.querySelector('.ec-cover.is-active'); if (b) coverUrl = b.getAttribute('data-cover-url');
+      } }]
+    }).then(function (v) { if (v) { main.querySelector('[data-cover]').src = coverUrl; ui.toast('画像を変えました。保存すると反映されます'); } });
+  }
+
+  function dupFromModal() {
+    var o = currentOrgChoice();
+    var list = db.searchEvents({ organizerId: o.id, status: 'all', includeDraft: true }).filter(function (x) { return !ev || x.id !== ev.id; });
+    return ui.modal({
+      title: '過去のイベントから複製',
+      html: list.length ? '<div class="stack" style="--stack-gap:0">' + list.map(function (x) {
+        return '<label class="check ec-dup-row"><input type="radio" name="src" value="' + esc(x.id) + '"><span><strong>' + esc(x.title) + '</strong><br><span class="t-small t-muted">' + f.ymd(x.startAt) + ' · ' + esc(db.eventBadge(x.id).label) + '</span></span></label>';
+      }).join('') + '</div><p class="field__help">枠・追加の質問・会場・説明をコピーした下書きを作ります。日時は入れ直してください。</p><p class="field__error" hidden data-err></p>' : '<p>' + esc(o.displayName) + ' のイベントはまだありません。</p>',
+      actions: [{ label: 'やめる', value: false, kind: 'outline' }].concat(list.length ? [{ label: '複製して編集', kind: 'black', onClick: function (w) {
+        var r = w.querySelector('[name=src]:checked'), err = w.querySelector('[data-err]');
+        if (!r) { err.textContent = '複製するイベントを選んでください'; err.hidden = false; return false; }
+        try { var c = db.duplicateEvent(r.value); location.href = ui.url('eventCreate', { id: c.id }); } catch (x) { err.textContent = x.message; err.hidden = false; return false; }
+      } }] : [])
+    });
+  }
+
+  function publish() {
+    if (!tryDo(save)) return;
+    var errs = db.publishErrors(ev.id);
+    if (errs.length) {
+      return ui.modal({
+        title: 'まだ公開できません',
+        html: '<p class="t-small">下書きを保存しました。公開するには次を入れてください。</p><ul class="org-bullets">' + errs.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul>',
+        actions: [{ label: '閉じる', value: true, kind: 'black' }]
+      });
+    }
+    var o = db.organizerById(ev.organizerId);
+    return ui.modal({
+      title: 'このイベントを公開しますか？',
+      html: '<div class="stack"><p><strong>' + esc(ev.title) + '</strong></p><ul class="org-bullets t-small">' +
+        (o.type === 'GROUP' ? '<li>' + esc(o.displayName) + 'のフォロワー ' + db.followerCount(o.id) + ' 人にメールで通知されます</li>' : '') +
+        '<li>公開後は申込時の質問を削除できません</li><li>回答の保存期間：イベント終了から ' + ev.answerRetentionDays + ' 日</li></ul></div>',
+      actions: [{ label: '戻る', value: false, kind: 'outline' }, { label: '公開する', value: true, kind: 'black' }]
+    }).then(function (yes) {
+      if (!yes) return;
+      if (tryDo(function () { return db.publishEvent(ev.id); })) {
+        ev = db.eventById(ev.id);
+        ui.toast('公開しました');
+        renderSlots(); renderQuestions(); renderStatus();
+      }
+    });
+  }
+
+  // ---------- 配線 ----------
+  renderPage();
+
+  main.addEventListener('submit', function (x) {
+    x.preventDefault();
+    if (ev && ev.status !== 'DRAFT') { if (tryDo(save)) ui.toast('変更を保存しました'); }
+    else publish();
+  });
+  // form 外（見出し・保存バー）の submit ボタンは form 属性で #event-form に送られる
+  document.addEventListener('click', function (x) {
+    var t = x.target.closest('[data-save-draft],[data-preview],[data-dup-from],[data-pick-cover],[data-add-slot],[data-add-q],[data-preset],[data-del-slot],[data-del-q]');
+    if (!t) return;
+    if (t.hasAttribute('data-save-draft')) { if (tryDo(save)) ui.toast('下書きを保存しました'); }
+    else if (t.hasAttribute('data-preview')) {
+      if (!ev) return ui.toast('下書き保存するとプレビューできます');
+      if (tryDo(save)) location.href = ui.url('event', { id: ev.id });
+    }
+    else if (t.hasAttribute('data-dup-from')) dupFromModal();
+    else if (t.hasAttribute('data-pick-cover')) pickCover();
+    else if (t.hasAttribute('data-add-slot')) addSlotModal();
+    else if (t.hasAttribute('data-add-q')) addQuestionModal();
+    else if (t.hasAttribute('data-preset')) addQuestionModal(PRESETS[t.getAttribute('data-preset')]);
+    else if (t.hasAttribute('data-del-slot')) {
+      var s = db.slotById(t.getAttribute('data-del-slot'));
+      ui.confirm({ title: '「' + s.name + '」の枠を削除しますか？', body: 'この枠を対象にした質問は、対象の枠が無くなります。', ok: '削除する', danger: true }).then(function (yes) {
+        if (yes && tryDo(function () { db.removeSlot(s.id); return true; })) { renderSlots(); renderQuestions(); renderStatus(); ui.toast('枠を削除しました'); }
+      });
+    } else if (t.hasAttribute('data-del-q')) {
+      if (tryDo(function () { db.removeQuestion(t.getAttribute('data-del-q')); return true; })) { renderQuestions(); renderStatus(); ui.toast('質問を削除しました'); }
+    }
+  });
+  // 枠の欄はその場で保存
+  main.addEventListener('change', function (x) {
+    var inp = x.target.closest('[data-slot] [data-f]');
+    if (inp) {
+      var sid = inp.closest('[data-slot]').getAttribute('data-slot'), k = inp.getAttribute('data-f'), patch = {};
+      var v = inp.value.trim();
+      patch[k] = k === 'opensAt' || k === 'closesAt' ? f.fromLocalInput(v) : k === 'description' ? v || null : v;
+      if ((k === 'capacity' && !(Number(v) > 0)) || (k === 'name' && !v)) { ui.toast(k === 'name' ? '枠名を入れてください' : '定員を入れてください'); renderSlots(); return; }
+      if (tryDo(function () { return db.updateSlot(sid, patch); })) { renderSlots(); renderStatus(); } else renderSlots();
+      return;
+    }
+    if (x.target.name === 'venue_type') {
+      [].forEach.call(main.querySelectorAll('[data-venue]'), function (b) { b.hidden = b.getAttribute('data-venue') !== x.target.value; });
+    }
+    if (x.target.id === 'f-org') { org = currentOrgChoice(); }
+    renderStatus();
+  });
+  main.addEventListener('input', function (x) { if (!x.target.closest('[data-slot]')) renderStatus(); });
+});
+</script>
 </body>
 </html>

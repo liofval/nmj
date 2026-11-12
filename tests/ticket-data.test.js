@@ -186,7 +186,7 @@ test('イベントの作成→公開。個人情報の質問があれば利用�
 
 test('移管は organizerId の付け替えだけ。移管先の owner でなければできない', () => {
   const db = fresh(); db.login('u-yamada');
-  const e = findEvent(db, x => x.organizerId === 'o-keio');
+  const e = findEvent(db, x => x.organizerId === 'o-keio' && !db.t.payments.some(p => p.eventId === x.id && p.status === 'PAID'));
   const personal = db.t.organizers.find(o => o.type === 'USER' && o.userId === 'u-yamada');
   db.transferEvent(e.id, personal.id);
   assert.equal(db.eventById(e.id).organizerId, personal.id);
@@ -202,4 +202,60 @@ test('状態は storage に保存され、reset で seed に戻る', () => {
   assert.equal(db2.isSaved(db.t.events[0].id), true);
   db2.reset();
   assert.equal(createDb({ storage }).t.savedEvents.length, fresh().t.savedEvents.length);
+});
+
+test('支払い済みの申込があるイベントは移管できない（wireframes 20b）', () => {
+  const db = fresh(); db.login('u-yamada');
+  const g = db.createGroup({ displayName: '移管先テスト', slug: 'move-target' });
+  const paid = findEvent(db, x => x.organizerId === 'o-keio' && db.t.payments.some(p => p.eventId === x.id && p.status === 'PAID'));
+  assert.throws(() => db.transferEvent(paid.id, g.id), /支払い済み/);
+  assert.equal(db.canTransfer(paid.id).ok, false);
+});
+
+test('回答の保存期間（終了日＋answerRetentionDays）を過ぎたら参加者リストに回答を出さない', () => {
+  const db = fresh(); db.login('u-yamada');
+  const old = db.eventById('e-gasshuku'); // 2026-02-22 終了・30日
+  assert.equal(db.answersExpired(old.id), true);
+  assert.ok(db.attendees(old.id).every(a => Object.keys(a.answers).length === 0));
+  const live = db.eventById('e-bandbattle');
+  assert.equal(db.answersExpired(live.id), false);
+  assert.ok(db.attendees(live.id).some(a => Object.keys(a.answers).length > 0));
+});
+
+test('受付は NMJ 運営もできる。受付の記録はイベントごとに引ける', () => {
+  const db = fresh(); db.login('u-admin');
+  const t = db.t.tickets.find(x => x.eventId === 'e-bandbattle' && !x.revokedAt);
+  db.setCheckin(t.id, 'CHECKED_IN', 'QR');
+  assert.equal(db.checkinLogsOf('e-bandbattle').at(0).ticketId, t.id);
+  assert.ok(db.reports({ status: 'OPEN' }).every(r => r.status === 'OPEN'));
+});
+
+test('seed: 名前のある利用者の回答は固有の氏名になる', () => {
+  const db = fresh();
+  const reg = db.t.registrations.find(r => r.userId === 'u-mio');
+  const name = db.t.answers.find(a => a.registrationId === reg.id && db.t.questions.find(q => q.id === a.questionId).commonKey === 'NAME');
+  assert.equal(name.value, '三田 澪');
+});
+
+test('UC-1 一本線: 団体作成 → イベント作成・公開 → 参加者が無料＋有料枠に申込 → 決済 → QR で受付', () => {
+  const db = fresh();
+  db.login('u-p150');
+  const g = db.createGroup({ displayName: 'UC1 サークル', slug: 'uc1-circle' });
+  const e = db.createEvent(g.id, { title: '新歓ミーティング', genreId: 'g-music', startAt: '2026-12-05T18:00:00+09:00', endAt: '2026-12-05T20:00:00+09:00', venueName: '三田キャンパス', dataUsePurpose: '受付のため' });
+  const free = db.addSlot(e.id, { kind: 'STUDENT', name: '学生枠', capacity: 40, priceYen: 0 });
+  const party = db.addSlot(e.id, { kind: 'PARTY', name: '懇親会枠', capacity: 20, priceYen: 1500 });
+  db.updateEvent(e.id, { capacity: 60 });
+  const allergy = db.addQuestion(e.id, { label: 'アレルギー', type: 'TEXT', slotIds: [party.id] });
+  db.publishEvent(e.id);
+  db.login('u-p151');
+  const ans = requiredAnswers(db, e.id, [free.id, party.id]); ans[allergy.id] = 'なし';
+  const r = db.apply(e.id, [free.id, party.id], ans);
+  assert.equal(r.kind, 'payment');
+  assert.equal(db.paymentById(r.paymentId).amountYen, 1500);
+  const done = db.completePayment(r.paymentId, true);
+  const tk = db.ticketById(done.ticketId);
+  assert.equal(db.registrationsOfTicket(tk.id).length, 2);
+  db.login('u-p150');
+  assert.equal(db.checkinByToken(tk.token, e.id).ticket.checkinStatus, 'CHECKED_IN');
+  assert.equal(db.attendees(e.id)[0].answers[allergy.id], 'なし');
 });

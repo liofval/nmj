@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>通報の確認｜NEXT MOVE TICKETS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Noto+Sans+JP:wght@400;500;700;900&family=DM+Mono:wght@400;500&family=Instrument+Serif:ital@1&family=Barlow+Condensed:wght@700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="org.css">
+<link rel="stylesheet" href="manage.css">
+<script src="data.js"></script>
+<script src="common.js"></script>
+</head>
+<body class="org-page">
+<div data-header="org" data-active="admin"></div>
+<main id="main"><div class="wrap" id="root"></div></main>
+<div data-footer></div>
+<script>
+NMT.ready(function (db, ui) {
+  var f = NMT.fmt, L = NMT.LABEL, root = document.getElementById('root');
+  if (!ui.requireLogin()) return;
+  if (!db.isAdmin()) {
+    root.innerHTML = '<div class="box mg-gate"><p class="mg-gate__title">このページを見る権限がありません</p><p class="t-small">通報の確認は NMJ 運営だけが使えます。</p><div class="cluster"><a class="btn btn--outline" href="' + ui.url('top') + '">トップへ</a></div></div>';
+    return;
+  }
+
+  var state = { status: ui.param('status') || 'OPEN' };
+  // data.js に一覧の関数が無いので、テーブル（db.t.reports）を直接読む
+  function all() { return db.t.reports.slice().sort(function (a, b) { return Date.parse(b.createdAt) - Date.parse(a.createdAt); }); }
+  function targetHref(r) {
+    if (r.targetType === 'EVENT') return db.eventById(r.targetId) ? ui.url('event', { id: r.targetId }) : '';
+    var o = db.organizerById(r.targetId); return o ? ui.url('organizer', { slug: o.slug }) : '';
+  }
+  function target(r) {
+    var h = targetHref(r), label = ui.esc(db.reportTargetLabel(r));
+    return '<span class="t-small t-muted">' + (r.targetType === 'EVENT' ? 'イベント' : '主催者') + '</span><br>' + (h ? '<a class="rp-target" href="' + h + '">' + label + '</a>' : label);
+  }
+  function reporter(r) { var p = db.profileOf(r.reporterUserId); return p ? '@' + p.slug : '—'; }
+  function when(d) { return f.md(d) + ' ' + f.hm(d); }
+  function status(r) { return '<span class="rp-status rp-status--' + r.status + '">' + L.ReportStatus[r.status] + '</span>'; }
+
+  function render() {
+    var list = all();
+    var shown = list.filter(function (r) { return !state.status || r.status === state.status; });
+    var chips = [['OPEN', '未対応'], ['RESOLVED', '対応済み'], ['DISMISSED', '問題なし'], ['', 'すべて']].map(function (c) {
+      var n = c[0] ? list.filter(function (r) { return r.status === c[0]; }).length : list.length;
+      return '<button type="button" class="chip' + (state.status === c[0] ? ' is-active' : '') + '" data-filter="' + c[0] + '">' + c[1] + ' ' + n + '</button>';
+    }).join('');
+    document.getElementById('rp-chips').innerHTML = chips;
+    document.getElementById('rp-list').innerHTML = shown.length ?
+      '<div class="table-scroll"><table class="table rp-table"><thead><tr><th>通報日時</th><th>対象</th><th>理由</th><th>詳細</th><th>通報者</th><th>状態</th><th></th></tr></thead><tbody>' +
+      shown.map(function (r) {
+        return '<tr><td>' + when(r.createdAt) + '</td><td class="wrap-ok">' + target(r) + '</td><td>' + ui.esc(L.ReportReason[r.reason]) + '</td>' +
+          '<td class="wrap-ok">' + ui.esc(r.detail || '—') + (r.resolution ? '<br><span class="t-small t-muted">メモ：' + ui.esc(r.resolution) + '</span>' : '') + '</td>' +
+          '<td>' + ui.esc(reporter(r)) + '</td><td>' + status(r) + (r.resolvedAt ? '<br><span class="t-small t-muted">' + when(r.resolvedAt) + '</span>' : '') + '</td>' +
+          '<td><button type="button" class="org-btn' + (r.status === 'OPEN' ? ' org-btn--black' : '') + '" data-open="' + ui.esc(r.id) + '">' + (r.status === 'OPEN' ? '対応する' : '詳細') + '</button></td></tr>';
+      }).join('') + '</tbody></table></div>' :
+      '<p class="empty">' + (state.status === 'OPEN' ? '未対応の通報はありません' : '該当する通報はありません') + '</p>';
+  }
+
+  function open(rid) {
+    var r = db.t.reports.find(function (x) { return x.id === rid; });
+    var acts = [{ label: '閉じる', value: null, kind: 'outline' }];
+    if (r.status !== 'OPEN') acts.push({ label: '未対応に戻す', value: 'OPEN', kind: 'outline' });
+    if (r.status !== 'DISMISSED') acts.push({ label: '問題なし', value: 'DISMISSED', kind: 'outline' });
+    if (r.status !== 'RESOLVED') acts.push({ label: '対応済みにする', value: 'RESOLVED', kind: 'black' });
+    var memo = '';
+    ui.modal({
+      title: '通報の詳細',
+      html: '<dl class="rp-dl">' +
+        '<dt>状態</dt><dd>' + status(r) + (r.resolvedAt ? ' <span class="t-small t-muted">' + when(r.resolvedAt) + '</span>' : '') + '</dd>' +
+        '<dt>通報日時</dt><dd>' + when(r.createdAt) + '</dd>' +
+        '<dt>対象</dt><dd>' + target(r) + '</dd>' +
+        '<dt>理由</dt><dd>' + ui.esc(L.ReportReason[r.reason]) + '</dd>' +
+        '<dt>詳細</dt><dd>' + ui.esc(r.detail || '—') + '</dd>' +
+        '<dt>通報者</dt><dd>' + ui.esc(reporter(r)) + '<br><span class="t-small t-muted">主催者には伝わりません</span></dd></dl>' +
+        '<label class="field" style="margin-top:20px"><span class="field__label">対応メモ（運営だけが見ます）</span><textarea class="textarea" name="memo" maxlength="1000" placeholder="例：主催者に確認し、イベントを非公開にした">' + ui.esc(r.resolution || '') + '</textarea></label>',
+      actions: acts.map(function (a) { return { label: a.label, value: a.value, kind: a.kind, onClick: function (w) { memo = w.querySelector('textarea').value.trim(); } }; })
+    }).then(function (v) {
+      if (!v) return;
+      try {
+        db.resolveReport(rid, v, memo);
+        ui.toast({ OPEN: '未対応に戻しました', RESOLVED: '対応済みにしました', DISMISSED: '問題なしにしました' }[v]);
+      } catch (err) { ui.toast(err.message); }
+      render();
+    });
+  }
+
+  root.innerHTML =
+    '<div class="mg-head"><div class="p-head"><div><p class="p-head__en">REPORTS</p><h1 class="p-head__ja">通報の確認（NMJ 運営）</h1></div></div></div>' +
+    '<div class="mg-body">' +
+      '<div class="chip-row" id="rp-chips" aria-label="状態で絞り込み"></div>' +
+      '<div class="org-card" id="rp-list"></div>' +
+      '<p class="t-small t-muted">通報が届くと運営にお知らせが届きます。対応（イベントの非公開・団体の統合・削除）は検討中のため、ここでは対応状況とメモだけを記録します。</p>' +
+    '</div>';
+  render();
+  root.addEventListener('click', function (ev) {
+    var b = ev.target.closest('[data-filter]');
+    if (b) { state.status = b.getAttribute('data-filter'); return render(); }
+    b = ev.target.closest('[data-open]');
+    if (b) open(b.getAttribute('data-open'));
+  });
+});
+</script>
+</body>
+</html>

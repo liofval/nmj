@@ -9,8 +9,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Noto+Sans+JP:wght@400;500;700;900&family=DM+Mono:wght@400;500&family=Instrument+Serif:ital@1&family=Barlow+Condensed:wght@700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 <link rel="stylesheet" href="media.css">
-<script src="data.js" defer></script>
-<script src="common.js" defer></script>
+<script src="data.js"></script>
+<script src="common.js"></script>
 </head>
 <body>
 
@@ -26,37 +26,11 @@
     </div>
   </div>
 
-  <!-- カテゴリ絞り込み -->
-  <div class="wrap chip-row m-filter" role="group" aria-label="カテゴリで絞り込む" data-filter>
-    <button class="chip is-active" type="button" data-cat="all" aria-pressed="true">すべて</button>
-    <button class="chip" type="button" data-cat="新歓ガイド" aria-pressed="false">新歓ガイド</button>
-    <button class="chip" type="button" data-cat="インタビュー" aria-pressed="false">インタビュー</button>
-    <button class="chip" type="button" data-cat="ノウハウ" aria-pressed="false">ノウハウ</button>
-    <button class="chip" type="button" data-cat="学園祭" aria-pressed="false">学園祭</button>
-    <button class="chip" type="button" data-cat="スポット" aria-pressed="false">スポット</button>
-  </div>
+  <!-- カテゴリ絞り込み（?cat=） -->
+  <div class="wrap chip-row m-filter" role="group" aria-label="カテゴリで絞り込む" data-filter></div>
 
   <!-- Feature -->
-  <section class="wrap m-feature" aria-label="特集" data-filter-group>
-    <a class="m-feature__main" href="article.html" data-item="新歓ガイド">
-      <img class="m-feature__img" src="assets/flyer-morning-run.jpg" alt="">
-      <div class="m-feature__meta"><span class="tag tag--coral">特集</span><span>新歓ガイド · 読了 8分 · 2026.10.24</span></div>
-      <h2 class="m-feature__title">新歓 2026 完全ガイド：サークル選びで後悔しない、5つの視点</h2>
-      <p class="m-feature__desc">雰囲気・お金・時間・人数・続け方。先輩30人に聞いた「入ってから気づいたこと」から、見学で確かめるべきポイントをまとめました。</p>
-    </a>
-    <div class="m-feature__side">
-      <a class="m-card" href="article.html" data-item="インタビュー">
-        <img class="m-card__img m-card__img--l" src="assets/article-interview.jpg" alt="">
-        <p class="m-card__meta">インタビュー · 読了 10分</p>
-        <h3 class="m-card__title m-card__title--l">主催者に聞く：100人規模の交流会を3週間でつくるまで</h3>
-      </a>
-      <a class="m-card" href="article.html" data-item="ノウハウ">
-        <img class="m-card__img m-card__img--l" src="assets/flyer-zine-fair.jpg" alt="">
-        <p class="m-card__meta">ノウハウ · 読了 7分</p>
-        <h3 class="m-card__title m-card__title--l">代替わりで団体を引き継ぐコツ — 引き継ぎ資料のテンプレ付き</h3>
-      </a>
-    </div>
-  </section>
+  <section class="wrap m-feature" aria-label="特集" data-feature></section>
 
   <!-- Latest ＋ Ranking -->
   <section class="m-latest">
@@ -66,40 +40,9 @@
           <h2 class="headline__en">LATEST</h2>
           <p class="headline__ja">新着の記事</p>
         </div>
-        <div class="m-latest__grid" data-filter-group>
-          <a class="m-card" href="article.html" data-item="新歓ガイド">
-            <img class="m-card__img" src="assets/article-guide.jpg" alt="">
-            <p class="m-card__meta">ガイド · 10.24 · 8分</p>
-            <h3 class="m-card__title">「はじめまして」が苦手な人のための、イベントの楽しみ方</h3>
-          </a>
-          <a class="m-card" href="article.html" data-item="スポット">
-            <img class="m-card__img" src="assets/flyer-halloween.jpg" alt="">
-            <p class="m-card__meta">スポット · 10.16 · 4分</p>
-            <h3 class="m-card__title">渋谷で学生が集まる、夜のイベントスペース5選</h3>
-          </a>
-          <a class="m-card" href="article.html" data-item="インタビュー">
-            <img class="m-card__img" src="assets/flyer-hackathon.jpg" alt="">
-            <p class="m-card__meta">インタビュー · 10.12 · 6分</p>
-            <h3 class="m-card__title">24時間で何がつくれる？ ハッカソン常連の4年生に聞く</h3>
-          </a>
-          <a class="m-card" href="article.html" data-item="学園祭">
-            <img class="m-card__img" src="assets/flyer-acoustic.jpg" alt="">
-            <p class="m-card__meta">学園祭 · 10.08 · 5分</p>
-            <h3 class="m-card__title">学園祭ライブの裏側：PA担当がいちばん緊張する瞬間</h3>
-          </a>
-          <a class="m-card" href="article.html" data-item="ノウハウ">
-            <img class="m-card__img" src="assets/flyer-band-battle.jpg" alt="">
-            <p class="m-card__meta">ノウハウ · 10.02 · 7分</p>
-            <h3 class="m-card__title">ライブハウスを借りる前に確認したい7つのこと</h3>
-          </a>
-          <a class="m-card" href="article.html" data-item="ノウハウ">
-            <img class="m-card__img" src="assets/article-interview.jpg" alt="">
-            <p class="m-card__meta">ノウハウ · 09.28 · 6分</p>
-            <h3 class="m-card__title">イベント告知文の書き方：申込が伸びた3つの例</h3>
-          </a>
-        </div>
+        <div class="m-latest__grid" data-latest></div>
         <p class="m-empty" data-empty hidden>このカテゴリの記事はまだありません。</p>
-        <button class="btn btn--outline" type="button">もっと読み込む</button>
+        <button class="btn btn--outline" type="button" data-more>もっと読み込む</button>
       </div>
 
       <aside class="m-ranking" aria-label="よく読まれている記事">
@@ -107,49 +50,77 @@
           <h2 class="headline__en">RANKING</h2>
           <p class="headline__ja">よく読まれている記事</p>
         </div>
-        <ol>
-          <li><a class="m-rank" href="article.html"><span class="m-rank__no">1</span><span class="m-rank__title">新歓 2026 完全ガイド：サークル選びの5つの視点</span></a></li>
-          <li><a class="m-rank" href="article.html"><span class="m-rank__no">2</span><span class="m-rank__title">ひとりでも浮かない、交流会の選び方</span></a></li>
-          <li><a class="m-rank" href="article.html"><span class="m-rank__no">3</span><span class="m-rank__title">学祭シーズンのおすすめ週末イベント</span></a></li>
-          <li><a class="m-rank" href="article.html"><span class="m-rank__no">4</span><span class="m-rank__title">代替わりで団体を引き継ぐコツ</span></a></li>
-          <li><a class="m-rank" href="article.html"><span class="m-rank__no">5</span><span class="m-rank__title">はじめてのライブハウス、持ち物リスト</span></a></li>
-        </ol>
+        <ol data-ranking></ol>
       </aside>
     </div>
   </section>
 </main>
 
 <script>
-/* カテゴリチップで特集・新着の記事を絞り込む */
-(function () {
-  var chips = document.querySelectorAll('[data-filter] .chip');
-  var items = document.querySelectorAll('[data-item]');
-  var empty = document.querySelector('[data-empty]');
-  var side = document.querySelector('.m-feature__side');
-  var feature = document.querySelector('.m-feature');
-  function apply(cat) {
-    var shownLatest = 0;
-    for (var i = 0; i < items.length; i++) {
-      var on = cat === 'all' || items[i].getAttribute('data-item') === cat;
-      items[i].hidden = !on;
-      if (on && items[i].closest('.m-latest__grid')) shownLatest++;
-    }
-    var mainOn = !feature.querySelector('.m-feature__main').hidden;
-    var sideOn = side.querySelectorAll('[data-item]:not([hidden])').length > 0;
-    side.hidden = !sideOn;
-    feature.hidden = !mainOn && !sideOn;
-    empty.hidden = shownLatest > 0;
+NMT.ready(function (db, ui) {
+  var esc = ui.esc, f = NMT.fmt;
+  var PAGE = 6;
+  var all = db.t.articles.filter(function (a) { return a.status === 'PUBLISHED'; })
+    .sort(function (a, b) { return Date.parse(b.publishedAt) - Date.parse(a.publishedAt); });
+  // カテゴリ（記事にあるものだけ。特集の記事の並びを先に）
+  var cats = [];
+  all.slice().sort(function (a, b) { return (b.isFeatured ? 1 : 0) - (a.isFeatured ? 1 : 0); })
+    .forEach(function (a) { if (cats.indexOf(a.category) < 0) cats.push(a.category); });
+  var cat = ui.param('cat');
+  if (cats.indexOf(cat) < 0) cat = null;
+
+  document.querySelector('[data-filter]').innerHTML = [null].concat(cats).map(function (c) {
+    var on = c === cat;
+    return '<a class="chip' + (on ? ' is-active' : '') + '" href="' + ui.url('media', { cat: c }) + '"' + (on ? ' aria-current="page"' : '') + '>' + esc(c || 'すべて') + '</a>';
+  }).join('');
+
+  var list = all.filter(function (a) { return !cat || a.category === cat; });
+  var href = function (a) { return ui.url('article', { slug: a.slug }); };
+  var md = function (a) { return f.ymd(a.publishedAt).slice(5); };
+
+  // 特集（isFeatured）: 1件目を大きく、続く2件を右に
+  var feat = list.filter(function (a) { return a.isFeatured; }).slice(0, 3);
+  var featEl = document.querySelector('[data-feature]');
+  if (!feat.length) featEl.hidden = true;
+  else {
+    var m = feat[0];
+    featEl.innerHTML = '<a class="m-feature__main" href="' + href(m) + '">' +
+        '<img class="m-feature__img" src="' + esc(m.coverUrl) + '" alt="">' +
+        '<div class="m-feature__meta"><span class="tag tag--coral">特集</span><span>' + esc(m.category) + ' · 読了 ' + m.readMinutes + '分 · ' + f.ymd(m.publishedAt) + '</span></div>' +
+        '<h2 class="m-feature__title">' + esc(m.title) + '</h2>' +
+        (m.lead ? '<p class="m-feature__desc">' + esc(m.lead) + '</p>' : '') +
+      '</a>' +
+      (feat.length > 1 ? '<div class="m-feature__side">' + feat.slice(1).map(function (a) {
+        return '<a class="m-card" href="' + href(a) + '"><img class="m-card__img m-card__img--l" src="' + esc(a.coverUrl) + '" alt="">' +
+          '<p class="m-card__meta">' + esc(a.category) + ' · 読了 ' + a.readMinutes + '分</p><h3 class="m-card__title m-card__title--l">' + esc(a.title) + '</h3></a>';
+      }).join('') + '</div>' : '');
   }
-  for (var i = 0; i < chips.length; i++) {
-    chips[i].addEventListener('click', function () {
-      for (var j = 0; j < chips.length; j++) {
-        chips[j].classList.toggle('is-active', chips[j] === this);
-        chips[j].setAttribute('aria-pressed', chips[j] === this ? 'true' : 'false');
-      }
-      apply(this.getAttribute('data-cat'));
-    });
+
+  // 新着（特集に出したものを除く）
+  var latest = list.filter(function (a) { return feat.indexOf(a) < 0; });
+  var shown = 0;
+  var grid = document.querySelector('[data-latest]'), more = document.querySelector('[data-more]');
+  function renderMore() {
+    var next = latest.slice(shown, shown + PAGE);
+    grid.insertAdjacentHTML('beforeend', next.map(function (a) {
+      return '<a class="m-card" href="' + href(a) + '"><img class="m-card__img" src="' + esc(a.coverUrl) + '" alt="">' +
+        '<p class="m-card__meta">' + esc(a.category) + ' · ' + md(a) + ' · ' + a.readMinutes + '分</p><h3 class="m-card__title">' + esc(a.title) + '</h3></a>';
+    }).join(''));
+    shown += next.length;
+    more.hidden = shown >= latest.length;
   }
-})();
+  more.addEventListener('click', renderMore);
+  renderMore();
+  grid.hidden = !latest.length;
+  document.querySelector('[data-empty]').hidden = latest.length > 0 || feat.length > 0;
+  if (!latest.length && feat.length) { grid.hidden = true; }
+
+  // よく読まれている記事（閲覧数のデータが無いので、特集→新しい順の上位5件で代用）
+  var rank = all.slice().sort(function (a, b) { return (b.isFeatured ? 1 : 0) - (a.isFeatured ? 1 : 0) || Date.parse(b.publishedAt) - Date.parse(a.publishedAt); }).slice(0, 5);
+  document.querySelector('[data-ranking]').innerHTML = rank.map(function (a, i) {
+    return '<li><a class="m-rank" href="' + href(a) + '"><span class="m-rank__no">' + (i + 1) + '</span><span class="m-rank__title">' + esc(a.title) + '</span></a></li>';
+  }).join('');
+});
 </script>
 </body>
 </html>

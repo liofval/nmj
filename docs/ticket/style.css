@@ -40,6 +40,7 @@
 
 /* ---------- 2. ベース ---------- */
 *, *::before, *::after { box-sizing: border-box; }
+[hidden] { display: none !important; }
 html, body { margin: 0; }
 body {
   background: var(--color-white);
@@ -396,6 +397,7 @@ button, input, select { font: inherit; color: inherit; }
   .event-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px 12px; }
   .event-card__title { font-size: 15px; }
   .event-card__flyer { margin-bottom: 6px; }
+  .event-card__bottom { flex-wrap: wrap; gap: 6px; }
   .genre-grid { gap: 10px; }
   .genre-card { flex-basis: calc((100% - 10px) / 2); padding: 14px; }
   .article-grid { grid-template-columns: minmax(0, 1fr); }

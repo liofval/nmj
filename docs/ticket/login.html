@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ログイン｜NEXT MOVE TICKETS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Noto+Sans+JP:wght@400;500;700;900&family=DM+Mono:wght@400;500&family=Instrument+Serif:ital@1&family=Barlow+Condensed:wght@700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="flow.css">
+<script src="data.js"></script>
+<script src="common.js"></script>
+</head>
+<body>
+<div data-header="v2" data-active="none"></div>
+<main id="main" class="flow-main"><div class="wrap"><div class="narrow" id="login" style="width:min(480px,100%)"></div></div></main>
+<div data-footer></div>
+<script>
+NMT.ready(function (db, ui) {
+  var esc = ui.esc;
+  var box = document.getElementById('login');
+  // DEMO バー（common.js）と同じ顔ぶれ
+  var DEMO = ['u-yamada', 'u-mio', 'u-saki', 'u-p150', 'u-admin'];
+
+  // next は同じフォルダのページ名＋クエリだけ受け付ける（外のサイトへ飛ばさない）
+  var raw = ui.param('next') || '';
+  var next = /^[a-z][a-z0-9-]*\.html(\?[^#]*)?$/.test(raw) ? raw : ui.url('top');
+  function goNext() { location.replace(next); }
+
+  function head(en, ja, lead) {
+    return '<div class="p-head" style="justify-content:center;text-align:center"><div><p class="p-head__en">' + en + '</p><h1 class="p-head__ja">' + ja + '</h1>' +
+      (lead ? '<p class="t-small t-muted" style="margin-top:8px">' + lead + '</p>' : '') + '</div></div>';
+  }
+
+  // ① ようこそ
+  function welcome() {
+    var u = db.currentUser();
+    box.innerHTML = head('LOGIN', 'ようこそ', '学生イベントの告知と参加登録の場所です') +
+      '<div class="login-box">' +
+        (u ? '<div class="notice notice--gray"><div>いま <b>' + esc(db.profileOf(u.id).displayName) + '</b>（@' + esc(db.profileOf(u.id).slug) + '）でログインしています。<br><a class="textlink" href="' + esc(next) + '">このまま続ける</a> ／ <button class="textlink" type="button" data-act="logout">ログアウト</button></div></div>' : '') +
+        '<button class="google-btn" type="button" data-act="google"><span class="google-btn__g" aria-hidden="true">G</span>Google で続ける</button>' +
+        '<p class="t-small t-muted" style="text-align:center">続けると <a class="textlink" href="' + ui.url('media') + '">利用規約</a> と <a class="textlink" href="' + ui.url('media') + '">プライバシーポリシー</a> に同意したことになります</p>' +
+        '<p class="t-small t-muted" style="text-align:center">このプロトタイプの Google ログインは模擬です。次の画面でデモのアカウントを選びます。</p>' +
+      '</div>';
+  }
+
+  // ② アカウントを選ぶ（Google の画面の代わり）
+  function chooser() {
+    var list = DEMO.map(function (uid) {
+      var u = db.userById(uid), p = db.profileOf(uid); if (!u || !p) return '';
+      return '<button class="account" type="button" data-uid="' + esc(uid) + '"><span class="account__icon" aria-hidden="true"></span><span class="account__body"><span class="account__name">' + esc(p.displayName) + ' <span class="t-muted" style="font-weight:400">@' + esc(p.slug) + '</span></span><span class="account__sub">' + esc(u.email) + '</span></span></button>';
+    }).join('');
+    box.innerHTML = head('LOGIN', 'アカウントを選ぶ', 'Google（模擬）') +
+      '<div class="login-box">' + list +
+        '<hr class="divider">' +
+        '<button class="google-btn" type="button" data-act="signup">＋ 新しいアカウントで登録</button>' +
+        '<button class="textlink t-small" type="button" data-act="back" style="align-self:center">← 戻る</button>' +
+      '</div>';
+  }
+
+  // ③ 初回設定
+  var draft = { email: '', displayName: '', slug: '', badgeName: '' };
+  function onboarding() {
+    box.innerHTML = head('WELCOME', 'プロフィールを作成', 'あとからマイページで変えられます。本名は登録しません。') +
+      '<form class="login-box" novalidate data-form>' +
+        '<label class="field"><span class="field__label">Google のメールアドレス <span class="req">必須</span></span><input class="input" type="email" name="email" autocomplete="email" value="' + esc(draft.email) + '" placeholder="you@example.com"><span class="field__help">模擬のログインなので、実際には送りません</span><span class="field__error" hidden data-err="email"></span></label>' +
+        '<label class="field"><span class="field__label">ユーザーネーム <span class="req">必須</span></span><span class="slug-field"><span class="slug-field__at">@</span><input class="input" name="slug" autocomplete="username" autocapitalize="off" spellcheck="false" value="' + esc(draft.slug) + '" placeholder="yamada"></span>' +
+          '<span class="field__help">半角英小文字・数字・_ - で3〜30文字。ページの URL になります（/@ユーザーネーム）</span><span class="field__error" hidden data-err="slug"></span><span class="field__ok" hidden data-ok="slug">✓ 使えます</span></label>' +
+        '<label class="field"><span class="field__label">あだ名 <span class="req">必須</span></span><input class="input" name="displayName" value="' + esc(draft.displayName) + '" placeholder="やまだ"><span class="field__help">画面に出る名前。日本語可・他の人と同じでも大丈夫です</span><span class="field__error" hidden data-err="displayName"></span></label>' +
+        '<label class="field"><span class="field__label">名札の名前 <span class="t-small t-muted" style="font-weight:400">任意</span></span><input class="input" name="badgeName" value="' + esc(draft.badgeName) + '" placeholder="YAMADA" autocapitalize="characters"><span class="field__help">イベントパス（名札）に出す名前。半角英字・スペース・. - \' で20文字まで</span><span class="field__error" hidden data-err="badgeName"></span></label>' +
+        '<p class="field__error" hidden data-err="form"></p>' +
+        '<button class="btn btn--black btn--block" type="submit">この内容ではじめる</button>' +
+        '<button class="textlink t-small" type="button" data-act="chooser" style="align-self:center">← アカウントの選択に戻る</button>' +
+      '</form>';
+    var form = box.querySelector('[data-form]');
+    var slugIn = form.elements.slug;
+    slugIn.addEventListener('input', function () { checkSlug(true); });
+    form.addEventListener('submit', function (ev) { ev.preventDefault(); submit(form); });
+  }
+  function setErr(form, name, msg) {
+    var el = form.querySelector('[data-err="' + name + '"]'); if (!el) return;
+    el.textContent = msg || ''; el.hidden = !msg;
+    var input = form.elements[name]; if (input && input.setAttribute) input.setAttribute('aria-invalid', msg ? 'true' : 'false');
+  }
+  function checkSlug(live) {
+    var form = box.querySelector('[data-form]'); if (!form) return '';
+    var v = form.elements.slug.value.trim();
+    var err = v || !live ? db.validateSlug(v) : '';
+    setErr(form, 'slug', err);
+    form.querySelector('[data-ok="slug"]').hidden = !!err || !v;
+    return err;
+  }
+  function submit(form) {
+    var el = form.elements;
+    draft = { email: el.email.value.trim(), slug: el.slug.value.trim(), displayName: el.displayName.value.trim(), badgeName: el.badgeName.value.trim() };
+    var bad = false;
+    var emailErr = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(draft.email) ? '' : 'メールアドレスの形で入力してください';
+    if (!emailErr && db.t.users.some(function (u) { return u.email === draft.email; })) emailErr = 'このメールアドレスのアカウントはすでにあります。前の画面から選んでください';
+    setErr(form, 'email', emailErr); bad = bad || !!emailErr;
+    bad = !!checkSlug(false) || bad;
+    var dn = draft.displayName ? '' : 'あだ名を入力してください';
+    setErr(form, 'displayName', dn); bad = bad || !!dn;
+    // 名札の名前の決まりは data.js の updateProfile と同じ
+    var bn = draft.badgeName && !/^[A-Za-z .'\-]{1,20}$/.test(draft.badgeName) ? '名札の名前は半角英字・スペース・. - \' で20文字までです' : '';
+    setErr(form, 'badgeName', bn); bad = bad || !!bn;
+    if (bad) { var first = form.querySelector('[aria-invalid="true"]'); if (first) first.focus(); return; }
+    try {
+      var u = db.createUser({ email: draft.email, slug: draft.slug, displayName: draft.displayName, badgeName: draft.badgeName || null });
+      db.login(u.id);
+      ui.toast('ようこそ、' + draft.displayName + ' さん');
+      goNext();
+    } catch (err) { setErr(form, 'form', err.message); }
+  }
+
+  box.addEventListener('click', function (ev) {
+    var acc = ev.target.closest('[data-uid]');
+    if (acc) { try { db.login(acc.getAttribute('data-uid')); goNext(); } catch (err) { ui.toast(err.message); } return; }
+    var b = ev.target.closest('[data-act]'); if (!b) return;
+    var act = b.getAttribute('data-act');
+    if (act === 'google' || act === 'chooser') chooser();
+    else if (act === 'signup') onboarding();
+    else if (act === 'back') welcome();
+    else if (act === 'logout') { db.logout(); location.reload(); }
+  });
+
+  welcome();
+});
+</script>
+</body>
+</html>

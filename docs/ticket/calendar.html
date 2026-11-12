@@ -9,8 +9,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Noto+Sans+JP:wght@400;500;700;900&family=DM+Mono:wght@400;500&family=Instrument+Serif:ital@1&family=Barlow+Condensed:wght@700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 <link rel="stylesheet" href="events.css">
-<script src="data.js" defer></script>
-<script src="common.js" defer></script>
+<script src="data.js"></script>
+<script src="common.js"></script>
 </head>
 <body>
 
@@ -23,27 +23,19 @@
       <h1 class="page-head__en">EVENTS</h1>
       <div class="page-head__sub">
         <p class="page-head__ja">イベントをさがす</p>
-        <p class="page-head__count">11月の開催 64件</p>
+        <p class="page-head__count" data-month-count></p>
       </div>
     </div>
     <nav class="view-toggle view-toggle--cal" aria-label="表示切替">
-      <a class="view-toggle__item" href="events-list.html">リスト</a>
-      <a class="view-toggle__item" href="events.html">カード</a>
+      <a class="view-toggle__item" href="events-list.html" data-view="eventsList">リスト</a>
+      <a class="view-toggle__item" href="events.html" data-view="events">カード</a>
       <a class="view-toggle__item is-active" href="calendar.html" aria-current="page">カレンダー</a>
     </nav>
   </div>
 
   <!-- ジャンル絞り込み＋凡例 -->
   <div class="wrap filter-row filter-row--cal">
-    <div class="chip-row" role="group" aria-label="ジャンル">
-      <button class="chip is-active" type="button" aria-pressed="true">すべて</button>
-      <button class="chip" type="button" aria-pressed="false">音楽</button>
-      <button class="chip" type="button" aria-pressed="false">スポーツ</button>
-      <button class="chip" type="button" aria-pressed="false">学び</button>
-      <button class="chip" type="button" aria-pressed="false">交流会</button>
-      <button class="chip" type="button" aria-pressed="false">アート</button>
-      <button class="chip" type="button" aria-pressed="false">キャリア</button>
-    </div>
+    <div class="chip-row" role="group" aria-label="ジャンル" data-genre-chips></div>
     <ul class="cal-legend" aria-label="色の凡例">
       <li class="cal-legend__item"><span class="cal-legend__swatch g-music"></span>音楽</li>
       <li class="cal-legend__item"><span class="cal-legend__swatch g-sports"></span>スポーツ</li>
@@ -55,105 +47,177 @@
 
   <div class="wrap cal-layout">
     <!-- Month -->
-    <section class="cal-month" aria-label="2026年11月のカレンダー">
+    <section class="cal-month" data-month>
       <div class="cal-month__head">
-        <h2 class="cal-month__title"><span class="cal-month__en">NOV 2026</span><span class="cal-month__ja">2026年11月</span></h2>
+        <h2 class="cal-month__title"><span class="cal-month__en" data-month-en></span><span class="cal-month__ja" data-month-ja></span></h2>
         <div class="cal-month__nav">
-          <button class="cal-navbtn" type="button" aria-label="前の月">←</button>
-          <button class="cal-navbtn" type="button">今月</button>
-          <button class="cal-navbtn" type="button" aria-label="次の月">→</button>
+          <button class="cal-navbtn" type="button" aria-label="前の月" data-nav="-1">←</button>
+          <button class="cal-navbtn" type="button" data-nav="0">今月</button>
+          <button class="cal-navbtn" type="button" aria-label="次の月" data-nav="1">→</button>
         </div>
       </div>
-      <div class="cal-grid">
-        <div class="cal-grid__wd">月</div>
-        <div class="cal-grid__wd">火</div>
-        <div class="cal-grid__wd">水</div>
-        <div class="cal-grid__wd">木</div>
-        <div class="cal-grid__wd">金</div>
-        <div class="cal-grid__wd">土</div>
-        <div class="cal-grid__wd">日</div>
-        <div class="cal-day cal-day--out"><span class="cal-day__num">26</span></div>
-        <div class="cal-day cal-day--out"><span class="cal-day__num">27</span></div>
-        <div class="cal-day cal-day--out"><span class="cal-day__num">28</span></div>
-        <div class="cal-day cal-day--out"><span class="cal-day__num">29</span></div>
-        <div class="cal-day cal-day--out"><span class="cal-day__num">30<span class="cal-today">今日</span></span></div>
-        <div class="cal-day cal-day--out"><span class="cal-day__num">31</span></div>
-        <div class="cal-day is-selected" aria-current="date"><span class="cal-day__num">1</span><a class="cal-tag g-music" href="#">アコースティック</a><a class="cal-tag g-party" href="#">ハロウィン</a><a class="cal-more" href="#">+1件</a></div>
-        <div class="cal-day"><span class="cal-day__num">2</span><a class="cal-tag g-sports" href="#">朝ラン</a><a class="cal-tag g-party" href="#">ZINEフェア</a></div>
-        <div class="cal-day"><span class="cal-day__num">3</span></div>
-        <div class="cal-day"><span class="cal-day__num">4</span><a class="cal-tag g-study" href="#">読書会</a></div>
-        <div class="cal-day"><span class="cal-day__num">5</span></div>
-        <div class="cal-day"><span class="cal-day__num">6</span><a class="cal-tag g-party" href="#">国際交流</a></div>
-        <div class="cal-day"><span class="cal-day__num">7</span><a class="cal-tag g-music" href="#">DJナイト</a><a class="cal-tag g-sports" href="#">フットサル</a></div>
-        <div class="cal-day"><span class="cal-day__num">8</span><a class="cal-tag g-music" href="#">バンド対抗</a><a class="cal-tag g-party" href="#">交流会</a><a class="cal-more" href="#">+3件</a></div>
-        <div class="cal-day"><span class="cal-day__num">9</span></div>
-        <div class="cal-day"><span class="cal-day__num">10</span></div>
-        <div class="cal-day"><span class="cal-day__num">11</span><a class="cal-tag g-study" href="#">勉強会</a></div>
-        <div class="cal-day"><span class="cal-day__num">12</span></div>
-        <div class="cal-day"><span class="cal-day__num">13</span><a class="cal-tag g-party" href="#">新歓</a></div>
-        <div class="cal-day"><span class="cal-day__num">14</span><a class="cal-tag g-music" href="#">ライブ</a><a class="cal-tag g-other" href="#">古着市</a></div>
-        <div class="cal-day"><span class="cal-day__num">15</span><a class="cal-tag g-sports" href="#">駅伝観戦</a><a class="cal-tag g-study" href="#">LT会</a></div>
-        <div class="cal-day"><span class="cal-day__num">16</span></div>
-        <div class="cal-day"><span class="cal-day__num">17</span></div>
-        <div class="cal-day"><span class="cal-day__num">18</span><a class="cal-tag g-other" href="#">映画会</a></div>
-        <div class="cal-day"><span class="cal-day__num">19</span></div>
-        <div class="cal-day"><span class="cal-day__num">20</span></div>
-        <div class="cal-day"><span class="cal-day__num">21</span><a class="cal-tag g-music" href="#">学園祭</a><a class="cal-tag g-party" href="#">後夜祭</a><a class="cal-more" href="#">+1件</a></div>
-        <div class="cal-day"><span class="cal-day__num">22</span><a class="cal-tag g-music" href="#">学園祭</a><a class="cal-tag g-sports" href="#">模擬店</a></div>
-        <div class="cal-day"><span class="cal-day__num">23</span><a class="cal-tag g-music" href="#">学園祭</a></div>
-        <div class="cal-day"><span class="cal-day__num">24</span></div>
-        <div class="cal-day"><span class="cal-day__num">25</span></div>
-        <div class="cal-day"><span class="cal-day__num">26</span></div>
-        <div class="cal-day"><span class="cal-day__num">27</span><a class="cal-tag g-study" href="#">キャリア</a></div>
-        <div class="cal-day"><span class="cal-day__num">28</span><a class="cal-tag g-party" href="#">鍋会</a><a class="cal-tag g-music" href="#">弾き語り</a></div>
-        <div class="cal-day"><span class="cal-day__num">29</span><a class="cal-tag g-sports" href="#">登山</a></div>
-        <div class="cal-day"><span class="cal-day__num">30</span></div>
-        <div class="cal-day cal-day--out"><span class="cal-day__num">1</span></div>
-        <div class="cal-day cal-day--out"><span class="cal-day__num">2</span></div>
-        <div class="cal-day cal-day--out"><span class="cal-day__num">3</span></div>
-        <div class="cal-day cal-day--out"><span class="cal-day__num">4</span></div>
-        <div class="cal-day cal-day--out"><span class="cal-day__num">5</span></div>
-        <div class="cal-day cal-day--out"><span class="cal-day__num">6</span></div>
-      </div>
+      <div class="cal-grid" data-grid></div>
     </section>
 
     <!-- DayPanel -->
-    <section class="day-panel" aria-label="11月1日のイベント">
-      <div class="day-panel__head"><span class="day-panel__date">11.01</span><span class="day-panel__label">（土）のイベント 3件</span></div>
-      <a class="day-item" href="#">
-        <img class="day-item__thumb" src="assets/flyer-hackathon.jpg" alt="">
-        <div class="day-item__body">
-          <span class="day-item__time">10:00</span>
-          <h3 class="day-item__title">24時間ハッカソン「つくって、見せて、寝る」</h3>
-          <p class="day-item__venue">東京大学 本郷キャンパス</p>
-          <div class="day-item__bottom"><span class="price">¥1,000</span><span class="pill pill--few">残り4枚</span></div>
-        </div>
-      </a>
-      <a class="day-item" href="#">
-        <img class="day-item__thumb" src="assets/flyer-acoustic.jpg" alt="">
-        <div class="day-item__body">
-          <span class="day-item__time">17:00</span>
-          <h3 class="day-item__title">アコースティック・ナイト 秋の弾き語り12組</h3>
-          <p class="day-item__venue">下北沢 lown</p>
-          <div class="day-item__bottom"><span class="price">¥1,200〜</span><span class="pill pill--upcoming">11/1 正午から</span></div>
-        </div>
-      </a>
-      <a class="day-item" href="#">
-        <img class="day-item__thumb" src="assets/flyer-halloween.jpg" alt="">
-        <div class="day-item__body">
-          <span class="day-item__time">21:00</span>
-          <h3 class="day-item__title">渋谷ハロウィン・アフターパーティ 2026</h3>
-          <p class="day-item__venue">渋谷 WOMB</p>
-          <div class="day-item__bottom"><span class="price">¥2,000〜</span><span class="pill pill--few">残り12枚</span></div>
-        </div>
-      </a>
-      <div class="day-panel__link"><a class="link-arrow" href="events-list.html">この日のイベントを一覧で見る<img class="icon" src="assets/icon-arrow-up-right.svg" alt=""></a></div>
-      <p class="day-panel__hint">ヒント：カレンダーの色はジャンル。日付を選ぶと、その日のイベントがここに出ます。絞り込みは一覧と共通です。</p>
-    </section>
+    <section class="day-panel" data-panel aria-live="polite"></section>
   </div>
 </main>
 
 <div data-footer></div>
 
+<script>
+// ヘッダー差し込み（DOMContentLoaded）の後に描く
+document.addEventListener('DOMContentLoaded', function () {
+NMT.ready(function (db, ui) {
+  var f = NMT.fmt, DAY = 864e5, H9 = 9 * 3600e3;
+  var EN = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+  var WD = ['月', '火', '水', '木', '金', '土', '日'];
+  var TAG = { music: 'g-music', sports: 'g-sports', study: 'g-study', party: 'g-party' }; // それ以外のジャンルは「その他」
+  var genres = db.t.genres.slice().sort(function (a, b) { return a.sortOrder - b.sortOrder; });
+  var SHORT = { music: '音楽', sports: 'スポーツ', study: '学び', party: '交流会', art: 'アート', career: 'キャリア' };
+
+  function ymdOf(ms) { return new Date(ms + H9).toISOString().slice(0, 10); }
+  function dayStart(ymd) { return Date.parse(ymd + 'T00:00:00+09:00'); }
+  function pad(n) { return ('0' + n).slice(-2); }
+  var today = ymdOf(db.now());
+
+  // ---- URL ⇔ 条件（一覧と共通の条件 ＋ ?ym= ?day=） ----
+  var KEEP = ['q', 'area', 'genre', 'kind', 'free', 'avail'];
+  function readState() {
+    var p = new URLSearchParams(location.search), s = {};
+    KEEP.concat(['ym', 'day']).forEach(function (k) { var v = (p.get(k) || '').trim(); if (v) s[k] = v; });
+    if (s.genre && !genres.some(function (g) { return g.slug === s.genre; })) delete s.genre;
+    if (s.area && NMT.AREAS.indexOf(s.area) < 0) delete s.area;
+    if (s.kind && !NMT.LABEL.SlotKind[s.kind]) delete s.kind;
+    if (s.free !== '1') delete s.free;
+    if (s.avail !== '1') delete s.avail;
+    if (s.day && !(/^\d{4}-\d{2}-\d{2}$/.test(s.day) && !isNaN(dayStart(s.day)))) delete s.day;
+    if (s.ym && !/^\d{4}-(0[1-9]|1[0-2])$/.test(s.ym)) delete s.ym;
+    if (!s.ym) s.ym = (s.day || today).slice(0, 7);
+    if (!s.day || s.day.slice(0, 7) !== s.ym) s.day = s.ym === today.slice(0, 7) ? today : s.ym + '-01';
+    return s;
+  }
+  var state = readState();
+  function writeUrl() { history.replaceState(null, '', ui.url('calendar', state)); }
+  function listParams(extra) {
+    var p = {}; KEEP.forEach(function (k) { if (state[k]) p[k] = state[k]; });
+    return Object.assign(p, extra || {});
+  }
+
+  // その月に重なる公開イベント（終わったものも出す）。日ごとに「開催中の日」に並べる
+  function monthEvents(y, m) {
+    var from = Date.UTC(y, m - 1, 1) - H9, to = Date.UTC(y, m, 1) - H9 - 1;
+    var list = db.searchEvents({ q: state.q, genre: state.genre, area: state.area, kind: state.kind, free: state.free === '1',
+      from: new Date(from).toISOString(), to: new Date(to).toISOString(), status: 'all' });
+    if (state.avail) list = list.filter(function (e) { return db.eventBadge(e.id).kind !== 'soldout'; });
+    return list;
+  }
+  function onDay(list, ymd) {
+    var a = dayStart(ymd), b = a + DAY - 1;
+    return list.filter(function (e) { return Date.parse(e.startAt) <= b && Date.parse(e.endAt) >= a; });
+  }
+  function tagClass(e) { var g = db.genreById(e.genreId); return (g && TAG[g.slug]) || 'g-other'; }
+
+  // ---- ジャンルのチップ ----
+  var chips = document.querySelector('[data-genre-chips]');
+  function renderChips() {
+    chips.innerHTML = [['', 'すべて']].concat(genres.map(function (g) { return [g.slug, SHORT[g.slug] || g.name]; })).map(function (c) {
+      var on = (state.genre || '') === c[0];
+      return '<button class="chip' + (on ? ' is-active' : '') + '" type="button" aria-pressed="' + on + '" data-genre="' + ui.esc(c[0]) + '">' + ui.esc(c[1]) + '</button>';
+    }).join('');
+  }
+  chips.addEventListener('click', function (ev) {
+    var b = ev.target.closest('[data-genre]'); if (!b) return;
+    var g = b.getAttribute('data-genre');
+    if (g) state.genre = g; else delete state.genre;
+    writeUrl(); render();
+  });
+
+  // ---- 月 ----
+  function render() {
+    renderChips();
+    var y = +state.ym.slice(0, 4), m = +state.ym.slice(5, 7);
+    var list = monthEvents(y, m);
+    var cond = [state.q ? '「' + state.q + '」' : '', state.area ? (state.area === 'online' ? 'オンライン' : state.area) : '',
+      state.kind ? NMT.LABEL.SlotKind[state.kind] + 'の枠あり' : '', state.free ? '無料' : '', state.avail ? '売り切れを除く' : ''].filter(Boolean);
+    document.querySelector('[data-month-count]').textContent = m + '月の開催 ' + list.length + '件' + (cond.length ? '（' + cond.join('・') + '）' : '');
+    document.querySelector('[data-month]').setAttribute('aria-label', y + '年' + m + '月のカレンダー');
+    document.querySelector('[data-month-en]').textContent = EN[m - 1] + ' ' + y;
+    document.querySelector('[data-month-ja]').textContent = y + '年' + m + '月';
+
+    var first = Date.UTC(y, m - 1, 1), lead = (new Date(first).getUTCDay() + 6) % 7; // 月曜はじまり
+    var days = new Date(Date.UTC(y, m, 0)).getUTCDate();
+    var cells = Math.ceil((lead + days) / 7) * 7;
+    var html = WD.map(function (w) { return '<div class="cal-grid__wd">' + w + '</div>'; }).join('');
+    for (var i = 0; i < cells; i++) {
+      var d = new Date(first + (i - lead) * DAY), ymd = d.toISOString().slice(0, 10), out = ymd.slice(0, 7) !== state.ym;
+      var isToday = ymd === today ? '<span class="cal-today">今日</span>' : '';
+      if (out) { html += '<div class="cal-day cal-day--out"><span class="cal-day__num">' + d.getUTCDate() + isToday + '</span></div>'; continue; }
+      var evs = onDay(list, ymd), sel = ymd === state.day;
+      var label = (m) + '月' + d.getUTCDate() + '日（' + WD[(d.getUTCDay() + 6) % 7] + '）' + (evs.length ? ' ' + evs.length + '件' : '');
+      html += '<div class="cal-day' + (sel ? ' is-selected' : '') + '" data-day="' + ymd + '"' + (sel ? ' aria-current="date"' : '') + '>' +
+        '<button class="cal-day__num" type="button" data-pick="' + ymd + '" aria-label="' + ui.esc(label) + '" aria-pressed="' + sel + '">' + d.getUTCDate() + isToday + '</button>' +
+        evs.slice(0, 2).map(function (e) { return '<a class="cal-tag ' + tagClass(e) + '" href="' + ui.url('event', { id: e.id }) + '" title="' + ui.esc(e.title) + '">' + ui.esc(e.title) + '</a>'; }).join('') +
+        (evs.length > 2 ? '<button class="cal-more" type="button" data-pick="' + ymd + '">+' + (evs.length - 2) + '件</button>' : '') +
+      '</div>';
+    }
+    document.querySelector('[data-grid]').innerHTML = html;
+    renderPanel(list);
+    document.querySelector('[data-view=events]').href = ui.url('events', listParams());
+    document.querySelector('[data-view=eventsList]').href = ui.url('eventsList', listParams());
+  }
+
+  // ---- その日のイベント ----
+  function renderPanel(list) {
+    var evs = onDay(list, state.day), ds = dayStart(state.day);
+    var html = '<div class="day-panel__head"><span class="day-panel__date">' + f.ymd(ds).slice(5) + '</span><span class="day-panel__label">（' + f.wd(ds) + '）のイベント ' + evs.length + '件</span></div>';
+    html += evs.map(function (e) {
+      var price = f.priceLabel(db.priceRange(e.id));
+      var started = ymdOf(Date.parse(e.startAt)) !== state.day;
+      return '<a class="day-item" href="' + ui.url('event', { id: e.id }) + '">' +
+        '<img class="day-item__thumb" src="' + ui.esc(e.coverUrl) + '" alt="" loading="lazy">' +
+        '<div class="day-item__body">' +
+          '<span class="day-item__time">' + (started ? f.md(e.startAt) + ' ' : '') + f.hm(e.startAt) + '</span>' +
+          '<h3 class="day-item__title">' + ui.esc(e.title) + '</h3>' +
+          '<p class="day-item__venue">' + ui.esc(e.venueName || 'オンライン') + '</p>' +
+          '<div class="day-item__bottom"><span class="price' + (price === '無料' ? ' price--free' : '') + '">' + price + '</span>' + ui.pill(db.eventBadge(e.id)) + '</div>' +
+        '</div></a>';
+    }).join('');
+    if (!evs.length) html += '<p class="day-panel__empty">この日のイベントはありません。色のついた日を選んでください。</p>';
+    else html += '<div class="day-panel__link"><a class="link-arrow" href="' + ui.url('eventsList', listParams({ date: state.day })) + '">この日のイベントを一覧で見る<img class="icon" src="assets/icon-arrow-up-right.svg" alt=""></a></div>';
+    html += '<p class="day-panel__hint">ヒント：カレンダーの色はジャンル。日付を選ぶと、その日のイベントがここに出ます。絞り込みは一覧と共通です。</p>';
+    var panel = document.querySelector('[data-panel]');
+    panel.setAttribute('aria-label', f.md(ds) + 'のイベント');
+    panel.innerHTML = html;
+  }
+
+  // ---- 操作 ----
+  document.querySelector('[data-grid]').addEventListener('click', function (ev) {
+    if (ev.target.closest('a')) return;
+    var b = ev.target.closest('[data-pick]') || ev.target.closest('[data-day]');
+    if (!b) return;
+    state.day = b.getAttribute('data-pick') || b.getAttribute('data-day');
+    writeUrl(); render();
+    if (matchMedia('(max-width: 1023px)').matches) document.querySelector('[data-panel]').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    else { var nb = document.querySelector('[data-pick="' + state.day + '"]'); if (nb) nb.focus(); }
+  });
+  document.querySelector('.cal-month__nav').addEventListener('click', function (ev) {
+    var b = ev.target.closest('[data-nav]'); if (!b) return;
+    var step = +b.getAttribute('data-nav');
+    if (step === 0) { state.ym = today.slice(0, 7); state.day = today; }
+    else {
+      var y = +state.ym.slice(0, 4), m = +state.ym.slice(5, 7) + step;
+      if (m < 1) { m = 12; y--; } if (m > 12) { m = 1; y++; }
+      state.ym = y + '-' + pad(m);
+      state.day = state.ym === today.slice(0, 7) ? today : state.ym + '-01';
+    }
+    writeUrl(); render();
+  });
+
+  writeUrl(); render();
+});
+});
+</script>
 </body>
 </html>

@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>イベント詳細｜NEXT MOVE TICKETS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Noto+Sans+JP:wght@400;500;700;900&family=DM+Mono:wght@400;500&family=Instrument+Serif:ital@1&family=Barlow+Condensed:wght@700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="flow.css">
+<script src="data.js"></script>
+<script src="common.js"></script>
+</head>
+<body>
+<div data-header="v2" data-active="events"></div>
+<main id="main" class="flow-main"></main>
+<div data-footer></div>
+<script>
+NMT.ready(function (db, ui) {
+  var f = NMT.fmt, L = NMT.LABEL, esc = ui.esc;
+  var main = document.getElementById('main');
+  var id = ui.param('id');
+  var here = 'event.html' + location.search;
+  var loginUrl = ui.url('login', { next: here });
+
+  function notFound(msg) {
+    main.innerHTML = '<div class="wrap"><div class="p-head"><div><p class="p-head__en">EVENT</p><h1 class="p-head__ja">' + esc(msg) + '</h1></div></div>' +
+      '<div class="empty">URL が正しいか確かめてください。<br><a class="textlink" href="' + ui.url('events') + '">イベント一覧へ</a></div></div>';
+  }
+  var e = id && db.eventById(id);
+  if (!e) return notFound('イベントが見つかりません');
+  if (e.status === 'DRAFT' && !db.canManageEvent(e.id)) return notFound('このイベントは公開されていません');
+
+  function loginPrompt() {
+    ui.modal({ title: 'ログインが必要です', html: '<p>保存・フォロー・申込にはログインしてください。</p>',
+      actions: [{ label: 'あとで', value: false, kind: 'outline' }, { label: 'Google で続ける', value: true }] })
+      .then(function (v) { if (v) location.href = loginUrl; });
+  }
+  function myTicket() {
+    if (!db.currentUser()) return null;
+    return db.myTickets().filter(function (x) { return x.event.id === e.id && !x.ticket.revokedAt; })[0] || null;
+  }
+  function pendingPay() { return db.pendingPayments().filter(function (p) { return p.eventId === e.id; })[0] || null; }
+  function dateRange() {
+    var s = e.startAt, en = e.endAt;
+    var sameDay = f.ymd(s) === f.ymd(en);
+    return f.ymd(s) + '（' + f.wd(s) + '）' + f.hm(s) + ' – ' + (sameDay ? '' : f.md(en) + '（' + f.wd(en) + '）') + f.hm(en);
+  }
+  function calDates() {
+    function z(d) { return new Date(d).toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, ''); }
+    return z(e.startAt) + '/' + z(e.endAt);
+  }
+  function icsHref() {
+    function z(d) { return new Date(d).toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, ''); }
+    var text = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//NEXT MOVE TICKETS//JA', 'BEGIN:VEVENT', 'UID:' + e.id + '@nextmove.example', 'DTSTAMP:' + z(db.now()),
+      'DTSTART:' + z(e.startAt), 'DTEND:' + z(e.endAt), 'SUMMARY:' + e.title.replace(/[,;\\]/g, ' '), 'LOCATION:' + (e.venueName || '').replace(/[,;\\]/g, ' '), 'END:VEVENT', 'END:VCALENDAR'].join('\r\n');
+    return URL.createObjectURL(new Blob([text], { type: 'text/calendar' }));
+  }
+
+  // 参加枠1行
+  function slotRow(s, mine, live) {
+    var st = db.slotState(s.id), rem = db.slotRemaining(s.id);
+    var pill = '', meta = '';
+    if (mine) pill = '<span class="pill pill--open">参加予定</span>';
+    else if (!live) pill = '';
+    else if (st === 'full') pill = '<span class="pill pill--soldout">満員</span>';
+    else if (st === 'before') pill = '<span class="pill pill--before">受付前</span>';
+    else if (st === 'closed') pill = '<span class="pill pill--ended">受付終了</span>';
+    else if (rem <= 5) pill = '<span class="pill pill--few">残りわずか</span>';
+    if (!live) meta = '定員 ' + s.capacity;
+    else if (st === 'open') meta = '残 ' + rem + ' / ' + s.capacity + ' 席';
+    else if (st === 'full') meta = '満員（定員 ' + s.capacity + '）';
+    else if (st === 'before') meta = f.card(s.opensAt) + ' から受付';
+    else meta = '受付終了' + (s.closesAt ? '（' + f.card(s.closesAt) + ' まで）' : '');
+    if (live && st === 'open' && s.closesAt) meta += ' · ' + f.card(s.closesAt) + ' まで';
+    var off = !mine && live && st !== 'open';
+    return '<div class="slot' + (off ? ' is-off' : '') + '">' +
+      '<div class="slot__top"><span class="slot__name">' + esc(s.name) + '</span><span class="option__price">' + esc(f.yen(s.priceYen)) + '</span></div>' +
+      '<div class="slot__meta"><span class="tag">' + esc(L.SlotKind[s.kind] || s.kind) + '</span>' + pill + '<span>' + esc(meta) + '</span></div>' +
+      (s.description ? '<p class="t-small t-muted">' + esc(s.description) + '</p>' : '') +
+    '</div>';
+  }
+
+  // 申込ボタンの状態: { html(大きいボタン), short(固定バー用), sub }
+  function cta(b, mt, pp) {
+    var slots = db.slotsOf(e.id);
+    var mineIds = mt ? mt.slots.map(function (s) { return s.id; }) : [];
+    var openOthers = slots.filter(function (s) { return mineIds.indexOf(s.id) < 0 && db.slotState(s.id) === 'open'; });
+    var started = db.isStarted(e);
+    var capOk = !e.capacity || mt || db.eventRemaining(e.id) > 0;
+    var btns = [];
+    if (b.kind === 'cancelled' || b.kind === 'ended') return { html: '', short: '' };
+    if (b.kind === 'draft') {
+      var edit = ui.url('eventCreate', { id: e.id });
+      return { html: '<button class="btn btn--black btn--block" type="button" disabled>下書きのため申し込めません</button><a class="btn btn--outline btn--block" href="' + edit + '">イベントを編集する</a>',
+        short: '<a class="btn btn--outline" href="' + edit + '">編集する</a>' };
+    }
+    if (pp) {
+      var co = ui.url('checkout', { payment: pp.id });
+      return { html: '<a class="btn btn--coral btn--block" href="' + co + '">支払いを続ける<img class="icon" src="assets/icon-arrow-btn.svg" alt=""></a>', short: '<a class="btn btn--coral" href="' + co + '">支払いを続ける</a>' };
+    }
+    if (mt) btns.push('<a class="btn btn--black btn--block" href="' + ui.url('ticket', { id: mt.ticket.id }) + '">QR チケットを表示<img class="icon" src="assets/icon-arrow-btn-white.svg" alt=""></a>');
+    if (!started && openOthers.length && capOk) {
+      var ap = ui.url('apply', { id: e.id });
+      btns.push('<a class="btn ' + (mt ? 'btn--outline' : 'btn--coral') + ' btn--block" href="' + ap + '">' + (mt ? 'ほかの枠にも申し込む' : '申し込む<img class="icon" src="assets/icon-arrow-btn.svg" alt="">') + '</a>');
+      return { html: btns.join(''), short: mt ? '<a class="btn btn--black" href="' + ui.url('ticket', { id: mt.ticket.id }) + '">QR チケット</a>' : '<a class="btn btn--coral" href="' + ap + '">申し込む</a>' };
+    }
+    if (mt) return { html: btns.join(''), short: '<a class="btn btn--black" href="' + ui.url('ticket', { id: mt.ticket.id }) + '">QR チケット</a>' };
+    var label = started ? '開始後は申し込めません'
+      : b.kind === 'before' ? b.label.replace(/ ?から$/, '') + ' から受付'
+      : b.kind === 'soldout' || !capOk ? '満員のため申し込めません'
+      : slots.some(function (s) { return db.slotState(s.id) === 'before'; }) ? '受付前です'
+      : '申込は締め切りました';
+    return { html: '<button class="btn btn--black btn--block" type="button" disabled>' + esc(label) + '</button>', short: '<button class="btn btn--black" type="button" disabled>' + esc(label) + '</button>' };
+  }
+
+  function render() {
+    var u = db.currentUser();
+    var o = db.organizerById(e.organizerId), g = db.genreById(e.genreId);
+    var b = db.eventBadge(e.id), mt = myTicket(), pp = u ? pendingPay() : null;
+    var live = b.kind !== 'ended' && b.kind !== 'cancelled';
+    var slots = db.slotsOf(e.id), qs = db.questionsOf(e.id);
+    var mineIds = mt ? mt.slots.map(function (s) { return s.id; }) : [];
+    var c = cta(b, mt, pp);
+    var saved = db.isSaved(e.id), following = o.type === 'GROUP' && db.isFollowing(o.id);
+    var online = e.venueType === 'ONLINE';
+    document.title = e.title + '｜NEXT MOVE TICKETS';
+
+    var banner = '';
+    if (b.kind === 'cancelled') banner = '<div class="notice notice--error ev-banner"><div><b>このイベントは中止されました</b>' + (e.cancelReason ? '<br>主催者より：' + esc(e.cancelReason) : '') + '<br>申込は停止しています。支払い済みの参加費は返金されます。</div></div>';
+    else if (b.kind === 'ended') banner = '<div class="notice notice--gray ev-banner"><div><b>このイベントは終了しました</b>　参加枠は記録として表示しています。</div></div>';
+    else if (b.kind === 'draft') banner = '<div class="notice ev-banner"><div><b>下書きのプレビューです</b>　主催者だけが見られます。公開すると一覧に載ります。</div></div>';
+    if (pp && live) banner += '<div class="notice ev-banner"><div><b>支払いの途中の申込があります</b>　席は ' + esc(f.hm(pp.holdExpiresAt)) + ' まで確保しています。<a href="' + ui.url('checkout', { payment: pp.id }) + '">支払いを続ける</a></div></div>';
+    if (mt && b.kind !== 'cancelled') banner += '<div class="notice notice--mint ev-banner"><div><b>' + esc(mt.slots.map(function (s) { return s.name; }).join('・')) + ' で参加予定です</b>　<a href="' + ui.url('ticket', { id: mt.ticket.id }) + '">QR チケットを表示</a></div></div>';
+
+    var venue = online
+      ? 'オンライン' + (mt ? '<br><a class="textlink" href="' + esc(e.onlineUrl) + '" target="_blank" rel="noopener">' + esc(e.onlineUrl) + '</a>' : '<br><span class="t-small t-muted">参加 URL は参加予定の人にだけ表示されます</span>')
+      : esc(e.venueName || '') + (e.address ? '<br><span class="t-small">' + esc(e.address) + '</span>' : '') +
+        '<br><a class="textlink t-small" href="https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(e.address || e.venueName || '') + '" target="_blank" rel="noopener">地図を開く</a>';
+
+    var qRows = qs.map(function (q) {
+      var target = q.slotIds.length ? q.slotIds.map(function (sid) { var s = db.slotById(sid); return s ? s.name : ''; }).join('・') + ' を選んだ人のみ' : '';
+      return '<div class="ev-q"><span class="ev-q__label">' + esc(q.label) + '</span>' +
+        (q.isPersonalData ? '<span class="tag tag--pi">個人情報</span>' : '') +
+        (q.commonKey ? '<span class="tag">共通</span>' : '') +
+        '<span class="t-small t-muted">' + (q.required ? '必須' : '任意') + (target ? ' · ' + esc(target) : '') + '</span></div>';
+    }).join('');
+    var hasPi = qs.some(function (q) { return q.isPersonalData; });
+
+    var others = db.searchEvents({ organizerId: o.id }).filter(function (x) { return x.id !== e.id; }).slice(0, 4);
+    var priceText = f.priceLabel(db.priceRange(e.id));
+
+    main.innerHTML =
+      '<div class="wrap">' +
+        '<div class="p-head" style="padding-bottom:0"><a class="p-back" href="' + ui.url('events') + '">← イベント一覧に戻る</a></div>' +
+        banner +
+        '<div class="ev-layout" style="margin-top:clamp(20px,2.23vw,32px)">' +
+          '<section class="ev-hero" aria-label="概要">' +
+            '<img class="ev-flyer" src="' + esc(e.coverUrl) + '" alt="' + esc(e.title) + ' のフライヤー">' +
+            '<div class="ev-info">' +
+              '<div class="flow-tags">' + ui.pill(b) + (g ? '<span class="tag">' + esc(g.name) + '</span>' : '') + '<span class="tag">' + esc(e.area === 'online' ? 'オンライン' : e.area) + '</span><span class="tag">' + (online ? 'オンライン' : '対面') + '</span></div>' +
+              '<h1 class="ev-title">' + esc(e.title) + '</h1>' +
+              '<a class="ev-org" href="' + ui.url('organizer', { slug: o.slug }) + '"><span class="ev-org__icon" aria-hidden="true"></span><span class="ev-org__name"><b>' + esc(o.displayName) + '</b></span><span class="t-muted">@' + esc(o.slug) + '</span></a>' +
+              '<dl class="kv">' +
+                '<dt>Date</dt><dd><b>' + esc(dateRange()) + '</b><br><span class="cluster" style="--cluster-gap:12px"><a class="textlink t-small" href="https://calendar.google.com/calendar/render?action=TEMPLATE&text=' + encodeURIComponent(e.title) + '&dates=' + calDates() + '&location=' + encodeURIComponent(e.venueName || '') + '" target="_blank" rel="noopener">＋ Google カレンダー</a><a class="textlink t-small" href="' + icsHref() + '" download="' + esc(e.id) + '.ics">.ics</a></span></dd>' +
+                '<dt>Place</dt><dd>' + venue + '</dd>' +
+                '<dt>Price</dt><dd>' + esc(priceText) + '<span class="t-small t-muted">（' + slots.length + ' 枠）</span></dd>' +
+              '</dl>' +
+              '<div class="ev-actions">' +
+                '<button class="btn-sm" type="button" data-act="save" aria-pressed="' + saved + '">' + (saved ? '保存済み' : '保存') + '</button>' +
+                (o.type === 'GROUP' ? '<button class="btn-sm" type="button" data-act="follow" aria-pressed="' + following + '">' + (following ? 'フォロー中' : '＋ 団体をフォロー') + '</button>' : '') +
+                '<button class="btn-sm" type="button" data-act="copy">リンクをコピー</button>' +
+                '<button class="btn-sm btn-sm--ghost" type="button" data-act="report">… 通報</button>' +
+              '</div>' +
+            '</div>' +
+          '</section>' +
+
+          '<aside class="ev-side" aria-label="参加枠">' +
+            '<div class="box">' +
+              '<h2 class="box__title">参加枠</h2>' +
+              slots.map(function (s) { return slotRow(s, mineIds.indexOf(s.id) >= 0, live); }).join('') +
+              (c.html ? '<div class="stack" style="--stack-gap:10px;margin-top:16px">' + c.html + '</div>' : '') +
+              '<p class="side-note">' + (e.capacity ? 'イベント全体の上限 ' + e.capacity + ' 人' + (live ? '（残 ' + db.eventRemaining(e.id) + '）' : '') + '。' : '') +
+                (slots.some(function (s) { return s.priceYen > 0; }) ? '有料枠は支払い後にキャンセルしても返金されません。' : '') + '補欠はありません。</p>' +
+            '</div>' +
+          '</aside>' +
+
+          '<div class="ev-body">' +
+            '<section class="flow-sec"><h2 class="flow-h">説明</h2><p class="ev-desc">' + esc(e.body) + '</p></section>' +
+            '<section class="flow-sec"><h2 class="flow-h">申込時に聞かれること</h2>' + qRows +
+              '<div class="box box--gray" style="margin-top:16px"><dl class="kv">' +
+                '<dt>Who</dt><dd>回答を見る人：' + esc(o.displayName) + ' の運営メンバーのみ</dd>' +
+                '<dt>Keep</dt><dd>保持期間：イベント終了から ' + esc(e.answerRetentionDays) + ' 日</dd>' +
+                (hasPi ? '<dt>Purpose</dt><dd>利用目的：' + esc(e.dataUsePurpose || '（未設定）') + '</dd>' : '') +
+              '</dl></div>' +
+            '</section>' +
+            '<section class="flow-sec"><h2 class="flow-h">主催者</h2>' +
+              '<div class="ev-orgcard"><span class="ev-orgcard__icon" aria-hidden="true"></span><div class="ev-orgcard__body">' +
+                '<a class="t-h3" href="' + ui.url('organizer', { slug: o.slug }) + '">' + esc(o.displayName) + '</a> <span class="tag">' + (o.type === 'GROUP' ? '団体' : '個人') + '</span>' +
+                '<p class="t-small t-muted">@' + esc(o.slug) + (o.type === 'GROUP' ? ' · フォロワー ' + db.followerCount(o.id) + '人' : '') + '</p>' +
+              '</div><a class="btn-sm" href="' + ui.url('organizer', { slug: o.slug }) + '">ページを見る</a></div>' +
+              (o.bio ? '<p class="t-body" style="margin-top:12px">' + esc(o.bio) + '</p>' : '') +
+            '</section>' +
+          '</div>' +
+        '</div>' +
+      '</div>' +
+      (others.length ? '<section class="section section--flush-top" style="margin-top:var(--gap-section)"><div class="wrap">' +
+        '<div class="sec-head"><div class="sec-head__titles"><p class="sec-head__en">MORE</p><h2 class="sec-head__ja">この主催者の他のイベント</h2></div>' +
+        '<a class="link-arrow" href="' + ui.url('organizer', { slug: o.slug }) + '">すべて見る<img class="icon" src="assets/icon-arrow-up-right.svg" alt=""></a></div>' +
+        '<div class="event-grid">' + others.map(function (x) { return ui.eventCard(x); }).join('') + '</div></div></section>' : '') +
+      (c.short ? '<div class="fixbar" role="region" aria-label="申込"><div class="fixbar__sum"><span class="fixbar__price">' + esc(priceText) + '</span><span class="fixbar__meta">' + slots.length + ' 枠' + (mt ? ' · 参加予定' : '') + '</span></div>' + c.short + '</div>' : '');
+
+    main.classList.toggle('has-fixbar', !!c.short);
+    document.body.classList.toggle('has-fixbar', !!c.short);
+  }
+
+  main.addEventListener('click', function (ev) {
+    var b = ev.target.closest('[data-act]'); if (!b) return;
+    var act = b.getAttribute('data-act');
+    if (act === 'copy') return ui.copyLink();
+    if (act === 'report') return ui.report('EVENT', e.id);
+    if (!db.currentUser()) return loginPrompt();
+    try {
+      if (act === 'save') ui.toast(db.toggleSave(e.id) ? '保存しました' : '保存を外しました');
+      if (act === 'follow') ui.toast(db.toggleFollow(e.organizerId) ? 'フォローしました' : 'フォローを外しました');
+    } catch (err) { ui.toast(err.message); }
+    render();
+  });
+
+  render();
+});
+</script>
+</body>
+</html>

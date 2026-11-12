@@ -9,178 +9,212 @@
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Noto+Sans+JP:wght@400;500;700;900&family=DM+Mono:wght@400;500&family=Instrument+Serif:ital@1&family=Barlow+Condensed:wght@700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 <link rel="stylesheet" href="org.css">
-<script src="data.js" defer></script>
-<script src="common.js" defer></script>
+<script src="data.js"></script>
+<script src="common.js"></script>
 </head>
 <body class="org-page">
 <div data-header="org" data-active="dashboard"></div>
-<main>
-  <!-- 団体の見出し（Figma 1774:10552） -->
-  <section class="wrap dash-head">
-    <div class="dash-org">
-      <span class="dash-org__swatch" aria-hidden="true"></span>
-      <div class="dash-org__text">
-        <h1 class="dash-org__name">慶應軽音サークル</h1>
-        <p class="dash-org__meta">@keio-lightmusic · <a href="organizer.html">公開ページを見る</a></p>
-      </div>
-    </div>
-    <a class="btn btn--black" href="event-create.html">＋ イベントを作成</a>
-  </section>
+<!-- 中身は data.js から描く（Figma 1774:10552〜。1440 幅の配置は Figma どおり） -->
+<main id="main"></main>
+<script>
+NMT.ready(function (db, ui) {
+  var esc = ui.esc, f = NMT.fmt, main = document.getElementById('main');
+  if (!ui.requireLogin()) return;
+  var me = db.currentUser();
+  var org = NMT.currentOrg();
 
-  <!-- 数字（Figma 1774:10562） -->
-  <section class="wrap dash-stats" aria-label="サマリー">
-    <div class="org-card dash-stat">
-      <p class="dash-stat__label">フォロワー</p>
-      <p class="dash-stat__num">234</p>
-      <p class="dash-stat__sub">今月 +12</p>
-    </div>
-    <div class="org-card dash-stat">
-      <p class="dash-stat__label">公開中のイベント</p>
-      <p class="dash-stat__num">3</p>
-      <p class="dash-stat__sub">下書き 1</p>
-    </div>
-    <div class="org-card dash-stat">
-      <p class="dash-stat__label">今月の申込</p>
-      <p class="dash-stat__num">42</p>
-      <p class="dash-stat__sub">先月 +18</p>
-    </div>
-    <div class="org-card dash-stat">
-      <p class="dash-stat__label">保存された回数</p>
-      <p class="dash-stat__num">38</p>
-      <p class="dash-stat__sub">春の新歓ミーティング</p>
-    </div>
-  </section>
+  function gate(title, body, actions) {
+    main.innerHTML = '<div class="wrap org-gate"><div class="box stack"><h1 class="org-gate__title">' + esc(title) + '</h1><p class="t-small">' + esc(body) + '</p><div class="cluster">' + (actions || '') + '</div></div></div>';
+  }
+  if (!org) return gate('管理している団体がありません', '団体を作ると、イベントの作成・参加者の受付・告知ができるようになります。', '<a class="btn btn--black" href="' + ui.url('groupNew') + '">団体を作る</a>');
+  if (!db.isOwner(org.id)) return gate('このページを見る権限がありません', org.displayName + ' のダッシュボードは、団体の owner だけが見られます。owner に招待してもらうか、団体の作成画面から参加を依頼してください。',
+    '<a class="org-btn" href="' + ui.url('organizer', { slug: org.slug }) + '">公開ページを見る</a><a class="org-btn" href="' + ui.url('mypage') + '">マイページへ</a>');
 
-  <!-- 本体（Figma 1774:10579） -->
-  <div class="wrap dash-body">
-    <div class="dash-main">
-      <section class="org-card dash-published">
-        <h2 class="org-card__title">公開中のイベント</h2>
-        <div class="dash-event">
-          <img class="dash-event__flyer" src="assets/flyer-band-battle.jpg" alt="インカレ・バンド対抗ライブ vol.4 のフライヤー">
-          <div class="dash-event__body">
-            <div class="dash-event__meta">
-              <span class="pill pill--open">受付中</span>
-              <span>11/8（土）17:30 · 下北沢 SHELTER</span>
-            </div>
-            <h3 class="dash-event__title"><a href="#">インカレ・バンド対抗ライブ vol.4</a></h3>
-            <ul class="dash-quota" aria-label="参加枠の申込状況">
-              <li class="dash-quota__row">
-                <span class="dash-quota__name">学生</span>
-                <span class="dash-quota__bar"><span class="dash-quota__fill" style="width:62.5%"></span></span>
-                <span class="dash-quota__count">25 / 40</span>
-              </li>
-              <li class="dash-quota__row">
-                <span class="dash-quota__name">一般</span>
-                <span class="dash-quota__bar"><span class="dash-quota__fill dash-quota__fill--full" style="width:100%"></span></span>
-                <span class="dash-quota__count">10 / 10<span class="dash-full">満席</span></span>
-              </li>
-              <li class="dash-quota__row">
-                <span class="dash-quota__name">早割（学生）</span>
-                <span class="dash-quota__bar"><span class="dash-quota__fill dash-quota__fill--full" style="width:100%"></span></span>
-                <span class="dash-quota__count">20 / 20<span class="dash-full">満席</span></span>
-              </li>
-              <li class="dash-quota__row dash-quota__row--total">
-                <span class="dash-quota__name">全体</span>
-                <span class="dash-quota__bar"><span class="dash-quota__fill dash-quota__fill--total" style="width:78.6%"></span></span>
-                <span class="dash-quota__count">55 / 70</span>
-              </li>
-            </ul>
-          </div>
-        </div>
-        <div class="dash-actions">
-          <a class="org-btn org-btn--black" href="#">参加者・受付</a>
-          <a class="org-btn" href="#">QR で受付</a>
-          <a class="org-btn" href="#">告知を送る</a>
-          <a class="org-btn" href="event-create.html">編集</a>
-          <a class="org-btn" href="event-create.html">複製</a>
-          <span class="dash-actions__spacer"></span>
-          <button class="org-btn org-btn--plain" type="button">移管</button>
-          <button class="org-btn org-btn--plain" type="button">中止</button>
-        </div>
-      </section>
+  var COLORS = ['pink', 'mint', 'coral', 'lavender'];
+  function month(iso) { return f.ymd(iso).slice(0, 7); }
+  function tryDo(fn) { try { return fn(); } catch (err) { ui.toast(err.message || String(err)); return null; } }
 
-      <div class="dash-pair">
-        <section class="org-card dash-list">
-          <h2 class="org-card__title">下書き</h2>
-          <div class="dash-list__item">
-            <div class="dash-list__text">
-              <p class="dash-list__name">追いコン 2026</p>
-              <p class="dash-list__sub">更新 3日前 · 枠・質問が未設定</p>
-            </div>
-            <a class="org-btn" href="event-create.html">編集</a>
-            <button class="org-btn org-btn--black" type="button">公開する</button>
-          </div>
-        </section>
-        <section class="org-card dash-list">
-          <h2 class="org-card__title">過去のイベント</h2>
-          <div class="dash-list__item">
-            <div class="dash-list__text">
-              <p class="dash-list__name">冬合宿 2026</p>
-              <p class="dash-list__sub">2/20 · 参加 32人</p>
-            </div>
-            <a class="org-btn" href="event-create.html">複製して作成</a>
-          </div>
-          <div class="dash-list__item">
-            <div class="dash-list__text">
-              <p class="dash-list__name">卒業ライブ 2026</p>
-              <p class="dash-list__sub">3/14 · 参加 120人</p>
-            </div>
-            <a class="org-btn" href="event-create.html">複製して作成</a>
-          </div>
-        </section>
-      </div>
-    </div>
+  function render() {
+    var nowMonth = month(db.now());
+    var lastMonth = (function () { var p = nowMonth.split('.'), y = +p[0], m = +p[1] - 1; if (m === 0) { y--; m = 12; } return y + '.' + ('0' + m).slice(-2); })();
+    var all = db.searchEvents({ organizerId: org.id, status: 'all', includeDraft: true });
+    var upcoming = all.filter(function (e) { return e.status !== 'DRAFT' && db.isUpcoming(e); });
+    var published = upcoming.filter(function (e) { return e.status === 'PUBLISHED'; });
+    var drafts = all.filter(function (e) { return e.status === 'DRAFT'; }).sort(function (a, b) { return Date.parse(b.updatedAt) - Date.parse(a.updatedAt); });
+    var past = db.searchEvents({ organizerId: org.id, status: 'past' });
+    var regs = db.recentRegistrations(org.id, 100000);
 
-    <aside class="dash-side">
-      <section class="dash-notice">
-        <h2 class="dash-notice__title">お知らせ</h2>
-        <p class="dash-notice__text">「冬合宿 2026」の申込時の回答は、7日後（11/6）に自動で削除されます。必要なら今のうちに控えを取ってください。</p>
-        <button class="org-btn org-btn--black" type="button">CSV で控えを取る</button>
-      </section>
+    // 数字
+    var followers = db.followerCount(org.id);
+    var newFollowers = db.t.follows.filter(function (x) { return x.organizerId === org.id && month(x.createdAt) === nowMonth; }).length;
+    var regThis = regs.filter(function (r) { return month(r.appliedAt) === nowMonth; }).length;
+    var regLast = regs.filter(function (r) { return month(r.appliedAt) === lastMonth; }).length;
+    var savedTop = null, savedSum = 0;
+    published.forEach(function (e) { var n = db.savedCount(e.id); savedSum += n; if (!savedTop || n > savedTop.n) savedTop = { e: e, n: n }; });
 
-      <section class="org-card dash-recent">
-        <div class="dash-recent__head">
-          <h2 class="dash-recent__title">最近の申込</h2>
-          <a class="dash-recent__all" href="#">すべて →</a>
-        </div>
-        <ul>
-          <li class="dash-recent__item">
-            <span class="dash-recent__avatar dash-recent__avatar--pink" aria-hidden="true"></span>
-            <div class="dash-recent__text">
-              <p class="dash-recent__name">みお</p>
-              <p class="dash-recent__sub">学生 × 1</p>
-            </div>
-            <span class="dash-recent__time">15分前</span>
-          </li>
-          <li class="dash-recent__item">
-            <span class="dash-recent__avatar dash-recent__avatar--mint" aria-hidden="true"></span>
-            <div class="dash-recent__text">
-              <p class="dash-recent__name">たける</p>
-              <p class="dash-recent__sub">学生 × 1 ＋ 早割</p>
-            </div>
-            <span class="dash-recent__time">1時間前</span>
-          </li>
-          <li class="dash-recent__item">
-            <span class="dash-recent__avatar dash-recent__avatar--coral" aria-hidden="true"></span>
-            <div class="dash-recent__text">
-              <p class="dash-recent__name">さき</p>
-              <p class="dash-recent__sub">一般 × 2</p>
-            </div>
-            <span class="dash-recent__time">2時間前</span>
-          </li>
-          <li class="dash-recent__item">
-            <span class="dash-recent__avatar dash-recent__avatar--lavender" aria-hidden="true"></span>
-            <div class="dash-recent__text">
-              <p class="dash-recent__name">ゆうと</p>
-              <p class="dash-recent__sub">学生 × 1</p>
-            </div>
-            <span class="dash-recent__time">3時間前</span>
-          </li>
-        </ul>
-      </section>
-    </aside>
-  </div>
-</main>
+    function stat(label, num, sub) {
+      return '<div class="org-card dash-stat"><p class="dash-stat__label">' + esc(label) + '</p><p class="dash-stat__num">' + esc(num) + '</p><p class="dash-stat__sub">' + esc(sub) + '</p></div>';
+    }
+
+    // 公開中のイベント（1件ずつ: 枠ごとの申込数／定員と全体、操作）
+    function eventBlock(e) {
+      var slots = db.slotsOf(e.id), b = db.eventBadge(e.id);
+      var rows = slots.map(function (s) {
+        var taken = db.slotTaken(s.id), full = taken >= s.capacity;
+        var pct = s.capacity ? Math.min(100, taken / s.capacity * 100) : 0;
+        return '<li class="dash-quota__row"><span class="dash-quota__name">' + esc(s.name) + '</span>' +
+          '<span class="dash-quota__bar"><span class="dash-quota__fill' + (full ? ' dash-quota__fill--full' : '') + '" style="width:' + (+pct.toFixed(1)) + '%"></span></span>' +
+          '<span class="dash-quota__count">' + taken + ' / ' + s.capacity + (full ? '<span class="dash-full">満席</span>' : '') + '</span></li>';
+      }).join('');
+      var cap = e.capacity || slots.reduce(function (a, s) { return a + s.capacity; }, 0);
+      var tot = e.capacity ? db.eventTaken(e.id) : slots.reduce(function (a, s) { return a + db.slotTaken(s.id); }, 0);
+      var tp = cap ? Math.min(100, tot / cap * 100) : 0;
+      rows += '<li class="dash-quota__row dash-quota__row--total"><span class="dash-quota__name">' + (e.capacity ? '全体（人）' : '全体') + '</span>' +
+        '<span class="dash-quota__bar"><span class="dash-quota__fill dash-quota__fill--total" style="width:' + (+tp.toFixed(1)) + '%"></span></span>' +
+        '<span class="dash-quota__count">' + tot + ' / ' + cap + '</span></li>';
+      return '<div class="dash-event">' +
+          '<img class="dash-event__flyer" src="' + esc(e.coverUrl) + '" alt="' + esc(e.title) + ' のフライヤー">' +
+          '<div class="dash-event__body">' +
+            '<div class="dash-event__meta">' + ui.pill(b) + '<span>' + f.card(e.startAt) + ' · ' + esc(e.venueName || 'オンライン') + ' · 保存 ' + db.savedCount(e.id) + '</span></div>' +
+            '<h3 class="dash-event__title"><a href="' + ui.url('event', { id: e.id }) + '">' + esc(e.title) + '</a></h3>' +
+            '<ul class="dash-quota" aria-label="参加枠の申込状況">' + rows + '</ul>' +
+          '</div>' +
+        '</div>' +
+        '<div class="dash-actions">' +
+          '<a class="org-btn org-btn--black" href="' + ui.url('attendees', { id: e.id }) + '">参加者・受付</a>' +
+          '<a class="org-btn" href="' + ui.url('checkin', { id: e.id }) + '">QR で受付</a>' +
+          '<a class="org-btn" href="' + ui.url('announce', { id: e.id }) + '">告知を送る</a>' +
+          '<a class="org-btn" href="' + ui.url('eventCreate', { id: e.id }) + '">編集</a>' +
+          '<a class="org-btn" href="' + ui.url('eventCreate', { org: org.slug }) + '" data-dup="' + esc(e.id) + '">複製</a>' +
+          '<span class="dash-actions__spacer"></span>' +
+          '<a class="org-btn org-btn--plain" href="' + ui.url('transfer', { id: e.id }) + '">移管</a>' +
+          '<button class="org-btn org-btn--plain" type="button" data-cancel="' + esc(e.id) + '">中止</button>' +
+        '</div>';
+    }
+
+    function draftItem(e) {
+      var errs = db.publishErrors(e.id);
+      return '<div class="dash-list__item"><div class="dash-list__text"><p class="dash-list__name">' + esc(e.title) + '</p>' +
+        '<p class="dash-list__sub">更新 ' + f.ago(e.updatedAt, db.now()) + ' · ' + (errs.length ? '公開まであと ' + errs.length + ' 項目' : '公開できます') + '</p></div>' +
+        '<a class="org-btn" href="' + ui.url('eventCreate', { id: e.id }) + '">編集</a>' +
+        '<button class="org-btn org-btn--black" type="button" data-publish="' + esc(e.id) + '">公開する</button></div>';
+    }
+    function pastItem(e) {
+      return '<div class="dash-list__item"><div class="dash-list__text"><p class="dash-list__name">' + esc(e.title) + '</p>' +
+        '<p class="dash-list__sub">' + f.md(e.startAt) + (e.status === 'CANCELLED' ? ' · 中止' : ' · 参加 ' + db.checkinSummary(e.id).total + '人') + '</p></div>' +
+        '<a class="org-btn" href="' + ui.url('eventCreate', { org: org.slug }) + '" data-dup="' + esc(e.id) + '">複製して作成</a></div>';
+    }
+
+    // お知らせ（自分宛てのうち、この団体のイベントに関わるもの）
+    var orgEventIds = all.map(function (e) { return e.id; });
+    var notices = db.notificationsOf(me.id).filter(function (n) { return n.type === 'ANSWER_DELETION_NOTICE' && orgEventIds.indexOf(n.eventId) >= 0 && !n.readAt; });
+    var notice = notices[0];
+
+    var recent = regs.slice(0, 4);
+    var allLink = published[0] ? ui.url('attendees', { id: published[0].id }) : (recent[0] ? ui.url('attendees', { id: recent[0].ticket.eventId }) : '');
+
+    var cancelled = upcoming.filter(function (e) { return e.status === 'CANCELLED'; });
+
+    main.innerHTML = '' +
+      '<section class="wrap dash-head">' +
+        '<div class="dash-org"><span class="dash-org__swatch" aria-hidden="true"></span><div class="dash-org__text">' +
+          '<h1 class="dash-org__name">' + esc(org.displayName) + (org.type === 'USER' ? '（個人）' : '') + '</h1>' +
+          '<p class="dash-org__meta">@' + esc(org.slug) + ' · <a href="' + ui.url('organizer', { slug: org.slug }) + '">公開ページを見る</a></p>' +
+        '</div></div>' +
+        '<a class="btn btn--black" href="' + ui.url('eventCreate', { org: org.slug }) + '">＋ イベントを作成</a>' +
+      '</section>' +
+      '<section class="wrap dash-stats" aria-label="サマリー">' +
+        stat('フォロワー', followers, org.type === 'USER' ? '個人はフォローされません' : '今月 +' + newFollowers) +
+        stat('公開中のイベント', published.length, '下書き ' + drafts.length) +
+        stat('今月の申込', regThis, '先月 ' + regLast) +
+        stat('保存された回数', savedSum, savedTop && savedTop.n ? savedTop.e.title : '—') +
+      '</section>' +
+      '<div class="wrap dash-body">' +
+        '<div class="dash-main">' +
+          '<section class="org-card dash-published">' +
+            '<h2 class="org-card__title">公開中のイベント</h2>' +
+            (published.length ? published.map(eventBlock).join('') : '<p class="dash-empty">公開中のイベントはありません。<a class="textlink" href="' + ui.url('eventCreate', { org: org.slug }) + '">イベントを作成</a></p>') +
+            (cancelled.length ? '<div class="dash-cancelled">' + cancelled.map(function (e) {
+              return '<p class="dash-list__sub"><span class="pill pill--cancelled">中止</span> ' + esc(e.title) + '（' + f.md(e.startAt) + '）· <a class="textlink" href="' + ui.url('attendees', { id: e.id }) + '">参加者</a> · <a class="textlink" href="' + ui.url('announce', { id: e.id }) + '">告知</a></p>';
+            }).join('') + '</div>' : '') +
+          '</section>' +
+          '<div class="dash-pair">' +
+            '<section class="org-card dash-list"><h2 class="org-card__title">下書き</h2>' +
+              (drafts.length ? drafts.map(draftItem).join('') : '<p class="dash-list__sub">下書きはありません</p>') + '</section>' +
+            '<section class="org-card dash-list"><h2 class="org-card__title">過去のイベント</h2>' +
+              (past.length ? past.slice(0, 5).map(pastItem).join('') : '<p class="dash-list__sub">まだありません</p>') + '</section>' +
+          '</div>' +
+        '</div>' +
+        '<aside class="dash-side">' +
+          (notice ? '<section class="dash-notice"><h2 class="dash-notice__title">お知らせ</h2>' +
+            '<p class="dash-notice__text">' + esc(notice.title) + '。必要なら今のうちに控えを取ってください。</p>' +
+            '<a class="org-btn org-btn--black" href="' + ui.url('attendees', { id: notice.eventId }) + '" data-read="' + esc(notice.id) + '">CSV で控えを取る</a></section>' : '') +
+          '<section class="org-card dash-recent">' +
+            '<div class="dash-recent__head"><h2 class="dash-recent__title">最近の申込</h2>' + (allLink ? '<a class="dash-recent__all" href="' + allLink + '">すべて →</a>' : '') + '</div>' +
+            (recent.length ? '<ul>' + recent.map(function (r, i) {
+              var ev = db.eventById(r.ticket.eventId);
+              return '<li class="dash-recent__item"><span class="dash-recent__avatar dash-recent__avatar--' + COLORS[i % COLORS.length] + '" aria-hidden="true"></span>' +
+                '<div class="dash-recent__text"><p class="dash-recent__name">' + esc(r.profile ? r.profile.displayName : '') + '</p>' +
+                '<p class="dash-recent__sub" title="' + esc(ev ? ev.title : '') + '">' + esc(r.slots.map(function (s) { return s.name; }).join(' ＋ ')) + '</p></div>' +
+                '<span class="dash-recent__time">' + f.ago(r.appliedAt, db.now()) + '</span></li>';
+            }).join('') + '</ul>' : '<p class="dash-list__sub dash-recent__none">まだ申込はありません</p>') +
+          '</section>' +
+        '</aside>' +
+      '</div>';
+  }
+
+  function cancelModal(e) {
+    var s = db.checkinSummary(e.id);
+    var paid = db.t.payments.filter(function (p) { return p.eventId === e.id && p.status === 'PAID'; }).length;
+    return ui.modal({
+      title: 'イベントを中止しますか？',
+      html: '<div class="stack"><p><strong>' + esc(e.title) + '</strong><br><span class="t-small">申込 ' + s.total + ' 人（うち支払済 ' + paid + ' 人）</span></p>' +
+        '<ul class="org-bullets t-small"><li>参加予定の全員に中止のお知らせ（メール）が届きます</li><li>以後の申込は停止します</li><li>支払済みの分は返金の扱いになります</li><li>取り消せません</li></ul>' +
+        '<label class="field"><span class="field__label">参加者への説明 <span class="req">必須</span></span><textarea class="textarea" name="reason" maxlength="1000" placeholder="例：会場の都合により中止します。"></textarea></label>' +
+        '<p class="field__error" hidden data-err></p></div>',
+      actions: [{ label: '戻る', value: false, kind: 'outline' }, { label: '中止する', kind: 'danger', onClick: function (w) {
+        var err = w.querySelector('[data-err]');
+        try { db.cancelEvent(e.id, w.querySelector('textarea').value); } catch (x) { err.textContent = x.message; err.hidden = false; return false; }
+      } }]
+    }).then(function (v) { if (v) { ui.toast('イベントを中止しました'); render(); } });
+  }
+
+  function publishFlow(e) {
+    var errs = db.publishErrors(e.id);
+    if (errs.length) {
+      return ui.modal({
+        title: 'まだ公開できません',
+        html: '<p class="t-small">「' + esc(e.title) + '」を公開するには、次を入れてください。</p><ul class="org-bullets">' + errs.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul>',
+        actions: [{ label: '閉じる', value: false, kind: 'outline' }, { label: '編集する', value: 'edit', kind: 'black' }]
+      }).then(function (v) { if (v === 'edit') location.href = ui.url('eventCreate', { id: e.id }); });
+    }
+    var o = db.organizerById(e.organizerId);
+    return ui.modal({
+      title: 'このイベントを公開しますか？',
+      html: '<div class="stack"><p><strong>' + esc(e.title) + '</strong></p><ul class="org-bullets t-small">' +
+        (o.type === 'GROUP' ? '<li>' + esc(o.displayName) + 'のフォロワー ' + db.followerCount(o.id) + ' 人にメールで通知されます</li>' : '') +
+        '<li>公開後は申込時の質問を削除できません</li><li>回答の保存期間：イベント終了から ' + e.answerRetentionDays + ' 日</li></ul></div>',
+      actions: [{ label: '戻る', value: false, kind: 'outline' }, { label: '公開する', value: true, kind: 'black' }]
+    }).then(function (v) {
+      if (!v) return;
+      if (tryDo(function () { return db.publishEvent(e.id); })) { ui.toast('公開しました'); render(); }
+    });
+  }
+
+  main.addEventListener('click', function (ev) {
+    var t = ev.target.closest('[data-dup],[data-cancel],[data-publish],[data-read]');
+    if (!t) return;
+    if (t.hasAttribute('data-read')) { db.markRead(t.getAttribute('data-read')); return; }
+    ev.preventDefault();
+    if (t.hasAttribute('data-dup')) {
+      var copy = tryDo(function () { return db.duplicateEvent(t.getAttribute('data-dup')); });
+      if (copy) location.href = ui.url('eventCreate', { id: copy.id });
+    } else if (t.hasAttribute('data-cancel')) cancelModal(db.eventById(t.getAttribute('data-cancel')));
+    else if (t.hasAttribute('data-publish')) publishFlow(db.eventById(t.getAttribute('data-publish')));
+  });
+
+  render();
+});
+</script>
 </body>
 </html>

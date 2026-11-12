@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>QR チケット｜NEXT MOVE TICKETS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Noto+Sans+JP:wght@400;500;700;900&family=DM+Mono:wght@400;500&family=Instrument+Serif:ital@1&family=Barlow+Condensed:wght@700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="flow.css">
+<script src="data.js"></script>
+<script src="common.js"></script>
+</head>
+<body>
+<div data-header="v2" data-active="none"></div>
+<main id="main" class="flow-main"><div class="wrap" id="tk"></div></main>
+<div data-footer></div>
+<script>
+NMT.ready(function (db, ui) {
+  if (!ui.requireLogin()) return;
+  var f = NMT.fmt, L = NMT.LABEL, esc = ui.esc;
+  var box = document.getElementById('tk');
+  var id = ui.param('id');
+  var back = '<a class="p-back" href="' + ui.url('mypage') + '">← マイページ</a>';
+
+  function head(ja) { return '<div class="p-head"><div class="stack" style="--stack-gap:8px">' + back + '<p class="p-head__en">MY TICKET</p><h1 class="p-head__ja">' + esc(ja) + '</h1></div></div>'; }
+  function stop(title, msg) { box.innerHTML = head(title) + '<div class="empty">' + msg + '</div>'; }
+
+  var tk = id && db.ticketById(id);
+  // 本人以外には、あるかどうかも見せない
+  if (!tk || tk.userId !== db.currentUser().id) return stop('チケットが見つかりません', 'このチケットは申し込んだ本人だけが見られます。<br><a class="textlink" href="' + ui.url('mypage') + '">マイページへ</a>');
+
+  function render() {
+    var x = db.myTickets().filter(function (t) { return t.ticket.id === id; })[0];
+    var e = x.event, t = x.ticket, me = db.profileOf(t.userId);
+    var started = db.isStarted(e), cancelledEvent = e.status === 'CANCELLED';
+    var valid = !t.revokedAt && !cancelledEvent;
+    var pays = db.t.payments.filter(function (p) { return p.userId === t.userId && p.eventId === e.id && (p.status === 'PAID' || p.status === 'REFUNDED'); });
+    var online = e.venueType === 'ONLINE';
+    document.title = 'QR チケット：' + e.title + '｜NEXT MOVE TICKETS';
+
+    var status = cancelledEvent ? '<span class="pill pill--cancelled">イベント中止</span>'
+      : t.revokedAt ? '<span class="pill pill--ended">キャンセル済み</span>'
+      : '<span class="pill pill--open">参加予定</span><span class="pill ' + (t.checkinStatus === 'CHECKED_IN' ? 'pill--open' : t.checkinStatus === 'ABSENT' ? 'pill--few' : 'pill--line') + '">' + esc(L.CheckinStatus[t.checkinStatus]) + '</span>';
+
+    var qr = valid
+      ? '<div class="qr">' + ui.qr(t.token) + '</div><p class="tk__token" aria-label="チケットの番号">' + esc(t.token) + '</p><p class="t-small t-muted" style="text-align:center">QR が読めないときは、この番号を受付で伝えてください</p>'
+      : '<div class="tk__void">' + (cancelledEvent ? 'イベントが中止になったため、このチケットは使えません' : 'すべての枠をキャンセルしたため、このチケットは使えません') + '</div>';
+
+    var slotRows = x.registrations.map(function (r) {
+      var s = db.slotById(r.slotId);
+      return '<div class="tk-slot"><span><span class="tk-slot__name">' + esc(s.name) + '</span> <span class="t-small t-muted">' + esc(f.yen(s.priceYen)) + (s.priceYen > 0 ? '・支払い済み' : '') + '</span></span>' +
+        (valid && !started ? '<button class="btn-sm" type="button" data-cancel="' + esc(r.id) + '">キャンセル</button>' : '') + '</div>';
+    }).join('') + x.cancelled.map(function (r) {
+      var s = db.slotById(r.slotId);
+      return '<div class="tk-slot"><span class="t-muted"><s>' + esc(s.name) + '</s> キャンセル済み（' + esc(f.card(r.cancelledAt)) + '）</span></div>';
+    }).join('');
+
+    var payRows = pays.length ? pays.map(function (p) {
+      return '<div class="tk-slot"><span>' + esc(f.yen(p.amountYen)) + ' <span class="t-small t-muted">' + esc(p.paidAt ? f.ymd(p.paidAt) + ' ' + f.hm(p.paidAt) : '') + '</span></span><span class="pill ' + (p.status === 'PAID' ? 'pill--line' : 'pill--ended') + '">' + esc(L.PaymentStatus[p.status]) + '</span></div>';
+    }).join('') : '<p class="t-small t-muted">無料の枠だけなので、支払いはありません</p>';
+
+    var place = online
+      ? (valid ? '<a class="textlink" href="' + esc(e.onlineUrl) + '" target="_blank" rel="noopener">' + esc(e.onlineUrl) + '</a>' : 'オンライン')
+      : esc(e.venueName || '') + (e.address ? '<br><span class="t-small">' + esc(e.address) + '</span>' : '');
+
+    box.innerHTML = head(e.title) +
+      (cancelledEvent ? '<div class="notice notice--error" style="margin-bottom:24px"><div><b>このイベントは中止されました</b>' + (e.cancelReason ? '<br>主催者より：' + esc(e.cancelReason) : '') + '</div></div>' : '') +
+      '<div class="tk">' +
+        '<section class="tk__qr box" aria-label="QR チケット">' + qr +
+          '<p class="t-h3">' + esc(me.displayName) + '<span class="t-muted" style="font-weight:400">（@' + esc(me.slug) + '）</span></p>' +
+          '<div class="flow-tags" style="justify-content:center">' + status + '</div>' +
+          (valid ? '<p class="t-small t-muted" style="text-align:center">受付では画面を明るくして見せてください</p>' : '') +
+        '</section>' +
+        '<div class="stack" style="--stack-gap:0">' +
+          '<dl class="kv">' +
+            '<dt>Event</dt><dd><a class="textlink" href="' + ui.url('event', { id: e.id }) + '">' + esc(e.title) + '</a></dd>' +
+            '<dt>Date</dt><dd>' + esc(f.ymd(e.startAt)) + '（' + esc(f.wd(e.startAt)) + '）' + esc(f.hm(e.startAt)) + ' – ' + esc(f.hm(e.endAt)) + '</dd>' +
+            '<dt>' + (online ? 'URL' : 'Place') + '</dt><dd>' + place + '</dd>' +
+            '<dt>Check-in</dt><dd>' + esc(L.CheckinStatus[t.checkinStatus]) + (t.checkedInAt ? '（' + esc(f.card(t.checkedInAt)) + '）' : '') + '</dd>' +
+          '</dl>' +
+          '<section class="flow-sec"><h2 class="flow-h">参加枠</h2>' + slotRows +
+            (valid ? '<p class="side-note">' + (started ? '開始後はキャンセルできません。' : '枠ごとにキャンセルできます。すべての枠をキャンセルすると QR チケットは使えなくなります。') + (x.slots.some(function (s) { return s.priceYen > 0; }) ? '有料枠はキャンセルしても返金されません。' : '') + '</p>' : '') +
+          '</section>' +
+          '<section class="flow-sec"><h2 class="flow-h">支払い</h2>' + payRows + '</section>' +
+        '</div>' +
+      '</div>';
+  }
+
+  box.addEventListener('click', function (ev) {
+    var b = ev.target.closest('[data-cancel]'); if (!b) return;
+    var r = db.t.registrations.filter(function (x) { return x.id === b.getAttribute('data-cancel'); })[0];
+    var s = db.slotById(r.slotId), last = db.registrationsOfTicket(r.ticketId).length === 1;
+    ui.confirm({
+      title: '「' + s.name + '」をキャンセルしますか？',
+      body: (s.priceYen > 0 ? '有料枠（' + f.yen(s.priceYen) + '・支払い済み）の返金は行いません。' : '') + (last ? 'これが最後の枠なので、QR チケットは使えなくなります。' : 'ほかの枠の申込はそのまま残ります。'),
+      ok: 'キャンセルする', cancel: '戻る', danger: true
+    }).then(function (yes) {
+      if (!yes) return;
+      try { db.cancelRegistration(r.id); ui.toast('キャンセルしました'); } catch (err) { ui.toast(err.message); }
+      render();
+    });
+  });
+
+  render();
+});
+</script>
+</body>
+</html>
