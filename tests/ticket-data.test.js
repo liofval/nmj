@@ -425,3 +425,64 @@ test('F19 告知のお知らせから本文を引ける', () => {
   const n = db.notificationsOf().find(x => x.announcementId === an.id);
   assert.equal(db.announcementById(n.announcementId).body, '西門に集合');
 });
+
+// ---- R2 レビュー指摘 ----
+test('R2-1 別タブでログインし直したら、古いタブの書き込みは別人として実行せずに止める', () => {
+  const storage = memStorage();
+  const a = createDb({ storage }); a.login('u-p180');
+  const b = createDb({ storage }); b.login('u-p181');
+  assert.throws(() => a.updateProfile({ displayName: 'A' }), /別のタブ/);
+  const c = createDb({ storage });
+  assert.notEqual(c.profileOf('u-p181').displayName, 'A');
+  assert.notEqual(c.profileOf('u-p180').displayName, 'A');
+});
+
+test('R2-2 期限切れの確保は、同じイベントの別の枠への申込を妨げない', () => {
+  let now = Date.parse('2026-10-29T10:00:00+09:00');
+  const db = createDb({ storage: memStorage(), clock: () => now });
+  const uid = newUser(db); db.login(uid);
+  const e = db.eventById('e-clean');
+  const potato = db.slotsOf(e.id).find(x => x.priceYen > 0);
+  db.apply(e.id, [potato.id], requiredAnswers(db, e.id, [potato.id]));
+  now += 31 * 60 * 1000;
+  const free = db.slotsOf(e.id).find(x => x.priceYen === 0);
+  assert.equal(db.apply(e.id, [free.id], requiredAnswers(db, e.id, [free.id])).kind, 'confirmed');
+});
+
+test('R2-3 同じ版から2つのタブが保存しても、片方の変更を黙って失わない', () => {
+  const storage = memStorage();
+  const a = createDb({ storage }); const b = createDb({ storage });
+  a.login('u-yamada');               // a が保存（版が進む）
+  b.toggleSave('e-run');             // b は古い版 → 読み直してから保存
+  const c = createDb({ storage });
+  assert.equal(c.currentUser().id, 'u-yamada');
+  assert.equal(c.isSaved('e-run'), true);
+});
+
+test('R2-4 reset した後、古いタブが前の状態を書き戻さない', () => {
+  const storage = memStorage();
+  const a = createDb({ storage }); a.login('u-yamada');
+  const g = a.createGroup({ displayName: '消えるはず', slug: 'gone-after-reset' });
+  const b = createDb({ storage });
+  b.reset();
+  a.login('u-yamada');
+  assert.equal(createDb({ storage }).organizerById(g.id), null);
+});
+
+test('R2-5 保存期間を過ぎたイベントの決済に残った回答の下書きも消す', () => {
+  const db = fresh();
+  db.t.payments.push({ id: 'pay-x', userId: 'u-p190', eventId: 'e-gasshuku', slotIds: ['e-gasshuku-s1'], answersDraft: { q: '氏名' }, provider: 'MOCK', providerRef: 'x', amountYen: 1, status: 'FAILED', holdExpiresAt: '2026-02-01T00:00:00Z', failureReason: 'x', paidAt: null, refundedAt: null, createdAt: '2026-02-01T00:00:00Z' });
+  db.save();
+  const again = createDb({ storage: (() => { const m = memStorage(); m.setItem(db.KEY, JSON.stringify(db.t)); return m; })() });
+  assert.equal(again.t.payments.find(p => p.id === 'pay-x').answersDraft, null);
+});
+
+test('R2-6 CSV: 改行で始まるセルにも \' を付ける', () => {
+  const db = fresh(); const uid = newUser(db); db.login(uid);
+  const e = db.eventById('e-intern'); const s = db.slotsOf(e.id)[0];
+  const ans = requiredAnswers(db, e.id, [s.id]);
+  const nameQ = db.questionsOf(e.id).find(q => q.commonKey === 'NAME'); ans[nameQ.id] = '\n=1+1';
+  db.apply(e.id, [s.id], ans);
+  db.login('u-p003');
+  assert.ok(db.exportCsv(e.id, true).includes(`"'\n=1+1"`));
+});

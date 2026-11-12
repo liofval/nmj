@@ -341,7 +341,11 @@
   window.NMT.currentOrg = currentOrg;
   // 別のタブで変わったら読み直す（古い状態のまま書き込まないため。画面は次の操作か再読み込みで新しくなる）
   window.addEventListener('storage', function (ev) {
-    if (ev.key === (window.NMT.data && window.NMT.data.KEY) && db() && db().sync()) ui.toast('別のタブでの変更を読み込みました');
+    if (ev.key !== (window.NMT.data && window.NMT.data.KEY) || !db()) return;
+    if (!db().sync()) return;
+    // 別のタブでログインし直したら、この画面は前の人のままなので読み直す
+    if (db().tabUserChanged()) { location.reload(); return; }
+    ui.toast('別のタブでの変更を読み込みました');
   });
   window.NMT.ready = function (fn) { if (started) run(fn); else readyFns.push(fn); };
 

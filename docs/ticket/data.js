@@ -277,7 +277,10 @@
     var clock = opts.clock || function () { return DEMO_NOW + Math.min(Math.max(Date.now() - t.meta.clockStartedAt, 0), CLOCK_CAP_MS); };
 
     // 別タブの変更を古い状態で上書きしないよう、書き込みの前に storage の版（meta.rev）を見て読み直す
-    if (t.meta.rev == null) t.meta.rev = 0;
+    // rev は保存のたびに作る一意な値（連番だと別タブと同じ値になり、変更を取りこぼす）
+    function newRev() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 10); }
+    if (t.meta.rev == null) t.meta.rev = newRev();
+    var tabUser = t.meta.currentUserId; // このタブでログインしている人（別タブのログインで黙って入れ替わらないように）
     function replaceAll(n) { Object.keys(t).forEach(function (k) { delete t[k]; }); Object.assign(t, n); }
     function sync() {
       if (!storage) return false;
@@ -287,7 +290,7 @@
       if (!n || !n.meta || n.meta.rev === t.meta.rev) return false;
       replaceAll(n); return true;
     }
-    function save() { t.meta.rev = (t.meta.rev || 0) + 1; if (storage) storage.setItem(KEY, JSON.stringify(t)); }
+    function save() { t.meta.rev = newRev(); if (storage) storage.setItem(KEY, JSON.stringify(t)); }
     function nowIso() { return new Date(clock()).toISOString(); }
     function id(p) { t.meta.seq += 1; return p + '-' + t.meta.seq.toString(36); }
     function fail(msg) { throw new Error(msg); }
@@ -298,7 +301,8 @@
     db.now = function () { return clock(); };
     db.save = save;
     db.sync = sync;
-    db.reset = function () { var rev = t.meta.rev || 0; if (storage) storage.removeItem(KEY); replaceAll(buildSeed()); t.meta.clockStartedAt = Date.now(); t.meta.rev = rev; purgeExpiredAnswers(); save(); };
+    db.reset = function () { if (storage) storage.removeItem(KEY); replaceAll(buildSeed()); t.meta.clockStartedAt = Date.now(); tabUser = t.meta.currentUserId; purgeExpiredAnswers(); save(); };
+    db.tabUserChanged = function () { return t.meta.currentUserId !== tabUser; };
 
     // ---- 参照 ----
     db.userById = function (uid) { return by('users', 'id', uid); };
@@ -424,8 +428,8 @@
 
     // ---- ログイン ----
     db.currentUser = function () { return t.meta.currentUserId ? db.userById(t.meta.currentUserId) : null; };
-    db.login = function (uid) { need(db.userById(uid), 'ユーザーがいません'); t.meta.currentUserId = uid; save(); return db.currentUser(); };
-    db.logout = function () { t.meta.currentUserId = null; save(); };
+    db.login = function (uid) { need(db.userById(uid), 'ユーザーがいません'); t.meta.currentUserId = uid; tabUser = uid; save(); return db.currentUser(); };
+    db.logout = function () { t.meta.currentUserId = null; tabUser = null; save(); };
     function me() { return need(db.currentUser(), 'ログインしてください'); }
     db.isAdmin = function () { var u = db.currentUser(); return !!u && u.role === 'ADMIN'; };
     db.isOwner = function (oid, uid) {
@@ -497,6 +501,7 @@
 
     // ---- 申込 ----
     function checkApply(e, slotIds, answers, uid) {
+      expireHolds();
       if (e.status !== 'PUBLISHED') fail('このイベントは申し込めません');
       if (db.isStarted(e)) fail('開始後は申し込めません');
       if (!slotIds.length) fail('参加枠を選んでください');
@@ -803,9 +808,11 @@
       var dead = {};
       t.events.forEach(function (e) { if (db.answersExpired(e.id)) dead[e.id] = 1; });
       var regEvent = {}; t.slots.forEach(function (s) { regEvent[s.id] = s.eventId; });
+      var drafts = false;
+      t.payments.forEach(function (p) { if (dead[p.eventId] && p.answersDraft) { p.answersDraft = null; drafts = true; } });
       var before = t.answers.length;
       t.answers = t.answers.filter(function (a) { var r = by('registrations', 'id', a.registrationId); return !(r && dead[regEvent[r.slotId]]); });
-      return before !== t.answers.length;
+      return drafts || before !== t.answers.length;
     }
     db.checkinLogsOf = function (eid) {
       var ids = {}; t.tickets.forEach(function (x) { if (x.eventId === eid) ids[x.id] = 1; });
@@ -870,8 +877,8 @@
       });
       t.exportLogs.push({ id: id('ex'), eventId: e.id, userId: me().id, includeAnswers: !!includeAnswers, includeWaitlist: false, exportedAt: nowIso() });
       save();
-      // 表計算ソフトで数式にならないよう、= + - @ タブ 改行 で始まるセルは ' を付ける（OWASP CSV Injection）
-      return rows.map(function (r) { return r.map(function (c) { c = String(c); if (/^[=+\-@\t\r]/.test(c)) c = "'" + c; return /[",\n\r]/.test(c) ? '"' + c.replace(/"/g, '""') + '"' : c; }).join(','); }).join('\n');
+      // 表計算ソフトで数式にならないよう、= + - @ タブ CR LF で始まるセルは ' を付ける（OWASP CSV Injection）
+      return rows.map(function (r) { return r.map(function (c) { c = String(c); if (/^[=+\-@\t\r\n]/.test(c)) c = "'" + c; return /[",\n\r]/.test(c) ? '"' + c.replace(/"/g, '""') + '"' : c; }).join(','); }).join('\n');
     };
     db.announceAudience = function (eid, audiences) {
       var to = {};
@@ -938,7 +945,11 @@
      'createGroup', 'requestJoin', 'decideJoin', 'updateGroup', 'createInvitation', 'acceptInvitation', 'leaveGroup', 'createEvent', 'updateEvent', 'addSlot', 'updateSlot', 'removeSlot', 'addQuestion', 'removeQuestion',
      'publishEvent', 'duplicateEvent', 'cancelEvent', 'transferEvent', 'setCheckin', 'checkinByToken', 'exportCsv', 'sendAnnouncement', 'markRead', 'report', 'resolveReport'].forEach(function (name) {
       var f = db[name];
-      db[name] = function () { sync(); return f.apply(db, arguments); };
+      db[name] = function () {
+        sync();
+        if (name !== 'login' && name !== 'logout' && t.meta.currentUserId !== tabUser) fail('別のタブでログインし直したため、このページを再読み込みしてください');
+        return f.apply(db, arguments);
+      };
     });
 
     purgeExpiredAnswers();
