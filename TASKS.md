@@ -11,4 +11,4 @@
 | 7 | ~~〔担当:nanase-shigeta〕Figma「ななせ」の既存インスタ投稿2点（Event／GREEN MUSIC チャレンジ）をもとに、インスタ投稿のフォーマット（テンプレ）を作る（追加:nanase-shigeta）~~ → **Figma セクション「ヨコワカ｜Instagram投稿FMT 2026-11-12」に6型＋部品を作成（2026-11-12）** | 2026-11-12 ユーザー依頼 |
 | 8 | ~~〔担当:nanase-shigeta〕インスタ投稿FMTをさらに10種類追加する（既存6型と違う印象のものも含める）（追加:nanase-shigeta）~~ → **FMT-07〜16 を同セクションに追加（2026-11-12）** | 2026-11-12 ユーザー依頼 |
 | 9 | ~~〔担当:nanase-shigeta〕トンマナが合うとして残したインスタFMTと、ヨコワカ公式ページ（next-gen.city.yokohama.lg.jp/yokowaka）を参考に、インスタ投稿FMTを追加で作る（追加:nanase-shigeta）~~ → **FMT-17〜22 を同セクションに追加（2026-11-12）** | 2026-11-12 ユーザー依頼 |
-| 10 | 〔担当:nanase-shigeta〕インスタ投稿FMT（ヨコワカ）の文言を、ヨコワカ公式ページ（next-gen.city.yokohama.lg.jp/yokowaka）で使われている文言だけに差し替える（追加:nanase-shigeta） | 2026-11-16 ユーザー依頼 |
+| 10 | ~~〔担当:nanase-shigeta〕インスタ投稿FMT（ヨコワカ）の文言を、ヨコワカ公式ページ（next-gen.city.yokohama.lg.jp/yokowaka）で使われている文言だけに差し替える（追加:nanase-shigeta）~~ → **16型の文言をサイトの文に差し替え（お知らせ定型文は残す）（2026-11-16）** | 2026-11-16 ユーザー依頼 |
