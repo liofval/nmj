@@ -59,7 +59,7 @@
     <!-- 3. 今週末／注目／ジャンル特集 -->
     <section class="tz-row tz-row--3" aria-label="今週の読み口">
       <div class="tz-watch">
-        <h2 class="tz-title"><span class="tz-title__en">This Weekend</span></h2>
+        <h2 class="tz-title"><span class="tz-title__en" data-weekend-title>This Weekend</span></h2>
         <div class="tz-watch__media" data-weekend-media></div>
         <ul class="tz-list" data-weekend-list></ul>
       </div>
@@ -85,7 +85,7 @@
       </div>
       <aside class="tz-side">
         <div class="tz-now">
-          <span class="tz-oval tz-oval--line" data-now-count>受付中</span>
+          <a class="tz-oval tz-oval--line" href="events.html" data-now-count>受付中</a>
           <strong>いま申し込めるイベント</strong>
           <small>当日まで受付・残りわずかも</small>
         </div>
@@ -162,8 +162,11 @@ NMT.ready(function (db, ui) {
 
   // 3a. 今週末（写真1枚＋日付と題名のリスト）
   var wr = db.weekendRange(), weekend = db.searchEvents({ from: wr.from, to: wr.to });
-  var wlist = (weekend.length ? weekend : upcoming).slice(0, 5);
-  if (wlist[0]) $('[data-weekend-media]').innerHTML = '<img src="' + ui.esc(wlist[0].coverUrl) + '" alt=""><a class="tz-oval" href="events.html?when=weekend">今週末なにいく？</a>';
+  // 今週末が0件なら、見出しとボタンを「近日開催」に切り替えて直近のイベントを出す（今週末と偽らない）
+  var isWeekend = weekend.length > 0, wlist = (isWeekend ? weekend : upcoming).slice(0, 5);
+  if (!isWeekend) $('[data-weekend-title]').textContent = 'Coming Up';
+  if (wlist[0]) $('[data-weekend-media]').innerHTML = '<img src="' + ui.esc(wlist[0].coverUrl) + '" alt="">' +
+    (isWeekend ? '<a class="tz-oval" href="events.html?when=weekend">今週末なにいく？</a>' : '<a class="tz-oval" href="events.html">近日開催を見る</a>');
   $('[data-weekend-list]').innerHTML = wlist.map(function (e) {
     return '<li><a href="' + ui.url('event', { id: e.id }) + '"><time>' + dot(e.startAt) + '</time><span>' + ui.esc(e.title) + '</span></a></li>';
   }).join('');
