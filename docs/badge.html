@@ -38,6 +38,9 @@ html,body{margin:0;height:100%;background:#fff;color:var(--black);font:14px/1.7 
 body.is-flat #flat{display:flex}
 body.is-flat #stage{display:none}
 @media (max-width:720px){.namefield{right:16px;top:16px;width:36vw}#flat{padding-top:110px}#flat canvas{width:min(46vw,200px)}#bgName{display:none}}
+/* ?copy= で背景の大きな文字をキャッチコピーに差し替える（日本語は Noto Sans JP の太字・句読点で折り返す） */
+body.has-copy #bgName{font:900 9vw/1.1 "Noto Sans JP",sans-serif;letter-spacing:-.04em;color:var(--copy,var(--black))}
+@media (max-width:720px){body.has-copy #bgName{display:block;width:92vw;white-space:normal;word-break:keep-all;font-size:12vw;bottom:3vh}}
 </style>
 <script type="importmap">
 {"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}
@@ -57,6 +60,10 @@ body.is-flat #stage{display:none}
 let THREE = null;   // three.js は 3D を表示するときだけ読み込む（取得に失敗しても平面表示は動く）
 
 const FALLBACK = 'NEXT MOVER';
+const COPY = (new URLSearchParams(location.search).get('copy') || '').trim().slice(0, 40);
+if (COPY) document.body.classList.add('has-copy');
+const COPY_COLOR = new URLSearchParams(location.search).get('copycolor');
+if (COPY_COLOR && /^[0-9a-f]{6}$/i.test(COPY_COLOR)) document.body.style.setProperty('--copy', '#' + COPY_COLOR);
 const NAME_RE = /^[A-Za-z][A-Za-z .'-]{0,19}$/;
 const CW = 1024, CH = 1396;            // 名札テクスチャの大きさ（カード 2.2:3.0 と同じ比率）
 
@@ -294,8 +301,9 @@ function render() {
   hint.textContent = state === 'ok' ? '' : state === 'empty'
     ? `未入力のため ${FALLBACK} と表示しています`
     : `半角英字（ローマ字）で20文字以内にしてください。今は ${FALLBACK} と表示しています`;
-  // 背景の大きな文字は名前に関係なく NEXT MOVER で固定
-  if (bgName.textContent !== FALLBACK) bgName.textContent = FALLBACK;
+  // 背景の大きな文字は名前に関係なく NEXT MOVER で固定（?copy= があればそのコピー）
+  const bgText = COPY || FALLBACK;
+  if (bgName.textContent !== bgText) bgName.textContent = bgText;
   fitBg();
   const flat = wantFlat();
   if (!flat && three === null) {
