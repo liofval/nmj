@@ -18,4 +18,4 @@
 | 14 | ~~〔担当:nanase-shigeta〕インスタ投稿FMT 修正版の使用用途などの説明をスライドにまとめる（追加:nanase-shigeta）（ユーザー待ち: slide-create 起動の確認）~~ → **スライドスキルは使わず、Figma セクション「ヨコワカ｜Instagram投稿FMT 説明スライド 2026-11-17」に16:9で22枚作成（2026-11-17）** | 2026-11-17 ユーザー依頼 |
 | 15 | ~~〔担当:nanase-shigeta〕インスタ投稿FMT 説明スライド（Figma・22枚）を PDF で書き出し、書き出しフォルダに入れる（追加:nanase-shigeta）~~ → **`ヨコワカ_Instagram投稿FMT_説明スライド_20261117.pdf`（22ページ・画像PDF）を書き出しフォルダに追加（2026-11-17）** | 2026-11-17 ユーザー依頼 |
 | 16 | 〔担当:nanase-shigeta〕Figma のインスタ投稿FMT（フィード投稿・修正版19型）を Canva（https://canva.link/qvjlxl2bu5lofpd）上に起こす（追加:nanase-shigeta）（ユーザー待ち: Canva の Figma import で `.canva-tmp/ヨコワカ_Instagram投稿FMT_19型.canv` を取り込む操作） | 2026-11-17 ユーザー依頼 |
-| 17 | 〔担当:nanase-shigeta〕Tarzan Web（https://tarzanweb.jp/）を参考にサイトのデザインを作り直す。セカンドビュー以降・Figma・カラーはオレンジ（追加:nanase-shigeta）（ユーザー待ち: 対象サイトと作る場所の確認） | 2026-11-17 ユーザー依頼 |
+| 17 | ~~〔担当:nanase-shigeta〕Tarzan Web（https://tarzanweb.jp/）を参考にチケットサイトのトップのデザインを作り直す。セカンドビュー以降・カラーはオレンジ、FV のコピーは「すべての人に〜」（Figma の予定を「一旦ローカルで」に変更）（追加:nanase-shigeta）~~ → **ローカルの別案 `docs/ticket/top-tarzan.html` を作成（2026-11-17・FVコピーは仮「すべての人に、次の一歩を。」・push と Figma 化は未）** | 2026-11-17 ユーザー依頼 |
