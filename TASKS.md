@@ -17,4 +17,4 @@
 | 13 | 〔担当:nanase-shigeta〕インスタ投稿FMT 修正版の画像を Slack の下書きに入れる（追加:nanase-shigeta）（ユーザー待ち: Slack コネクタの接続と、下書きの宛先） | 2026-11-17 ユーザー依頼 |
 | 14 | ~~〔担当:nanase-shigeta〕インスタ投稿FMT 修正版の使用用途などの説明をスライドにまとめる（追加:nanase-shigeta）（ユーザー待ち: slide-create 起動の確認）~~ → **スライドスキルは使わず、Figma セクション「ヨコワカ｜Instagram投稿FMT 説明スライド 2026-11-17」に16:9で22枚作成（2026-11-17）** | 2026-11-17 ユーザー依頼 |
 | 15 | ~~〔担当:nanase-shigeta〕インスタ投稿FMT 説明スライド（Figma・22枚）を PDF で書き出し、書き出しフォルダに入れる（追加:nanase-shigeta）~~ → **`ヨコワカ_Instagram投稿FMT_説明スライド_20261117.pdf`（22ページ・画像PDF）を書き出しフォルダに追加（2026-11-17）** | 2026-11-17 ユーザー依頼 |
-| 16 | 〔担当:nanase-shigeta〕Figma のインスタ投稿FMT（フィード投稿・修正版19型）を Canva（https://canva.link/qvjlxl2bu5lofpd）上に起こす（追加:nanase-shigeta）（ユーザー待ち: Figma で FMT-03 の書き出し用フレームに「CANVA Export」プラグインを実行して .canv を保存。普段の Chrome の Figma は閲覧のみでプラグインを動かせない） | 2026-11-17 ユーザー依頼 |
+| 16 | 〔担当:nanase-shigeta〕Figma のインスタ投稿FMT（フィード投稿・修正版19型）を Canva（https://canva.link/qvjlxl2bu5lofpd）上に起こす（追加:nanase-shigeta）（ユーザー待ち: Canva の Figma import で `.canva-tmp/ヨコワカ_Instagram投稿FMT_19型.canv` を取り込む操作） | 2026-11-17 ユーザー依頼 |
