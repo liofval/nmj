@@ -19,4 +19,4 @@
 | 15 | ~~〔担当:nanase-shigeta〕インスタ投稿FMT 説明スライド（Figma・22枚）を PDF で書き出し、書き出しフォルダに入れる（追加:nanase-shigeta）~~ → **`ヨコワカ_Instagram投稿FMT_説明スライド_20261117.pdf`（22ページ・画像PDF）を書き出しフォルダに追加（2026-11-17）** | 2026-11-17 ユーザー依頼 |
 | 16 | 〔担当:nanase-shigeta〕Figma のインスタ投稿FMT（フィード投稿・修正版19型）を Canva（https://canva.link/qvjlxl2bu5lofpd）上に起こす（追加:nanase-shigeta）（ユーザー待ち: Canva の Figma import で `.canva-tmp/ヨコワカ_Instagram投稿FMT_19型.canv` を取り込む操作） | 2026-11-17 ユーザー依頼 |
 | 17 | ~~〔担当:nanase-shigeta〕Tarzan Web（https://tarzanweb.jp/）を参考にチケットサイトのトップのデザインを作り直す。セカンドビュー以降・カラーはオレンジ、FV のコピーは「すべての人に〜」（Figma の予定を「一旦ローカルで」に変更）（追加:nanase-shigeta）~~ → **ローカルの別案 `docs/ticket/top-tarzan.html` を作成（2026-11-17・FVコピーは仮「すべての人に、次の一歩を。」・push と Figma 化は未）** | 2026-11-17 ユーザー依頼 |
-| 18 | 〔担当:nanase-shigeta〕ローカルの Tarzan 風トップ（`docs/ticket/top-tarzan.html`）のデザインを Figma に起こす（追加:nanase-shigeta） | 2026-11-18 ユーザー依頼 |
+| 18 | ~~〔担当:nanase-shigeta〕ローカルの Tarzan 風トップ（`docs/ticket/top-tarzan.html`）のデザインを Figma に起こす（追加:nanase-shigeta）~~ → **Figma「NMJ Ticket｜PC」Page 1 に「01 Top — Tarzan風（オレンジ）」（node 2688:25288・PC 1440幅）として取り込み（2026-11-18）** | 2026-11-18 ユーザー依頼 |
