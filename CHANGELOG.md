@@ -2,6 +2,11 @@
 
 このプロジェクトの主な変更を記録します（[Keep a Changelog](https://keepachangelog.com/ja/1.1.0/) 準拠）。
 
+## [2026-11-19 2]
+
+### Removed
+- トップページの別案 `docs/ticket/top-tarzan.html` を公開から外した。チケットサイトのトップは `docs/ticket/index.html`（名札のファーストビューのデザイン）が正。
+
 ## [2026-11-19]
 
 ### Added
