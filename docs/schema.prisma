@@ -1,8 +1,13 @@
 // ============================================================
-// NEXT MOVE JAPAN 学生イベント基盤 — Prisma schema（ドラフト）
-// 要件定義 v0.4 §5 ＋ プロトタイプ画面から追加で必要になったもの
-// 2026-10-08 定例の決定を反映（支払い待ち・補欠の廃止、枠の種類、QR チケットと受付状態、保存、権限 admin/owner/user ほか）
-// DB: PostgreSQL
+// NEXT MOVE JAPAN 学生イベント基盤 — Prisma schema（ドラフト v0.5）
+// 設計の理由・公開範囲・状態遷移・未決事項は docs/db-design.md
+//
+// v0.5（2026-11-27）: v0.4（10/8 定例）に次を反映
+//   - 10/22 確定「1アカウント・1イベント・本人分1枚・価格枠は1つ」→ 申込と QR チケットを1行に統合
+//   - スケジュール記載の決済構成（Stripe Checkout ＋ Connect Standard、返金は運営が Stripe 管理画面で行う）
+//   - Webhook の受信記録・通知の再送・監査ログ・販売停止スイッチ（docs/backend-planning.md のセキュリティ方針）
+//   - チケットプロトタイプ（docs/ticket/, 11/12）で使っている列（ジャンルの英字名・色）
+// DB: PostgreSQL（Cloudflare Workers から Hyperdrive 経由）
 // ※ Prisma で書けない制約（CHECK・部分一意インデックス）は末尾の SQL をマイグレーションに追記する
 // ============================================================
 
@@ -27,7 +32,7 @@ enum UserRole {
   ADMIN
 }
 
-// 団体の権限は owner のみ（複数可）。将来ロールを増やす余地として enum のまま残す
+// 団体の権限は owner のみ（複数可）。受付専用の担当などを足す余地として enum のまま残す
 enum MemberRole {
   OWNER
 }
@@ -54,17 +59,23 @@ enum AttendeeListVisibility {
   PUBLIC_NICKNAME // 参加者のあだ名を公開
 }
 
-// 支払い待ち・補欠は持たない。有料枠は決済完了の Webhook で初めて CONFIRMED の行を作る
+// 支払い待ち・補欠は持たない。有料枠は決済完了で初めて CONFIRMED の行を作る
 enum RegistrationStatus {
-  CONFIRMED // 参加予定
-  CANCELLED
+  CONFIRMED // 参加予定（QR が有効）
+  CANCELLED // 本人のキャンセル・イベント中止・返金で無効
+}
+
+enum CancelReason {
+  USER // 本人がキャンセル（有料でも返金しない）
+  EVENT_CANCELLED // 主催者がイベントを中止（返金する）
+  REFUNDED // 運営が個別に返金した
 }
 
 // 参加枠の種類（絞り込みに使う）
 enum SlotKind {
   STUDENT // 学生
   ADULT // 大人
-  PARTY // 懇親会
+  PARTY // 懇親会（「本編＋懇親会」のセット枠もここ）
   OTHER
 }
 
@@ -89,16 +100,29 @@ enum QuestionType {
 }
 
 enum PaymentProvider {
-  MOCK
+  MOCK // 開発・検証用（12/24 の疑似決済）
   STRIPE
 }
 
 enum PaymentStatus {
-  PENDING // 決済画面にいる間。holdExpiresAt まで席を確保する
+  PENDING // 席を確保中。providerRef が NULL の間は Checkout をまだ作っていない
   PAID
-  FAILED
-  EXPIRED // 確保の期限切れ（席を解放）
-  REFUNDED
+  FAILED // 決済が成立しないことが確定（モック・遅延決済の失敗）。席を解放
+  EXPIRED // 確保の期限切れ・本人が取りやめ（席を解放）
+  REFUNDED // 全額返金済み（部分返金は扱わない）
+}
+
+enum RefundReason {
+  EVENT_CANCELLED // 中止に伴う返金
+  OVER_CAPACITY // 席の解放後に支払いが確定し、定員を超えたための自動返金
+  MANUAL // 運営が Stripe 管理画面で返金（Webhook で反映）
+}
+
+enum WebhookEventStatus {
+  RECEIVED // 署名検証して保存した
+  PROCESSED
+  IGNORED // 対象外の種類・既に反映済み
+  FAILED // 再試行の上限に達した（運営が確認）
 }
 
 enum AnnouncementAudience {
@@ -118,6 +142,12 @@ enum ReportReason {
   OTHER
 }
 
+enum ReportStatus {
+  OPEN
+  RESOLVED
+  DISMISSED
+}
+
 enum ArticleStatus {
   DRAFT
   IN_REVIEW // 主催者投稿は運営の審査待ち
@@ -127,6 +157,7 @@ enum ArticleStatus {
 
 enum NotificationType {
   REGISTRATION_CONFIRMED // 申込完了（QR チケットを載せる）
+  PAYMENT_REFUNDED // 返金（中止・定員超過・運営対応）
   EVENT_CANCELLED // 中止
   NEW_EVENT_FROM_FOLLOWING // フォロー先の新規公開
   ANNOUNCEMENT // 主催者からの告知
@@ -137,39 +168,33 @@ enum NotificationType {
 }
 
 enum EmailCategory {
-  EVENT_UPDATES // 申込・QR チケット・中止（取引メール）
+  EVENT_UPDATES // 申込・QR チケット・中止・返金（取引メール。停止不可）
   FOLLOW_NEWS // フォロー先の新規公開
   ANNOUNCEMENTS // 主催者からのお知らせ（参加予定の人・保存した人）
 }
 
 enum NotificationStatus {
-  QUEUED
+  QUEUED // 送信待ち（Outbox。Queue への投入に失敗しても Cron が拾い直す）
   SENT
-  FAILED
-  SUPPRESSED // 配信停止により送らなかった
+  FAILED // 再試行の上限に達した
+  SUPPRESSED // 配信停止により送らなかった（サイト内のお知らせには出す）
 }
 
-enum ReportStatus {
-  OPEN
-  RESOLVED
-  DISMISSED
+// 緊急時に個別に止める操作（新規販売を止めても Webhook と照合は止めない）
+enum OperationSwitchKey {
+  REGISTRATION // 新規の申込（無料・有料とも）
+  CHECKOUT // 決済の開始
+  ANSWER_EXPORT // CSV 出力
 }
 
 // ---------- マスタ ----------
-// 10/8 で大学の絞り込みはなくした。Event.targetUniversityId を残すかは未決
-model University {
-  id          String  @id @default(cuid())
-  name        String
-  slug        String  @unique
-  emailDomain String? // 将来の自動判定用に持つだけ
-  events      Event[]
-}
-
 // ジャンル（絞り込み用。運営が管理）
 model Genre {
   id        String  @id @default(cuid())
-  name      String
+  name      String // 音楽・ライブ
+  nameEn    String // MUSIC（カードの英字ラベル）
   slug      String  @unique
+  color     String // ジャンルカードの色トークン名（coral / mint / lavender / pink / gray / white）
   sortOrder Int     @default(0)
   events    Event[]
 }
@@ -177,20 +202,21 @@ model Genre {
 // ---------- アカウント ----------
 // 認証と通知のための最小限。表示に関わる情報は Organizer（type=USER）が持つ。本名・大学は持たない
 model User {
-  id        String   @id @default(cuid())
-  googleSub String   @unique
-  email     String   @unique
-  role      UserRole @default(USER) // ADMIN = NMJ 運営（記事の審査・通報の対応・団体の統合と削除）
+  id        String    @id @default(cuid())
+  googleSub String    @unique // Google の sub。メールアドレスは変わりうるのでこちらで本人を特定
+  email     String    @unique // 通知の宛先。非公開
+  role      UserRole  @default(USER) // ADMIN = NMJ 運営（記事の審査・通報の対応・団体の統合と削除）
   // 名札（イベントパス）に表示する名前。半角英字・スペース・. - ' で20文字まで。未設定・ルール外は NEXT MOVER を表示（アプリ側の固定値）
-  badgeName String?  @db.VarChar(20)
-  createdAt DateTime @default(now())
+  badgeName String?   @db.VarChar(20)
+  createdAt DateTime  @default(now())
+  deletedAt DateTime? // 退会。決済・申込の記録を残すため行は消さず、email・googleSub を匿名値に置き換える
 
+  sessions            Session[]
   organizer           Organizer?         @relation("PersonalOrganizer")
   memberships         OrganizerMember[]
   follows             Follow[]
   savedEvents         SavedEvent[]
   registrations       Registration[]
-  tickets             Ticket[]
   payments            Payment[]
   checkinLogs         CheckinLog[]
   joinRequests        GroupJoinRequest[]
@@ -204,13 +230,28 @@ model User {
   articlesReviewed    MediaArticle[]     @relation("ArticleReviewer")
   notifications       NotificationLog[]
   emailPreferences    EmailPreference[]
-
-  // Auth.js（Prisma アダプタ）
-  accounts Account[]
-  sessions Session[]
+  auditLogs           AuditLog[]
+  switchesChanged     OperationSwitch[]
 }
 
-// 主催者アカウント（団体・個人を1つに閉じ込める）。/@slug の実体
+// サーバー側のセッション（Google ログイン）。Cookie には生のトークン、DB にはハッシュだけを置く
+// 認証ライブラリは段階0で決める。採用したライブラリの必須テーブルがあれば合わせて置き換える
+model Session {
+  id         String    @id @default(cuid())
+  tokenHash  String    @unique
+  userId     String
+  expiresAt  DateTime
+  createdAt  DateTime  @default(now())
+  lastSeenAt DateTime  @default(now())
+  revokedAt  DateTime? // ログアウト・権限変更・退会で失効
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+// 主催者アカウント（団体・個人を1つに閉じ込める）。/@slug の実体で、個人の公開プロフィールも兼ねる
 model Organizer {
   id          String        @id @default(cuid())
   type        OrganizerType
@@ -218,25 +259,26 @@ model Organizer {
   slug        String        @unique // ユーザーネーム。予約語はアプリ側で拒否
   displayName String // あだ名（重複可・日本語可）
   iconUrl     String?
-  bio         String? // 団体のみ UI で使う
+  bio         String?
   coverUrl    String? // 団体のみ UI で使う
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
+  deletedAt   DateTime? // 団体の削除（NMJ 運営が行う）・退会。公開ページと検索から外す
 
   user             User?                   @relation("PersonalOrganizer", fields: [userId], references: [id])
   members          OrganizerMember[]
   socialLinks      SocialLink[]
   followers        Follow[]
   events           Event[]
-  payoutAccounts   PayoutAccount[]
+  payoutAccount    PayoutAccount?
   invitations      Invitation[]
   joinRequests     GroupJoinRequest[]
   articleLinks     MediaArticleOrganizer[]
   articlesAuthored MediaArticle[]          @relation("ArticleAuthorOrganizer")
+  reports          Report[]
 }
 
 // 運営メンバー（type=GROUP の Organizer にのみ作成。owner は複数可。最後の owner は離脱不可 → アプリのトランザクションで検証）
-// 団体の作成に申請はない。削除・引き継ぎの扱いは未決（削除は NMJ 運営が行う想定）
 model OrganizerMember {
   organizerId String
   userId      String
@@ -251,12 +293,12 @@ model OrganizerMember {
   @@index([userId])
 }
 
-// 招待リンク（メンバー招待モーダル）
+// 招待リンク（メンバー招待モーダル）。リンクの生トークンは DB に置かない
 model Invitation {
   id           String     @id @default(cuid())
   organizerId  String
   role         MemberRole @default(OWNER)
-  token        String     @unique
+  tokenHash    String     @unique
   expiresAt    DateTime
   createdById  String
   acceptedById String?
@@ -286,6 +328,7 @@ model GroupJoinRequest {
   user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   decidedBy User?     @relation("JoinRequestDecidedBy", fields: [decidedById], references: [id])
 
+  // 同じ人の未処理の依頼は団体ごとに1件 → 末尾 SQL
   @@index([organizerId, status])
 }
 
@@ -315,14 +358,32 @@ model Follow {
   @@index([organizerId])
 }
 
+// ---------- 入金先（Stripe Connect Standard） ----------
+// 主催者ごとに1つ。状態は account.updated の Webhook で更新する。有料枠の公開・決済開始は chargesEnabled のときだけ
+// 口座情報・本人確認書類は Stripe 側にだけあり、ここには持たない
+model PayoutAccount {
+  id                String    @id @default(cuid())
+  organizerId       String    @unique
+  stripeAccountId   String    @unique // acct_...
+  chargesEnabled    Boolean   @default(false)
+  payoutsEnabled    Boolean   @default(false)
+  detailsSubmitted  Boolean   @default(false)
+  requirementsDueAt DateTime? // 追加の確認の期限（Stripe の current_deadline）
+  disabledReason    String? // Stripe の requirements.disabled_reason
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  organizer Organizer @relation(fields: [organizerId], references: [id])
+}
+
 // ---------- イベント ----------
+// 開催回ごとに1行（同じ企画の別日も別イベント）
 model Event {
   id                     String                 @id @default(cuid())
-  organizerId            String // 移管はこの付け替えだけ
-  targetUniversityId     String? // NULL = 大学を問わない（画面からは外した。残すか未決）
+  organizerId            String // 移管はこの付け替えだけ（支払い済みがあるイベントは移管不可。アプリで検証）
   genreId                String
   area                   String // 都道府県名。オンラインのみは "online"（絞り込み用）
-  capacity               Int? // イベント全体の参加者上限。NULL = 枠の定員だけ
+  capacity               Int? // イベント全体の参加者上限（枠をまたいで共有）。NULL = 枠の定員だけ
   title                  String
   body                   String // Markdown
   startAt                DateTime
@@ -335,27 +396,26 @@ model Event {
   publishedAt            DateTime?
   cancelledAt            DateTime?
   cancelReason           String? // 中止時の参加者への説明
-  coverUrl               String?
-  payoutAccountId        String? // この回の入金先（MVP は未使用）
+  coverUrl               String? // R2 のキー or URL
   attendeeListVisibility AttendeeListVisibility @default(ORGANIZER_ONLY)
   answerRetentionDays    Int                    @default(30) // 30 / 90 / 365（CHECK は末尾 SQL）
+  answersPurgedAt        DateTime? // 回答と決済中の回答下書きを削除した日時（Cron の済み印）
   dataUsePurpose         String? // 個人情報の質問があれば公開時に必須（アプリで検証）
   createdAt              DateTime               @default(now())
   updatedAt              DateTime               @updatedAt
 
-  organizer        Organizer              @relation(fields: [organizerId], references: [id])
-  targetUniversity University?            @relation(fields: [targetUniversityId], references: [id])
-  genre            Genre                  @relation(fields: [genreId], references: [id])
-  payoutAccount    PayoutAccount?         @relation(fields: [payoutAccountId], references: [id])
-  slots            Slot[]
-  questions        RegistrationQuestion[]
-  announcements    Announcement[]
-  savedBy          SavedEvent[]
-  tickets          Ticket[]
-  payments         Payment[]
-  exportLogs       AnswerExportLog[]
-  articleLinks     MediaArticleEvent[]
-  notifications    NotificationLog[]
+  organizer     Organizer              @relation(fields: [organizerId], references: [id])
+  genre         Genre                  @relation(fields: [genreId], references: [id])
+  slots         Slot[]
+  questions     RegistrationQuestion[]
+  registrations Registration[]
+  payments      Payment[]
+  announcements Announcement[]
+  savedBy       SavedEvent[]
+  exportLogs    AnswerExportLog[]
+  articleLinks  MediaArticleEvent[]
+  notifications NotificationLog[]
+  reports       Report[]
 
   @@index([status, startAt])
   @@index([genreId, startAt])
@@ -364,91 +424,80 @@ model Event {
   @@index([endAt]) // 回答の自動削除 Cron
 }
 
-// 参加枠。種類・定員・価格は枠の属性
+// 価格枠。種類・定員・価格・受付期間は枠の属性。参加者は1イベントにつき1枠だけ選ぶ
+// 「本編のみ」「本編＋懇親会」はそれぞれ別の枠にし、本編の共通定員は Event.capacity で持つ
+// 申込・決済がある枠は削除と価格変更を禁止（アプリで検証）。定員は申込数より下げられない
 model Slot {
   id          String    @id @default(cuid())
   eventId     String
   kind        SlotKind
   name        String
-  description String?
+  description String? // 対象条件などの補足（例：学生証の提示が必要）。60字まで
   capacity    Int
   priceYen    Int       @default(0) // 0 = 無料枠
   opensAt     DateTime?
   closesAt    DateTime?
   sortOrder   Int       @default(0)
 
-  event         Event          @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  event         Event                      @relation(fields: [eventId], references: [id], onDelete: Cascade)
   registrations Registration[]
+  payments      Payment[]
+  questionLinks RegistrationQuestionSlot[]
 
+  @@unique([id, eventId]) // Registration・Payment の複合外部キー（枠が同じイベントのものであることを DB で保証）
   @@index([eventId, kind])
 }
 
-// 申込（枠ごと）。行があるのは参加予定かキャンセルだけ
-// ticketId の Ticket は同じ userId・eventId のものに限る（アプリで検証）
-// 定員判定は Slot 行（と全体上限があれば Event 行）を SELECT ... FOR UPDATE してから、CONFIRMED と確保中の Payment を数える（registerToSlot に集約）
+// 申込＝QR チケット（1人1イベント1枚・1枠）。受付の状態もここで持つ
+// 有効（CONFIRMED）なのは同じ人・同じイベントで1行だけ（末尾 SQL）。キャンセル後の再申込は新しい行・新しい QR になる
+// 定員判定: Event → Slot の順に SELECT ... FOR UPDATE し、CONFIRMED の行と PENDING の Payment を数える（無料・有料・確定で共通）
 model Registration {
-  id          String             @id @default(cuid())
-  slotId      String
-  userId      String
-  ticketId    String
-  paymentId   String? // 有料枠のときの決済
-  status      RegistrationStatus @default(CONFIRMED)
-  appliedAt   DateTime           @default(now())
-  cancelledAt DateTime?
-  note        String?
+  id            String             @id @default(cuid())
+  eventId       String
+  slotId        String
+  userId        String
+  paymentId     String?            @unique // 有料枠のときの決済（1決済 = 1申込）
+  priceYen      Int // 申込時の価格（枠の価格が後で変わっても参加者リスト・CSV の表示を変えない）
+  status        RegistrationStatus @default(CONFIRMED)
+  qrToken       String             @unique // QR に載せる推測できない値（ログに出さない）
+  checkinStatus CheckinStatus      @default(NOT_CHECKED_IN)
+  checkedInAt   DateTime?
+  walletPassUrl String? // Apple / Google Wallet（検討中）
+  appliedAt     DateTime           @default(now())
+  cancelledAt   DateTime?
+  cancelReason  CancelReason?
 
-  slot          Slot                 @relation(fields: [slotId], references: [id])
+  event         Event                @relation(fields: [eventId], references: [id])
+  slot          Slot                 @relation(fields: [slotId, eventId], references: [id, eventId])
   user          User                 @relation(fields: [userId], references: [id])
-  ticket        Ticket               @relation(fields: [ticketId], references: [id])
   payment       Payment?             @relation(fields: [paymentId], references: [id])
   answers       RegistrationAnswer[]
+  checkinLogs   CheckinLog[]
   notifications NotificationLog[]
 
-  // 同一枠に有効な申込は1件 → 部分一意インデックスを末尾 SQL で作成
+  @@index([eventId, status])
   @@index([slotId, status])
   @@index([userId, status])
-  @@index([ticketId])
-}
-
-// QR チケット（1人1イベント1枚。複数枠でも1枚）。受付の状態もここで持つ
-model Ticket {
-  id            String        @id @default(cuid())
-  eventId       String
-  userId        String
-  token         String        @unique // QR に載せる推測できない値
-  checkinStatus CheckinStatus @default(NOT_CHECKED_IN)
-  checkedInAt   DateTime?
-  issuedAt      DateTime      @default(now())
-  revokedAt     DateTime? // 全枠キャンセルで無効化
-  walletPassUrl String? // Apple / Google Wallet（検討中）
-
-  event         Event          @relation(fields: [eventId], references: [id])
-  user          User           @relation(fields: [userId], references: [id])
-  registrations Registration[]
-  checkinLogs   CheckinLog[]
-
-  @@unique([eventId, userId])
-  @@index([eventId, checkinStatus])
 }
 
 // 受付の状態を変えた記録（誰が・いつ・QR かリストか）
 model CheckinLog {
-  id          String        @id @default(cuid())
-  ticketId    String
-  fromStatus  CheckinStatus
-  toStatus    CheckinStatus
-  method      CheckinMethod
-  changedById String
-  changedAt   DateTime      @default(now())
+  id             String        @id @default(cuid())
+  registrationId String
+  fromStatus     CheckinStatus
+  toStatus       CheckinStatus
+  method         CheckinMethod
+  changedById    String
+  changedAt      DateTime      @default(now())
 
-  ticket    Ticket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
-  changedBy User   @relation(fields: [changedById], references: [id])
+  registration Registration @relation(fields: [registrationId], references: [id], onDelete: Cascade)
+  changedBy    User         @relation(fields: [changedById], references: [id])
 
-  @@index([ticketId, changedAt])
+  @@index([registrationId, changedAt])
 }
 
 // 申込時の質問。公開後は削除・type 変更禁止（アプリで検証）
-// commonKey がある行は全イベント共通の質問（作成時に自動で入り、削除・変更不可）。中身は未決（仮：NAME / KANA / AFFILIATION）
+// commonKey がある行は全イベント共通の質問（作成時に自動で入り、削除・変更不可。仮：NAME / KANA / AFFILIATION）
 model RegistrationQuestion {
   id             String       @id @default(cuid())
   eventId        String
@@ -456,23 +505,35 @@ model RegistrationQuestion {
   label          String
   helpText       String?
   type           QuestionType
-  options        Json? // SELECT 系のみ
+  options        Json? // SELECT 系のみ。文字列の配列
   required       Boolean      @default(false)
   isPersonalData Boolean      @default(false)
-  slotIds        String[] // 空 = 全枠。「懇親会枠のみ」などの対象枠
   sortOrder      Int          @default(0)
 
-  event   Event                @relation(fields: [eventId], references: [id], onDelete: Cascade)
-  answers RegistrationAnswer[]
+  event     Event                      @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  slotLinks RegistrationQuestionSlot[] // 行が無い = 全枠に聞く。「懇親会つきの枠だけ」などの対象枠
+  answers   RegistrationAnswer[]
 
   @@index([eventId, sortOrder])
 }
 
-// 本名・連絡先はここにだけ存在し、保持期間後に削除される。閲覧は主催者と本人のみ
+// 質問の対象枠（v0.4 の slotIds 配列を外部キーつきの表にした）
+model RegistrationQuestionSlot {
+  questionId String
+  slotId     String
+
+  question RegistrationQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  slot     Slot                 @relation(fields: [slotId], references: [id], onDelete: Cascade)
+
+  @@id([questionId, slotId])
+  @@index([slotId])
+}
+
+// 本名・連絡先はここにだけ存在し、保持期間後に削除される。閲覧は主催者と本人のみ（一般公開しない）
 model RegistrationAnswer {
   registrationId String
   questionId     String
-  value          String
+  value          String // MULTI_SELECT は JSON 配列の文字列
   updatedAt      DateTime @updatedAt
 
   registration Registration         @relation(fields: [registrationId], references: [id], onDelete: Cascade)
@@ -481,14 +542,14 @@ model RegistrationAnswer {
   @@id([registrationId, questionId])
 }
 
-// CSV 出力の記録（誰がいつ出力したか。§8）
+// CSV 出力の記録（誰がいつ出力したか）
 model AnswerExportLog {
-  id              String   @id @default(cuid())
-  eventId         String
-  userId          String
-  includeAnswers  Boolean
-  includeWaitlist Boolean  @default(false)
-  exportedAt      DateTime @default(now())
+  id             String   @id @default(cuid())
+  eventId        String
+  userId         String
+  includeAnswers Boolean
+  rowCount       Int
+  exportedAt     DateTime @default(now())
 
   event Event @relation(fields: [eventId], references: [id])
   user  User  @relation(fields: [userId], references: [id])
@@ -497,55 +558,72 @@ model AnswerExportLog {
 }
 
 // ---------- 決済 ----------
-// 決済画面に進んだ時点で作る。PENDING の間（holdExpiresAt まで）は選んだ枠の席を確保し、
-// PAID の Webhook で Registration（CONFIRMED）と Ticket を作る。FAILED / EXPIRED なら何も作らず席を解放する
-// 期限切れの解放は、先に決済事業者側のセッションを失効させてから行う（Stripe なら checkout.sessions.expire）。
-//   失効がエラーになったときは、セッションを取得して支払い状況を確認する。支払い済み（payment_status=paid）のときだけ PAID として確定し、
-//   既に失効済み・未払いなら EXPIRED にする。解放後に支払い済みの通知が届き定員を超える場合は自動返金して本人に知らせる
-// 同じ人・同じイベントで PENDING は1件だけ（末尾 SQL の部分一意インデックス）。決済をやり直すときは前の Payment を失効させてから作る
+// 申込の最終確認で作り、そのトランザクションで席を確保する（PENDING・providerRef は NULL）。
+// コミット後に Stripe Checkout を作り（冪等キー = Payment.id）、session id を providerRef に保存する。
+// checkout.session.completed（payment_status=paid）の処理で Registration（CONFIRMED）を作る。
+// 期限切れの解放は、先に checkout.sessions.expire を呼んでから。失効がエラーなら session を取得し、支払い済みなら PAID として確定、
+//   未払い・失効済みなら EXPIRED にする。解放後に支払いが届いて定員を超える場合は自動返金（refundReason=OVER_CAPACITY）。
+// 同じ人・同じイベントで PENDING は1件だけ（末尾 SQL）。別のタブからの申込はこの行の手続きへ案内する
+// Connect Standard の direct charge。返金は接続アカウント側で行うので connectedAccountId を決済ごとに残す
 model Payment {
-  id            String          @id @default(cuid())
-  userId        String
-  eventId       String
-  slotIds       String[] // 申し込む枠（無料枠も含めて一緒に確定する）
-  answersDraft  Json? // 確定までの回答。確定時に RegistrationAnswer へ移す。失敗時は再試行の Payment へ引き継ぎ、EXPIRED になったら消す
-  provider      PaymentProvider
-  providerRef   String          @unique // Webhook の冪等性
-  amountYen     Int
-  status        PaymentStatus   @default(PENDING)
-  holdExpiresAt DateTime // 席の確保期限（Stripe Checkout の有効期限と合わせる）
-  failureReason String?
-  paidAt        DateTime?
-  refundedAt    DateTime?
-  createdAt     DateTime        @default(now())
+  id                 String          @id @default(cuid())
+  userId             String
+  eventId            String
+  slotId             String
+  answersDraft       Json? // 確定までの回答（個人情報）。確定時に RegistrationAnswer へ移し、EXPIRED・FAILED・PAID で NULL にする
+  provider           PaymentProvider
+  providerRef        String?         @unique // Checkout Session ID（cs_...）。Webhook の照合キー
+  paymentIntentId    String?         @unique // pi_...（返金の照合）
+  connectedAccountId String? // 決済時点の入金先（acct_...）。MOCK は NULL
+  amountYen          Int // サーバーが枠の価格から計算した金額（1枚分）
+  applicationFeeYen  Int             @default(0) // NMJ の運営手数料（率は 11/26 定例で決める。決済ごとに金額で残す）
+  currency           String          @default("jpy")
+  status             PaymentStatus   @default(PENDING)
+  holdExpiresAt      DateTime // 席の確保期限（Checkout の expires_at と同じ。Stripe の最短は30分）
+  failureReason      String?
+  paidAt             DateTime?
+  expiredAt          DateTime?
+  refundedAt         DateTime?
+  refundReason       RefundReason?
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
 
   user          User           @relation(fields: [userId], references: [id])
   event         Event          @relation(fields: [eventId], references: [id])
-  registrations Registration[]
+  slot          Slot           @relation(fields: [slotId, eventId], references: [id, eventId])
+  registration  Registration?
+  webhookEvents WebhookEvent[]
 
   @@index([eventId, status, holdExpiresAt]) // 定員判定と期限切れ Cron
-  @@index([userId])
+  @@index([status, holdExpiresAt])
+  @@index([userId, createdAt])
 }
 
-// 実決済フェーズで有効化（Stripe Connect Standard 想定）
-model PayoutAccount {
-  id                String          @id @default(cuid())
-  organizerId       String
-  provider          PaymentProvider
-  externalAccountId String
-  label             String
-  verifiedAt        DateTime?
+// Stripe Webhook の受信記録。署名を検証したら保存して 200 を返し、処理は Queue 側で行う（重複受信は id の一意で弾く）
+model WebhookEvent {
+  id          String             @id // Stripe の event id（evt_...）
+  provider    PaymentProvider    @default(STRIPE)
+  type        String // checkout.session.completed / checkout.session.expired / charge.refunded / account.updated など
+  accountId   String? // Connect の接続アカウントから届いたもの
+  paymentId   String? // 照合できた決済
+  payload     Json // 処理に必要な部分だけ（カード情報は Stripe から来ない）
+  status      WebhookEventStatus @default(RECEIVED)
+  attempts    Int                @default(0)
+  lastError   String?
+  receivedAt  DateTime           @default(now())
+  processedAt DateTime?
 
-  organizer Organizer @relation(fields: [organizerId], references: [id])
-  events    Event[]
+  payment Payment? @relation(fields: [paymentId], references: [id])
 
-  @@index([organizerId])
+  @@index([status, receivedAt]) // 未処理の拾い直し
+  @@index([paymentId])
 }
 
-// ---------- 告知・お気に入り・通報 ----------
+// ---------- 告知・保存・通報 ----------
 model Announcement {
   id             String                 @id @default(cuid())
   eventId        String
+  sentById       String
   subject        String
   body           String
   audiences      AnnouncementAudience[] // 参加予定の人・保存した人（両方可）
@@ -558,7 +636,7 @@ model Announcement {
   @@index([eventId, sentAt])
 }
 
-// イベントの保存（UI 名「保存」。旧「お気に入り」）。主催者は保存した人にもお知らせを送れる
+// イベントの保存（UI 名「保存」）。主催者は保存した人にもお知らせを送れる
 model SavedEvent {
   userId    String
   eventId   String
@@ -571,25 +649,29 @@ model SavedEvent {
   @@index([eventId])
 }
 
-// 通報（targetId は Event.id か Organizer.id。ポリモーフィックなので FK は張らない）
-// 理由は必須。OTHER のときは detail も必須（アプリで検証）。受け付けたら NMJ 運営へ REPORT_RECEIVED を送る。項目は検討中
+// 通報。対象は eventId か organizerId のどちらか一方（CHECK は末尾 SQL）
+// 理由は必須。OTHER のときは detail も必須（アプリで検証）。受け付けたら NMJ 運営へ REPORT_RECEIVED を送る
 model Report {
   id             String           @id @default(cuid())
   reporterUserId String
   targetType     ReportTargetType
-  targetId       String
+  eventId        String?
+  organizerId    String?
   reason         ReportReason
   detail         String?
   status         ReportStatus     @default(OPEN)
   createdAt      DateTime         @default(now())
   resolvedAt     DateTime?
   resolvedById   String? // 対応した運営
-  resolution     String?
+  resolution     String? // 対応メモ（運営だけが見る）
 
-  reporter   User  @relation(fields: [reporterUserId], references: [id])
-  resolvedBy User? @relation("ReportResolvedBy", fields: [resolvedById], references: [id])
+  reporter   User       @relation(fields: [reporterUserId], references: [id])
+  resolvedBy User?      @relation("ReportResolvedBy", fields: [resolvedById], references: [id])
+  event      Event?     @relation(fields: [eventId], references: [id])
+  organizer  Organizer? @relation(fields: [organizerId], references: [id])
 
-  @@index([targetType, targetId])
+  @@index([eventId])
+  @@index([organizerId])
   @@index([status, createdAt])
 }
 
@@ -645,20 +727,24 @@ model MediaArticleOrganizer {
   @@id([articleId, organizerId])
 }
 
-// ---------- お知らせ（サイト内のお知らせ＋メール送信ログ）と配信停止 ----------
-// サイト内のお知らせとして表示し、同じ内容をメールでも送る
+// ---------- お知らせ（サイト内のお知らせ＋メールの Outbox）と配信停止 ----------
+// サイト内のお知らせとして表示し、同じ内容をメールでも送る。業務処理と同じトランザクションで QUEUED の行を作り、
+// 送信は Queue（失敗時は Cron が nextAttemptAt を見て拾い直す）。Webhook の再送などで二重に作らないよう dedupeKey を一意にする
 model NotificationLog {
   id                String             @id @default(cuid())
+  dedupeKey         String             @unique // 例：REGISTRATION_CONFIRMED:<registrationId>、ANSWER_DELETION_NOTICE:<eventId>
   userId            String? // 宛先ユーザー（招待など未登録宛ては NULL）
   toEmail           String
   type              NotificationType
   title             String // お知らせ一覧に出す件名
   readAt            DateTime? // サイト内で既読にした日時
   status            NotificationStatus @default(QUEUED)
+  attempts          Int                @default(0)
+  nextAttemptAt     DateTime?
   eventId           String?
   registrationId    String?
   announcementId    String?
-  providerMessageId String? // Resend のメッセージ ID
+  providerMessageId String? // メール送信サービスのメッセージ ID
   error             String?
   createdAt         DateTime           @default(now())
   sentAt            DateTime?
@@ -669,7 +755,7 @@ model NotificationLog {
   announcement Announcement? @relation(fields: [announcementId], references: [id])
 
   @@index([userId, createdAt])
-  @@index([type, status])
+  @@index([status, nextAttemptAt]) // 送信待ちの拾い直し
   @@index([eventId])
 }
 
@@ -685,41 +771,39 @@ model EmailPreference {
   @@id([userId, category])
 }
 
-// ---------- Auth.js（@auth/prisma-adapter） ----------
-model Account {
-  id                String  @id @default(cuid())
-  userId            String
-  type              String
-  provider          String
-  providerAccountId String
-  refresh_token     String?
-  access_token      String?
-  expires_at        Int?
-  token_type        String?
-  scope             String?
-  id_token          String?
-  session_state     String?
+// ---------- 運用 ----------
+// 監査ログ。重要な操作の「誰が・何を・どれに・結果」。申込の回答・メール本文・トークン・Cookie は入れない
+// 例: OWNER_ADDED / OWNER_REMOVED / PAYOUT_ACCOUNT_LINKED / EVENT_PUBLISHED / EVENT_CANCELLED / EVENT_TRANSFERRED /
+//     ANSWERS_EXPORTED / REFUND_RECORDED / USER_ROLE_CHANGED / SWITCH_CHANGED / ACCESS_DENIED
+model AuditLog {
+  id          String   @id @default(cuid())
+  actorUserId String? // NULL = システム（Cron・Webhook）
+  action      String
+  targetType  String // Event / Organizer / Registration / Payment / User ...
+  targetId    String?
+  organizerId String? // 団体単位で絞り込むため
+  success     Boolean
+  reasonCode  String? // 失敗・拒否の理由コード
+  requestId   String?
+  ipHash      String? // 必要な場合だけ。保持期限つき
+  createdAt   DateTime @default(now())
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  actor User? @relation(fields: [actorUserId], references: [id])
 
-  @@unique([provider, providerAccountId])
+  @@index([organizerId, createdAt])
+  @@index([actorUserId, createdAt])
+  @@index([action, createdAt])
 }
 
-model Session {
-  id           String   @id @default(cuid())
-  sessionToken String   @unique
-  userId       String
-  expires      DateTime
+// 緊急停止のスイッチ（NMJ 運営が切り替え）。行が無い・enabled=true なら通常どおり
+model OperationSwitch {
+  key         OperationSwitchKey @id
+  enabled     Boolean            @default(true)
+  message     String? // 停止中に利用者へ出す文言
+  updatedById String?
+  updatedAt   DateTime           @updatedAt
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
-
-model VerificationToken {
-  identifier String
-  token      String   @unique
-  expires    DateTime
-
-  @@unique([identifier, token])
+  updatedBy User? @relation(fields: [updatedById], references: [id])
 }
 
 // ============================================================
@@ -729,27 +813,51 @@ model VerificationToken {
 // ALTER TABLE "Organizer" ADD CONSTRAINT organizer_user_check
 //   CHECK ((type = 'USER') = ("userId" IS NOT NULL));
 //
-// -- 保持期間は 30 / 90 / 365 のいずれか
-// ALTER TABLE "Event" ADD CONSTRAINT event_retention_check
-//   CHECK ("answerRetentionDays" IN (30, 90, 365));
+// -- 保持期間は 30 / 90 / 365 のいずれか。全体上限は 1 以上。終了は開始より後
+// ALTER TABLE "Event" ADD CONSTRAINT event_retention_check CHECK ("answerRetentionDays" IN (30, 90, 365));
+// ALTER TABLE "Event" ADD CONSTRAINT event_capacity_check CHECK (capacity IS NULL OR capacity >= 1);
+// ALTER TABLE "Event" ADD CONSTRAINT event_period_check CHECK ("endAt" > "startAt");
 //
-// -- 定員・価格は 0 以上
-// ALTER TABLE "Slot" ADD CONSTRAINT slot_capacity_check CHECK (capacity >= 0 AND "priceYen" >= 0);
+// -- 定員・価格は 0 以上。受付期間の順序
+// ALTER TABLE "Slot" ADD CONSTRAINT slot_values_check CHECK (capacity >= 0 AND "priceYen" >= 0);
+// ALTER TABLE "Slot" ADD CONSTRAINT slot_window_check
+//   CHECK ("opensAt" IS NULL OR "closesAt" IS NULL OR "closesAt" > "opensAt");
 //
-// -- 同一枠に有効な申込は1人1件（キャンセル後の再申込は許可）
-// CREATE UNIQUE INDEX registration_active_unique ON "Registration" ("slotId", "userId")
+// -- 有効な申込は同じ人・同じイベントで1件（1アカウント1イベント1枚。キャンセル後の再申込は許可）
+// CREATE UNIQUE INDEX registration_active_unique ON "Registration" ("eventId", "userId")
 //   WHERE status = 'CONFIRMED';
+//
+// -- 有料の申込には決済が付き、無料の申込には付かない。キャンセルには理由が付く
+// ALTER TABLE "Registration" ADD CONSTRAINT registration_payment_check
+//   CHECK (("priceYen" > 0) = ("paymentId" IS NOT NULL));
+// ALTER TABLE "Registration" ADD CONSTRAINT registration_cancel_check
+//   CHECK ((status = 'CANCELLED') = ("cancelledAt" IS NOT NULL AND "cancelReason" IS NOT NULL));
 //
 // -- 決済中の確保は同じ人・同じイベントで1件だけ（2タブからの二重決済を防ぐ）
 // CREATE UNIQUE INDEX payment_pending_unique ON "Payment" ("userId", "eventId")
 //   WHERE status = 'PENDING';
 //
-// -- イベント全体の上限は 1 以上
-// ALTER TABLE "Event" ADD CONSTRAINT event_capacity_check CHECK (capacity IS NULL OR capacity >= 1);
+// -- 金額と手数料。支払い済み・返金済みの Stripe 決済は providerRef と入金先を持つ
+// ALTER TABLE "Payment" ADD CONSTRAINT payment_amount_check
+//   CHECK ("amountYen" > 0 AND "applicationFeeYen" >= 0 AND "applicationFeeYen" < "amountYen");
+// ALTER TABLE "Payment" ADD CONSTRAINT payment_paid_ref_check
+//   CHECK (provider = 'MOCK' OR status NOT IN ('PAID', 'REFUNDED')
+//          OR ("providerRef" IS NOT NULL AND "connectedAccountId" IS NOT NULL));
+// ALTER TABLE "Payment" ADD CONSTRAINT payment_refund_check
+//   CHECK ((status = 'REFUNDED') = ("refundedAt" IS NOT NULL AND "refundReason" IS NOT NULL));
 //
 // -- 共通の質問はイベントごとに1つずつ
 // CREATE UNIQUE INDEX question_common_unique ON "RegistrationQuestion" ("eventId", "commonKey")
 //   WHERE "commonKey" IS NOT NULL;
+//
+// -- 未処理の参加依頼は同じ人・同じ団体で1件
+// CREATE UNIQUE INDEX join_request_pending_unique ON "GroupJoinRequest" ("organizerId", "userId")
+//   WHERE status = 'PENDING';
+//
+// -- 通報の対象はどちらか一方
+// ALTER TABLE "Report" ADD CONSTRAINT report_target_check CHECK (
+//   ("targetType" = 'EVENT' AND "eventId" IS NOT NULL AND "organizerId" IS NULL) OR
+//   ("targetType" = 'ORGANIZER' AND "organizerId" IS NOT NULL AND "eventId" IS NULL));
 //
 // -- キーワード検索（タイトル・説明）
 // CREATE EXTENSION IF NOT EXISTS pg_trgm;
